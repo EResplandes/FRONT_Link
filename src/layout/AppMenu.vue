@@ -11,24 +11,25 @@ const model = ref([
     {
         label: 'Pedidos',
         items: [
-            { label: 'Pedidos com Emival', icon: 'pi pi-fw pi-home', to: '/pedidos-emival' },
-            { label: 'Pedidos com Monica', icon: 'pi pi-fw pi-home', to: '/' },
-            { label: 'Todos', icon: 'pi pi-fw pi-home', to: '/' },
-            { label: 'Reprovados', icon: 'pi pi-fw pi-home', to: '/' }
+            { label: 'Cadastro', icon: 'pi pi-fw pi-book', to: '/cadastro-pedido' },
+            { label: 'Pedidos com Emival', icon: 'pi pi-fw pi-book', to: '/pedidos-emival' },
+            { label: 'Pedidos com Monica', icon: 'pi pi-fw pi-book', to: '/' },
+            { label: 'Todos', icon: 'pi pi-fw pi-book', to: '/' },
+            { label: 'Reprovados', icon: 'pi pi-fw pi-book', to: '/' }
         ]
     },
     {
         label: 'Meus pedidos',
         items: [
-            { label: 'Aprovação', icon: 'pi pi-fw pi-home', to: '/' },
-            { label: 'Pedidos com Ressalva', icon: 'pi pi-fw pi-home', to: '/' }
+            { label: 'Aprovação', icon: 'pi pi-fw pi-check-circle', to: '/' },
+            { label: 'Pedidos com Ressalva', icon: 'pi pi-fw pi-check-circle', to: '/' }
         ]
     },
     {
         label: 'Administração',
         items: [
-            { label: 'Cadastro de Usuário', icon: 'pi pi-fw pi-home', to: '/' },
-            { label: 'Cadastro de Empresa', icon: 'pi pi-fw pi-home', to: '/' }
+            { label: 'Usuários', icon: 'pi pi-fw pi-users', to: '/' },
+            { label: 'Empresas', icon: 'pi pi-fw pi-building', to: '/' }
         ]
     },
     {

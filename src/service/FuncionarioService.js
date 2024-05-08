@@ -1,17 +1,15 @@
 import API_URL from './config.js';
 
-export default class AutenticacaoService {
-    async login(form) {
-        return await fetch(`${API_URL}/autenticacao/login`, {
-            method: 'POST',
+const token = localStorage.getItem('token');
+
+export default class FuncionarioService {
+    async buscaGerentes() {
+        return await fetch(`${API_URL}/funcionarios/listar-gerentes`, {
+            method: 'GET',
             headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json'
-            },
-            body: JSON.stringify({
-                email: form.email,
-                password: form.senha
-            })
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
         })
             .then((res) => res.json())
             .then((d) => {
@@ -23,12 +21,12 @@ export default class AutenticacaoService {
             });
     }
 
-    async token() {
-        return await fetch(`${API_URL}/autenticacao/token`, {
+    async buscaDiretores() {
+        return await fetch(`${API_URL}/funcionarios/listar-diretores`, {
             method: 'GET',
             headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json'
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
             }
         })
             .then((res) => res.json())

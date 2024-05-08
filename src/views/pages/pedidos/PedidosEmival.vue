@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
 import PedidoService from '../../../service/Pedido';
+import EmpresaService from '../../../service/EmpresaService';
 
 export default {
     data() {
@@ -10,6 +11,7 @@ export default {
             toast: new useToast(),
             displayConfirmation: ref(false),
             pedidoService: new PedidoService(),
+            empresaService: new EmpresaService(),
             displayConfirmationActivation: ref(false),
             visibleRight: ref(false),
             confirm: new useConfirm(),
@@ -26,6 +28,13 @@ export default {
         this.pedidoService.pedidosEmival().then((data) => {
             this.pedidos = data.pedidos;
             this.preloading = false;
+        });
+
+        // Metódo responsável por buscar todas empresas
+        this.empresaService.buscaEmpresas().then((data) => {
+            if (data.resposta == 'Empresas listados com sucesso!') {
+                this.empresas = data.empresas;
+            }
         });
     },
 
@@ -142,7 +151,7 @@ export default {
             <div class="card p-fluid">
                 <div class="field">
                     <label for="empresa">Empresa:</label>
-                    <Dropdown v-model="form.empresa" :options="cities" showClear optionLabel="name" placeholder="Selecione..." class="w-full" />
+                    <Dropdown v-model="form.empresa" :options="empresas" showClear optionLabel="nome_empresa" placeholder="Selecione..." class="w-full" />
                 </div>
                 <div class="field">
                     <label for="cpf">Descrição: </label>
@@ -164,7 +173,7 @@ export default {
             </div>
         </Sidebar>
 
-        <!-- Tabela com todas empresas -->
+        <!-- Tabela com todos pedidos com Dr Emival -->
         <div class="col-12">
             <div class="col-12 lg:col-6">
                 <Toast />
@@ -190,7 +199,7 @@ export default {
                                     <Button @click.prevent="filtrar()" icon="pi pi-search" label="Filtrar" class="p-button-secondary" style="margin-right: 0.25em" />
                                 </div>
                                 <div class="col-6 md:col-4">
-                                    <Button @click.prevent="limparFiltro()" icon="pi pi-trash"  label="Limpar" class="mr-2 mb-2 p-button-danger" />
+                                    <Button @click.prevent="limparFiltro()" icon="pi pi-trash" label="Limpar" class="mr-2 mb-2 p-button-danger" />
                                 </div>
                             </div>
                         </div>

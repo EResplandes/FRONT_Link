@@ -19,6 +19,11 @@ const router = createRouter({
                     component: () => import('@/views/pages/pedidos/PedidosEmival.vue')
                 },
                 {
+                    path: '/cadastro-pedido',
+                    name: 'cadastro-pedido',
+                    component: () => import('@/views/pages/pedidos/Cadastro.vue')
+                },
+                {
                     path: '/uikit/formlayout',
                     name: 'formlayout',
                     component: () => import('@/views/uikit/FormLayout.vue')
