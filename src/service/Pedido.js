@@ -3,29 +3,7 @@ const token = localStorage.getItem('token');
 import API_URL from './config.js';
 
 export default class PedidoService {
-    async login(form) {
-        return await fetch(`${API_URL}/autenticacao/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json'
-            },
-            body: JSON.stringify({
-                email: form.email,
-                password: form.senha
-            })
-        })
-            .then((res) => res.json())
-            .then((d) => {
-                console.log(d);
-                return d;
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                throw error;
-            });
-    }
-
+    // Metódo responsável por buscar todos pedidos com Dr Emival
     async pedidosEmival() {
         return await fetch(`${API_URL}/pedidos/listar-emival`, {
             method: 'GET',
@@ -44,6 +22,64 @@ export default class PedidoService {
             });
     }
 
+    // Metódo responsável por buscar todos pedidos enviados para Dr Monica
+    async pedidosMonica() {
+        return await fetch(`${API_URL}/pedidos/listar-monica`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    // Metódo responsável por buscar todos pedidos
+    async buscaPedidos() {
+        return await fetch(`${API_URL}/pedidos/listar-pedidos`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    // Metódo responsável por buscar pedidos com status 6
+    async buscaAnalisando() {
+        return await fetch(`${API_URL}/pedidos/listar-analise`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    // Metódo responsável por buscar todos pedidos com filtros
     async filtroPedidos(form) {
         let descricao = form.descricao;
         let empresa = form.empresa?.id;
@@ -90,6 +126,7 @@ export default class PedidoService {
         }
     }
 
+    // Metódo responsável por excluir pedido de acordo com id passado
     async excluirPedido(id_pedido) {
         return await fetch(`${API_URL}/pedidos/deletar/` + id_pedido, {
             method: 'DELETE',

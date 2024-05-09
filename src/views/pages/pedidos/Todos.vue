@@ -4,6 +4,8 @@ import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
 import PedidoService from '../../../service/Pedido';
 import EmpresaService from '../../../service/EmpresaService';
+import StatusService from '../../../service/StatusService';
+import ChatService from '../../../service/ChatService';
 
 export default {
     data() {
@@ -12,25 +14,30 @@ export default {
             displayConfirmation: ref(false),
             pedidoService: new PedidoService(),
             empresaService: new EmpresaService(),
+            statusService: new StatusService(),
+            chatService: new ChatService(),
             displayConfirmationActivation: ref(false),
             visibleRight: ref(false),
             confirm: new useConfirm(),
             loading1: ref(null),
+            empresas: ref(null),
             pedidos: ref(null),
+            status: ref(null),
             form: ref({}),
             editar: ref(false),
             preloading: ref(true),
+            displayChat: ref(false),
             display: ref(false),
             urlBase: 'http://localhost:8000/storage',
             pdf: ref(null),
-            pdfsrc: ref(null)
+            pdfsrc: ref(null),
+            conversa: ref(null)
         };
     },
 
     mounted: function () {
-        // Metódo responsável por buscar todas os pedidos com Monica
-        this.pedidoService.pedidosMonica().then((data) => {
-            console.log(data);
+        // Metódo responsável por buscar todas os pedidos
+        this.pedidoService.buscaPedidos().then((data) => {
             this.pedidos = data.pedidos;
             this.preloading = false;
         });
@@ -41,27 +48,22 @@ export default {
                 this.empresas = data.empresas;
             }
         });
+
+        // Metódo responsável por buscar todos status
+        this.statusService.buscaStatus().then((data) => {
+            if (data.resposta == 'Status listados com sucesso!') {
+                this.status = data.itens;
+            }
+        });
     },
 
     methods: {
-        // Metódo responsável por buscar todos pedidos que estão com Mônica
+        // Metódo responsável por buscar todos pedidos
         buscaPedidos() {
             this.preloading = true;
-            this.pedidoService.pedidosMonica().then((data) => {
+            this.pedidoService.buscaPedidos().then((data) => {
                 this.pedidos = data.pedidos;
                 this.preloading = false;
-            });
-        },
-
-        // Metódo responsável por excluir pedido
-        excluirPedido(id_pedido) {
-            this.pedidoService.excluirPedido(id_pedido).then((data) => {
-                if (data.resposta == 'Pedido excluído com sucesso!') {
-                    this.showSuccess('Pedido excluído com sucesso!');
-                    this.buscaPedidos();
-                } else {
-                    this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
-                }
             });
         },
 
@@ -82,29 +84,23 @@ export default {
             return new Intl.DateTimeFormat('pt-BR', options).format(dataFormatada);
         },
 
-        // Metódo responsável por abrir confiramção de exclusão
-        confirmDeletar(id_pedido) {
-            this.confirm.require({
-                message: 'Tem certeza de que deseja excluir o pedido?',
-                header: 'Exclusão de Pedido',
-                icon: 'pi pi-info-circle',
-                rejectLabel: 'Cancelar',
-                acceptLabel: 'Deletar',
-                rejectClass: 'p-button-secondary p-button-outlined',
-                acceptClass: 'p-button-danger',
-                accept: () => {
-                    this.excluirPedido(id_pedido);
-                },
-                reject: () => {}
-            });
-        },
-
         // Metódo responsável por visualizar pdf
         visualizar(id, data) {
             this.display = true;
             this.pdf = data.anexo;
             // this.pdfsrc = `${this.urlBase}/${this.pdf}`;
             this.pdfsrc = 'https://www.gruporialma.com.br/wp-content/uploads/2024/05/pdf-teste.pdf';
+        },
+
+        chat(id, data) {
+            this.displayChat = true;
+            this.chatService.buscaConversa(id).then((data) => {
+                if (data.resposta == 'Chat listado com sucesso!') {
+                    this.conversa = data.conversa;
+                } else {
+                    this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
+                }
+            });
         },
 
         filtrar() {
@@ -153,15 +149,49 @@ export default {
     <div style="z-index: 99" v-if="preloading" class="full-screen-spinner">
         <ProgressSpinner />
     </div>
-
-    <!-- Visualizar -->
-    <Dialog header="Documento" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
-        <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
-    </Dialog>
-
     <div class="grid">
         <Toast />
-        <ConfirmDialog></ConfirmDialog>
+
+        <!-- Visualizar -->
+        <Dialog header="Documento" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
+            <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
+        </Dialog>
+
+        <!-- Chat -->
+        <Dialog header="Chat" v-model:visible="displayChat" :style="{ width: '40%' }" :modal="true">
+            <div class="grid">
+                <div class="col-12">
+                    <div class="card timeline-container">
+                        <Timeline :value="conversa" align="alternate" class="customized-timeline">
+                            <template #marker="slotProps">
+                                <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
+                                    <i :class="slotProps.item.icon"></i>
+                                </span>
+                            </template>
+                            <template #content="slotProps">
+                                <Card>
+                                    <template #title>
+                                        {{ slotProps.item.id_usuario.name }}
+                                    </template>
+                                    <template #subtitle>
+                                        {{ this.formatarData(slotProps.item.data_mensagem) }}
+                                    </template>
+                                    <template #content>
+                                        <h6>
+                                            {{ slotProps.item.mensagem }}
+                                        </h6>
+                                    </template>
+                                </Card>
+                            </template>
+                        </Timeline>
+                    </div>
+                    <hr />
+                    <!-- <InputText class="col-12" type="text" v-model="newMessage" placeholder="Digite a mensagem..." disabled/>
+                    <Button @click.prevent="enviarMensagem()" label="Enviar" class="mr-2 mt-3 p-button-success col-12" disabled /> -->
+                </div>
+            </div>
+        </Dialog>
+
         <!-- Modal Filtros -->
         <Sidebar style="width: 500px" v-model:visible="visibleRight" :baseZIndex="1000" position="right">
             <h3 v-if="this.editar == false" class="titleForm">Filtros</h3>
@@ -170,6 +200,10 @@ export default {
                 <div class="field">
                     <label for="empresa">Empresa:</label>
                     <Dropdown v-model="form.empresa" :options="empresas" showClear optionLabel="nome_empresa" placeholder="Selecione..." class="w-full" />
+                </div>
+                <div class="field">
+                    <label for="empresa">Status:</label>
+                    <Dropdown v-model="form.status" :options="status" showClear optionLabel="status" placeholder="Selecione..." class="w-full" />
                 </div>
                 <div class="field">
                     <label for="cpf">Descrição: </label>
@@ -191,7 +225,7 @@ export default {
             </div>
         </Sidebar>
 
-        <!-- Tabela com todos pedidos com Dr(a) Mônica -->
+        <!-- Tabela com todos pedidos -->
         <div class="col-12">
             <div class="col-12 lg:col-6">
                 <Toast />
@@ -211,7 +245,7 @@ export default {
                 >
                     <template #header>
                         <div class="flex justify-content-between">
-                            <h5 for="empresa">Pedidos com Mônica:</h5>
+                            <h5 for="empresa">Todos Pedidos:</h5>
                             <div class="grid">
                                 <div class="col-4 md:col-4 mr-2">
                                     <Button @click.prevent="filtrar()" icon="pi pi-search" label="Filtrar" class="p-button-secondary" style="margin-right: 0.25em" />
@@ -254,6 +288,13 @@ export default {
                         </template>
                     </Column>
 
+                    <Column field="Status" header="Status" :sortable="true" class="w-5">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Status</span>
+                            {{ slotProps.data.status.status }}
+                        </template>
+                    </Column>
+
                     <Column field="Valor" header="Valor" :sortable="true" class="w-1">
                         <template #body="slotProps">
                             <span class="p-column-title">CNPJ</span>
@@ -268,8 +309,8 @@ export default {
                                 <div class="col-4 md:col-4 mr-3">
                                     <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
                                 </div>
-                                <div class="col-6 md:col-4">
-                                    <Button @click.prevent="confirmDeletar(slotProps.data.id)" icon="pi pi-trash" class="p-button-danger" />
+                                <div v-if="slotProps.data.status.status == 'Reprovado'" class="col-4 md:col-4 ml-1">
+                                    <Button @click.prevent="chat(slotProps.data.id, slotProps.data)" icon="pi pi-comments" class="p-button-secon" />
                                 </div>
                             </div>
                         </template>
@@ -316,5 +357,10 @@ export default {
     justify-content: center;
     align-items: center;
     backdrop-filter: blur(5px);
+}
+
+.timeline-container {
+    max-height: 300px; /* Defina a altura máxima desejada */
+    overflow-y: auto; /* Adiciona uma barra de rolagem vertical quando o conteúdo excede a altura máxima */
 }
 </style>

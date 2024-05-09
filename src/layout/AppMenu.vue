@@ -9,18 +9,19 @@ const model = ref([
         items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' }]
     },
     {
-        label: 'Pedidos',
+        label: 'Gestor de Fluxo',
         items: [
-            { label: 'Cadastro', icon: 'pi pi-fw pi-book', to: '/cadastro-pedido' },
             { label: 'Pedidos com Emival', icon: 'pi pi-fw pi-book', to: '/pedidos-emival' },
-            { label: 'Pedidos com Monica', icon: 'pi pi-fw pi-book', to: '/' },
-            { label: 'Todos', icon: 'pi pi-fw pi-book', to: '/' },
-            { label: 'Reprovados', icon: 'pi pi-fw pi-book', to: '/' }
+            { label: 'Pedidos com Monica', icon: 'pi pi-fw pi-book', to: '/pedidos-monica' },
+            { label: 'Todos', icon: 'pi pi-fw pi-book', to: '/pedidos-todos' },
+            { label: 'Análise de Fluxo', icon: 'pi pi-fw pi-book', to: '/gestor-fluxo' },
+            { label: 'Cadastro sem Fluxo', icon: 'pi pi-fw pi-book', to: '/cadastro-pedido' }
         ]
     },
     {
         label: 'Meus pedidos',
         items: [
+            { label: 'Cadastro', icon: 'pi pi-fw pi-book', to: '/cadastro-pedido' },
             { label: 'Aprovação', icon: 'pi pi-fw pi-check-circle', to: '/' },
             { label: 'Pedidos com Ressalva', icon: 'pi pi-fw pi-check-circle', to: '/' }
         ]

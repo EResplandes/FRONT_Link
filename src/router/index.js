@@ -19,6 +19,21 @@ const router = createRouter({
                     component: () => import('@/views/pages/pedidos/PedidosEmival.vue')
                 },
                 {
+                    path: '/pedidos-monica',
+                    name: 'pedidos-monica',
+                    component: () => import('@/views/pages/pedidos/PedidosMonica.vue')
+                },
+                {
+                    path: '/pedidos-todos',
+                    name: 'pedidos-todos',
+                    component: () => import('@/views/pages/pedidos/Todos.vue')
+                },
+                {
+                    path: '/gestor-fluxo',
+                    name: 'gestor-fluxo',
+                    component: () => import('@/views/pages/pedidos/GestorFluxo.vue')
+                },
+                {
                     path: '/cadastro-pedido',
                     name: 'cadastro-pedido',
                     component: () => import('@/views/pages/pedidos/Cadastro.vue')

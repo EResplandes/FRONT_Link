@@ -19,7 +19,11 @@ export default {
             pedidos: ref(null),
             form: ref({}),
             editar: ref(false),
-            preloading: ref(true)
+            preloading: ref(true),
+            display: ref(false),
+            urlBase: 'http://localhost:8000/storage',
+            pdf: ref(null),
+            pdfsrc: ref(null)
         };
     },
 
@@ -75,6 +79,14 @@ export default {
             };
 
             return new Intl.DateTimeFormat('pt-BR', options).format(dataFormatada);
+        },
+
+        // Metódo responsável por visualizar pdf
+        visualizar(id, data) {
+            this.display = true;
+            this.pdf = data.anexo;
+            // this.pdfsrc = `${this.urlBase}/${this.pdf}`;
+            this.pdfsrc = 'https://www.gruporialma.com.br/wp-content/uploads/2024/05/pdf-teste.pdf';
         },
 
         // Metódo responsável por abrir confiramção de exclusão
@@ -140,6 +152,11 @@ export default {
     <div style="z-index: 99" v-if="preloading" class="full-screen-spinner">
         <ProgressSpinner />
     </div>
+
+    <!-- Visualizar -->
+    <Dialog header="Documento" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
+        <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
+    </Dialog>
 
     <div class="grid">
         <Toast />
@@ -248,7 +265,7 @@ export default {
                             <span class="p-column-title"></span>
                             <div class="grid">
                                 <div class="col-4 md:col-4 mr-3">
-                                    <Button @click.prevent="btnEditar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
+                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
                                 </div>
                                 <div class="col-6 md:col-4">
                                     <Button @click.prevent="confirmDeletar(slotProps.data.id)" icon="pi pi-trash" class="p-button-danger" />
