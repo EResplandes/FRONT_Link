@@ -39,6 +39,26 @@ const router = createRouter({
                     component: () => import('@/views/pages/pedidos/Cadastro.vue')
                 },
                 {
+                    path: '/cadastro-sem-fluxo',
+                    name: 'cadastro-sem-fluxo',
+                    component: () => import('@/views/pages/pedidos/CadastroSemFluxo.vue')
+                },
+                {
+                    path: '/aprovacao-gerentes',
+                    name: 'aprovacao-gerentes',
+                    component: () => import('@/views/pages/gerente/Aprovacao.vue')
+                },
+                {
+                    path: '/empresas',
+                    name: 'empresas',
+                    component: () => import('@/views/pages/empresa/Empresa.vue')
+                },
+                {
+                    path: '/usuarios',
+                    name: 'usuarios',
+                    component: () => import('@/views/pages/auth/Usuarios.vue')
+                },
+                {
                     path: '/uikit/formlayout',
                     name: 'formlayout',
                     component: () => import('@/views/uikit/FormLayout.vue')

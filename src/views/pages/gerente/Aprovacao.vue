@@ -2,17 +2,17 @@
 import { ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
-import PedidoService from '../../../service/Pedido';
 import EmpresaService from '../../../service/EmpresaService';
 import StatusService from '../../../service/StatusService';
 import FluxoService from '../../../service/FluxoService';
+import GerenteService from '../../../service/GerenteService';
 
 export default {
     data() {
         return {
             toast: new useToast(),
             displayConfirmation: ref(false),
-            pedidoService: new PedidoService(),
+            gerenteService: new GerenteService(),
             empresaService: new EmpresaService(),
             statusService: new StatusService(),
             fluxoService: new FluxoService(),
@@ -25,6 +25,7 @@ export default {
             status: ref(null),
             form: ref({}),
             idPedido: ref(null),
+            idFluxo: ref(null),
             editar: ref(false),
             preloading: ref(true),
             displayFluxo: ref(false),
@@ -37,8 +38,8 @@ export default {
     },
 
     mounted: function () {
-        // Metódo responsável por buscar todas os pedidos com status 6
-        this.pedidoService.buscaAnalisando().then((data) => {
+        // Metódo responsável por buscar todos pedidos relacionas a esse usuário que não foram aprovados por ele mesmo
+        this.gerenteService.buscaPedidos(localStorage.getItem('usuario_id')).then((data) => {
             this.pedidos = data.pedidos;
             this.preloading = false;
         });
@@ -59,25 +60,26 @@ export default {
     },
 
     methods: {
-        // Metódo responsável por buscar todos pedidos com status 6
+        // Metódo responsável por buscar todos pedidos do usuário logado
         buscaPedidos() {
             this.preloading = true;
-            this.pedidoService.buscaAnalisando().then((data) => {
+            this.gerenteService.buscaPedidos(localStorage.getItem('usuario_id')).then((data) => {
                 this.pedidos = data.pedidos;
                 this.preloading = false;
             });
         },
 
         // Metódo responsável por aprovar fluxo
-        aprovarFluxo() {
-            this.fluxoService.aprovarFluxo(this.idPedido).then((data) => {
-                if (data.resposta == 'Fluxo aprovado com sucesso!'){
-                    this.showSuccess('Fluxo aprovado com sucesso!');
-                    this.preloading = true;
-                    this.displayFluxo = false;
+        aprovarPedido() {
+            this.gerenteService.aprovar(this.idFluxo).then((data) => {
+                if (data.resposta == 'Pedido aprovado com sucesso!') {
+                    this.showSuccess('Pedido aprovado com suceso!');
                     this.buscaPedidos();
+                    this.display = false;
                 } else {
-                    this.showError('Ocorreu um erro, entre em contato com o Administrador!');
+                    this.showError('Ocorreu algum problema, entre em contato com o Administrador!');
+                    this.display = false;
+                    this.buscaPedidos();
                 }
             });
         },
@@ -102,19 +104,10 @@ export default {
         // Metódo responsável por visualizar pdf
         visualizar(id, data) {
             this.display = true;
-            this.pdf = data.anexo;
+            this.idFluxo = id;
+            this.pdf = data.pedido.anexo;
             // this.pdfsrc = `${this.urlBase}/${this.pdf}`;
             this.pdfsrc = 'https://www.gruporialma.com.br/wp-content/uploads/2024/05/pdf-teste.pdf';
-        },
-
-        fluxo(id, data) {
-            this.idPedido = id;
-            this.displayFluxo = true;
-            this.fluxoService.buscaFluxo(id).then((data) => {
-                if (data.resposta == 'Fluxo listado com sucesso!') {
-                    this.fluxoPedido = data.fluxo;
-                }
-            });
         },
 
         filtrar() {
@@ -168,35 +161,15 @@ export default {
 
         <!-- Visualizar -->
         <Dialog header="Documento" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
-            <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
-        </Dialog>
-
-        <!-- Fluxo -->
-        <Dialog header="Fluxo" v-model:visible="displayFluxo" :style="{ width: '40%' }" :modal="true">
             <div class="grid">
-                <div class="col-12">
-                    <div class="card timeline-container">
-                        <Timeline :value="fluxoPedido" align="alternate" class="customized-timeline">
-                            <template #marker="slotProps">
-                                <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
-                                    <i :class="slotProps.item.icon"></i>
-                                </span>
-                            </template>
-                            <template #content="slotProps">
-                                <Card>
-                                    <template #title>
-                                        {{ slotProps.item.usuario.name }}
-                                    </template>
-                                    <template #subtitle>
-                                        {{ slotProps.item.usuario.funcao.funcao }}
-                                    </template>
-                                </Card>
-                            </template>
-                        </Timeline>
-                    </div>
-                    <hr />
-                    <Button @click.prevent="aprovarFluxo()" label="Aprovar" class="mr-2 mt-3 p-button-success col-12" />
-                    <Button @click.prevent="reprovarFluxo()" label="Reprovar" class="mr-2 mt-3 p-button-danger col-12" />
+                <div class="col-6 md:col-6">
+                    <Button @click.prevent="aprovarPedido()" icon="pi pi-check" label="Aprovar" class="p-button-success" style="width: 100%" />
+                </div>
+                <div class="col-6 md:col-6">
+                    <Button icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%" />
+                </div>
+                <div class="col-12 md:col-12">
+                    <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
                 </div>
             </div>
         </Dialog>
@@ -254,7 +227,7 @@ export default {
                 >
                     <template #header>
                         <div class="flex justify-content-between">
-                            <h5 for="empresa">Análise de Fluxo:</h5>
+                            <h5 for="empresa">Minhas Aprovações:</h5>
                             <div class="grid">
                                 <div class="col-4 md:col-4 mr-2">
                                     <Button @click.prevent="filtrar()" icon="pi pi-search" label="Filtrar" class="p-button-secondary" style="margin-right: 0.25em" />
@@ -279,28 +252,28 @@ export default {
                     <Column field="Dt. Inclusão" header="Dt. Inclusão" :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">Dt. Inclusão</span>
-                            {{ formatarData(slotProps.data.dt_inclusao) }}
+                            {{ formatarData(slotProps.data.pedido.dt_inclusao) }}
                         </template>
                     </Column>
 
                     <Column field="Empresa" header="Empresa" :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">Empresa</span>
-                            {{ slotProps.data.empresa.nome_empresa }}
+                            {{ slotProps.data.pedido.empresa.nome_empresa }}
                         </template>
                     </Column>
 
                     <Column field="Descrição" header="Descrição" :sortable="true" class="w-5">
                         <template #body="slotProps">
                             <span class="p-column-title">Descrição</span>
-                            {{ slotProps.data.descricao }}
+                            {{ slotProps.data.pedido.descricao }}
                         </template>
                     </Column>
 
                     <Column field="Valor" header="Valor" :sortable="true" class="w-1">
                         <template #body="slotProps">
                             <span class="p-column-title">CNPJ</span>
-                            R$ {{ slotProps.data.valor }}
+                            R$ {{ slotProps.data.pedido.valor }}
                         </template>
                     </Column>
 
@@ -309,10 +282,7 @@ export default {
                             <span class="p-column-title"></span>
                             <div class="grid">
                                 <div class="col-4 md:col-4 mr-3">
-                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
-                                </div>
-                                <div class="col-4 md:col-4 ml-1">
-                                    <Button @click.prevent="fluxo(slotProps.data.id, slotProps.data)" icon="pi pi-sitemap" class="p-button-secon" />
+                                    <Button @click.prevent="visualizar(slotProps.data.id_fluxo, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
                                 </div>
                             </div>
                         </template>

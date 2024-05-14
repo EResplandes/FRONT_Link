@@ -2,9 +2,9 @@ import API_URL from './config.js';
 
 const token = localStorage.getItem('token');
 
-export default class FluxoService {
-    async buscaFluxo(id) {
-        return await fetch(`${API_URL}/fluxo/listar-fluxo/` + id, {
+export default class GerenteService {
+    async buscaPedidos(id) {
+        return await fetch(`${API_URL}/pedidos/listar-gerente/` + id, {
             method: 'GET',
             headers: {
                 Accept: 'application/json',
@@ -21,9 +21,9 @@ export default class FluxoService {
             });
     }
 
-    async aprovarFluxo(id) {
-        return await fetch(`${API_URL}/fluxo/aprovar-fluxo/` + id, {
-            method: 'PUT',
+    async aprovar(id) {
+        return await fetch(`${API_URL}/pedidos/aprovar-fluxo/` + id, {
+            method: 'GET',
             headers: {
                 Accept: 'application/json',
                 Authorization: 'Bearer ' + token
