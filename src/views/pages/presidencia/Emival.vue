@@ -3,7 +3,6 @@ import { ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
 import PedidoService from '../../../service/Pedido';
-import EmpresaService from '../../../service/EmpresaService';
 import ChatService from '../../../service/ChatService';
 
 export default {
@@ -12,7 +11,6 @@ export default {
             toast: new useToast(),
             displayConfirmation: ref(false),
             pedidoService: new PedidoService(),
-            empresaService: new EmpresaService(),
             chatService: new ChatService(),
             displayConfirmationActivation: ref(false),
             visibleRight: ref(false),
@@ -23,9 +21,10 @@ export default {
             sleep: ref(null),
             mensagemEmival: ref(null),
             pedidos: ref(null),
-            pedidosAprovados: [null],
+            pedidosAprovados: [],
             proximoPedido: ref(null),
             preloading: ref(true),
+            ocultaFiltros: ref(false),
             display: ref(false),
             urlBase: 'https://www.gruporialma.com.br/wp-content/uploads',
             pdf: ref(null),
@@ -34,51 +33,96 @@ export default {
     },
 
     mounted: function () {
-        // Metódo responsável por buscar todas os pedidos com Emival
-        this.pedidoService.pedidosEmival().then((data) => {
-            this.pedidos = data.pedidos;
-            this.preloading = false;
-        });
-
-        // Metódo responsável por buscar todas empresas
-        this.empresaService.buscaEmpresas().then((data) => {
-            if (data.resposta == 'Empresas listados com sucesso!') {
-                this.empresas = data.empresas;
-            }
-        });
+        this.preloading = false;
     },
 
     methods: {
-        // Metódo responsável por buscar todos pedidos que estão com Emival
-        buscaPedidos() {
+        // Metódo responsável por listagem de pedidos
+        listarEmivalMenorQuinhentos() {
             this.preloading = true;
-            this.pedidoService.pedidosEmival().then((data) => {
+            this.pedidoService.listarEmivalMenorQuinhentos().then((data) => {
                 this.pedidos = data.pedidos;
+                this.ocultaFiltros = true;
                 this.preloading = false;
             });
         },
 
+        // Metódo responsável por aprovar
+        aprovar() {
+            this.pedidoService.aprovarEmival(this.pedidosAprovados).then((data) => {
+                console.log(data);
+            });
+        },
+
+        // Metódo responsável por listagem de pedidos
+        listarEmivalMenorMil() {
+            this.preloading = true;
+            this.pedidoService.listarEmivalMenorMil().then((data) => {
+                this.pedidos = data.pedidos;
+                this.preloading = false;
+                this.ocultaFiltros = true;
+            });
+        },
+
+        // Metódo responsável por listagem de pedidos
+        listarEmivalMaiorMil() {
+            this.preloading = true;
+            this.pedidoService.listarEmivalMaiorMil().then((data) => {
+                this.pedidos = data.pedidos;
+                this.preloading = false;
+                this.ocultaFiltros = true;
+            });
+        },
+
         proximoItem() {
-            if (this.currentIndex < this.pedidos.length - 1) {
-                this.currentIndex++;
-                this.lista = this.pedidos.id;
-                const proximoPedido = this.pedidos[this.currentIndex];
-                this.pedidosAprovados.push({ id: proximoPedido.id, status: 4 });
+            // Verifica se currentIndex é igual ao comprimento dos pedidos
+            if (this.currentIndex === this.pedidos.length) {
+                this.showInfo('Você chegou ao último para aprovação!');
+                return;
+            }
+
+            // Incrementa currentIndex e verifica se está dentro dos limites do array
+            this.currentIndex++;
+            if (this.currentIndex < this.pedidos.length) {
                 console.log(this.pedidosAprovados);
+                let proximoPedido = this.pedidos[this.currentIndex];
+                this.pedidosAprovados.push({ id: proximoPedido.id, status: 4 });
                 this.visualizar(proximoPedido.id, proximoPedido);
+                localStorage.setItem('ultimoPedidoAprovado', this.currentIndex);
             } else {
-                console.log('Você alcançou o último item.');
+                // Se currentIndex for igual ao comprimento dos pedidos, não há próximo pedido
+                this.showInfo('Você chegou ao último para aprovação!');
+                let pedidoAtual = this.pedidos[this.currentIndex - 1];
+                this.pedidosAprovados.push({ id: pedidoAtual.id, status: 4 });
             }
         },
 
         async reprovarItem() {
-            if (this.currentIndex < this.pedidos.length - 1) {
-                this.currentIndex++;
-                this.proximoPedido = this.pedidos[this.currentIndex];
-                this.displayChat = true;
-            } else {
-                console.log('Você alcançou o último item.');
+            this.currentIndex++;
+            this.proximoPedido = this.pedidos[this.currentIndex];
+            this.displayChat = true;
+            localStorage.setItem('ultimoPedidoAprovado', this.currentIndex); // Alterado para 'ultimoPedidoAprovado'
+            if (this.currentIndex == this.pedidos.length) {
+                this.showInfo('Você chegou ao último para aprovação!');
             }
+        },
+
+        voltar() {
+            if (this.currentIndex == 0) {
+                return;
+            }
+
+            // Remover o último item do array pedidosAprovados
+            this.pedidosAprovados.pop();
+
+            // Recuperar o pedido anterior
+            const pedidoAnterior = this.pedidos[--this.currentIndex];
+
+            // Realizar as operações necessárias com o pedido anterior, como visualização, etc.
+            this.visualizar(pedidoAnterior.id, this.pedidos[this.currentIndex]);
+
+            // Atualizar o localStorage com o novo índice
+            localStorage.setItem('currentIndex', this.currentIndex);
         },
 
         salvaMensagem() {
@@ -91,7 +135,6 @@ export default {
             this.visualizar(1, this.proximoPedido);
             this.displayChat = false;
             this.mensagemEmival = null;
-            console.log(this.pedidosAprovados);
         },
 
         async chat(id) {
@@ -111,8 +154,8 @@ export default {
         // Metódo responsável por visualizar pdf
         visualizar(id, data) {
             this.display = true;
-            this.pdf = data.anexo;
-            this.pdfsrc = `${this.urlBase}/${this.pdf}`;
+            const dataAgora = new Date();
+            this.pdfsrc = `${this.urlBase}/${data.anexo}?t=${dataAgora.getSeconds()}`;
         },
 
         // Metódo responsável por formatar data padrão br
@@ -149,21 +192,6 @@ export default {
             this.toast.add({ severity: 'error', summary: 'Ocorreu um erro!', detail: mensagem, life: 3000 });
         },
 
-        // Metódo responsável por buscar pedidos com filtros
-        buscaFiltros() {
-            this.preloading = true;
-            this.pedidoService.filtroPedidos(this.form).then((data) => {
-                if (data.resposta == 'Pedidos para o Dr. Emival Caiado!') {
-                    this.pedidos = data.pedidos;
-                    this.form = {};
-                    this.showInfo('Filtros aplicados com sucesso!');
-                    this.preloading = false;
-                } else {
-                    this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
-                }
-            });
-        },
-
         // Metódo responsável por limpagem de filtros
         limparFiltro() {
             this.buscaPedidos();
@@ -177,6 +205,24 @@ export default {
 <template>
     <div style="z-index: 99" v-if="preloading" class="full-screen-spinner">
         <ProgressSpinner />
+    </div>
+
+    <Button v-if="this.pedidos != null" label="Voltar" class="p-button-secondary" style="width: 20%" @click="(this.ocultaFiltros = false), (this.pedidos = null)" />
+
+    <div v-if="this.ocultaFiltros == false" class="grid text-center">
+        <div class="col-12">
+            <Splitter style="height: 300px">
+                <SplitterPanel @click.prevent="listarEmivalMenorQuinhentos()" class="flex align-items-center justify-content-center splitter-panel">
+                    <h4>até R$ 500,00</h4>
+                </SplitterPanel>
+                <SplitterPanel @click.prevent="listarEmivalMenorMil()" class="flex align-items-center justify-content-center splitter-panel">
+                    <h4>R$ 500,01 à R$ 1000,00</h4>
+                </SplitterPanel>
+                <SplitterPanel @click.prevent="listarEmivalMaiorMil()" class="flex align-items-center justify-content-center splitter-panel">
+                    <h4>Acima de R$ 1000,00</h4>
+                </SplitterPanel>
+            </Splitter>
+        </div>
     </div>
 
     <!-- Chat -->
@@ -221,11 +267,21 @@ export default {
             <div class="col-12 md:col-12">
                 <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
             </div>
-            <div class="col-6 md:col-6">
+            <div class="col-4 md:col-4">
+                <Button icon="pi pi-times" label="Voltar" class="p-button-secondary" style="width: 100%" @click.prevent="voltar()" :disabled="this.currentIndex == 0" />
+            </div>
+            <div class="col-4 md:col-4">
                 <Button icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%" @click.prevent="reprovarItem()" />
             </div>
-            <div class="col-6 md:col-6">
-                <Button icon="pi pi-check" label="Proximo" class="p-button-success" style="width: 100%" @click.prevent="proximoItem()" />
+            <div class="col-4 md:col-4">
+                <Button icon="pi pi-check" label="Próximo" class="p-button-info" style="width: 100%" @click.prevent="proximoItem()" :disabled="this.currentIndex == this.pedidos.length" />
+            </div>
+
+            <div class="col-12 md:col-12 text-center">
+                <span>Mostrando {{ this.currentIndex }} de {{ this.pedidos.length }} registros!</span>
+            </div>
+            <div v-if="this.currentIndex == this.pedidos.length" class="col-12 md:col-12">
+                <Button icon="pi pi-check" label="Finalizar Aprovações" class="p-button-success" style="width: 100%" @click.prevent="aprovar()" />
             </div>
         </div>
     </Dialog>
@@ -267,7 +323,7 @@ export default {
             <div class="col-12 lg:col-6">
                 <Toast />
             </div>
-            <div class="card">
+            <div v-if="this.pedidos" class="card">
                 <DataTable
                     dataKey="id"
                     :value="pedidos"
@@ -301,24 +357,16 @@ export default {
                         </template>
                     </Column>
 
-                    <Column field="Empresa" header="Empresa" :sortable="true" class="w-2">
+                    <Column field="Valor" header="Valor" :sortable="true" class="w-3">
                         <template #body="slotProps">
-                            <span class="p-column-title">Empresa</span>
-                            {{ slotProps.data.empresa.nome_empresa }}
+                            <span class="p-column-title">CNPJ</span>
+                            R$ {{ slotProps.data.valor }}
                         </template>
                     </Column>
-
                     <Column field="Descrição" header="Descrição" :sortable="true" class="w-5">
                         <template #body="slotProps">
                             <span class="p-column-title">Descrição</span>
                             {{ slotProps.data.descricao }}
-                        </template>
-                    </Column>
-
-                    <Column field="Valor" header="Valor" :sortable="true" class="w-1">
-                        <template #body="slotProps">
-                            <span class="p-column-title">CNPJ</span>
-                            R$ {{ slotProps.data.valor }}
                         </template>
                     </Column>
 
@@ -327,7 +375,7 @@ export default {
                             <span class="p-column-title"></span>
                             <div class="grid">
                                 <div class="col-4 md:col-4 mr-3">
-                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
+                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-secondary" />
                                 </div>
                             </div>
                         </template>
@@ -374,5 +422,14 @@ export default {
     justify-content: center;
     align-items: center;
     backdrop-filter: blur(5px);
+}
+
+.splitter-panel {
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+
+.splitter-panel:hover {
+    background-color: rgb(231, 231, 231);
 }
 </style>

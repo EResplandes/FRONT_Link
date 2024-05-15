@@ -3,13 +3,72 @@ const token = localStorage.getItem('token');
 import API_URL from './config.js';
 
 export default class PedidoService {
-    // Metódo responsável por buscar todos pedidos com Dr Emival
-    async pedidosEmival() {
-        return await fetch(`${API_URL}/pedidos/listar-emival`, {
-            method: 'GET',
+    async aprovarEmival(pedidos) {
+        const pedidosJSON = JSON.stringify(pedidos); // Convertendo pedidos para JSON
+        console.log(pedidos);
+        console.log('Pedidos enviados para o backend:', pedidosJSON); // Exibindo no console
+
+        return fetch(`${API_URL}/app/aprovar`, {
+            method: 'PUT',
             headers: {
+                'Content-Type': 'application/json',
                 Accept: 'application/json',
                 Authorization: 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                pedidos: pedidos
+            })
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    // Metódo responsável por buscar todos pedidos com Dr Emival
+    async listarEmivalMenorQuinhentos() {
+        return await fetch(`${API_URL}/app/listarEmivalMenorQuinhentos`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json'
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    async listarEmivalMenorMil() {
+        return await fetch(`${API_URL}/app/listarEmivalMenorMil`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json'
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    async listarEmivalMaiorMil() {
+        return await fetch(`${API_URL}/app/listarEmivalMaiorMil`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json'
             }
         })
             .then((res) => res.json())

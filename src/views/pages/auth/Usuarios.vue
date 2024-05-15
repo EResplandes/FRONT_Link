@@ -18,8 +18,9 @@ export default {
             loading1: ref(null),
             form: ref({}),
             editar: ref(false),
-            empresas: ref(false),
             funcionarios: ref(false),
+            grupo: ref(false),
+            funcoes: ref(false),
             preloading: ref(true),
             display: ref(false)
         };
@@ -30,14 +31,21 @@ export default {
         this.funcionarioService.buscaFuncionarios().then((data) => {
             if (data.resposta == 'Usuários listados com sucesso!') {
                 this.funcionarios = data.usuarios;
+                this.preloading = false;
             }
         });
 
-        // Metódo responsável por buscar todas empresas
-        this.empresaService.buscaEmpresas().then((data) => {
-            if (data.resposta == 'Empresas listados com sucesso!') {
-                this.empresas = data.empresas;
-                this.preloading = false;
+        // Metódo responsável por buscar todos grupos
+        this.funcionarioService.buscaGrupos().then((data) => {
+            if (data.resposta == 'Grupos listados com sucesso!') {
+                this.grupo = data.grupos;
+            }
+        });
+
+        // Metódo responsável por buscar todas funções
+        this.funcionarioService.buscaFuncoes().then((data) => {
+            if (data.resposta == 'Funções listadas com sucesso!') {
+                this.funcoes = data.funcoes;
             }
         });
     },
@@ -103,23 +111,22 @@ export default {
         <!-- Modal Cadastro de Empresa -->
         <Sidebar style="width: 500px" v-model:visible="visibleRight" :baseZIndex="1000" position="right">
             <h3 v-if="this.editar == false" class="titleForm">Formulário de Cadastro</h3>
-
             <div class="card p-fluid">
                 <div class="field">
-                    <label for="cpf">Empresa: <span class="obrigatorio">* </span></label>
-                    <InputText v-tooltip.left="'Digite a o mome da empresa'" v-model="form.nome_empresa" id="empresa" placeholder="Digite..." />
+                    <label for="cpf">Nome: <span class="obrigatorio">* </span></label>
+                    <InputText v-tooltip.left="'Digite a o mome do funcionário'" v-model="form.nome_funcionario" id="nome" placeholder="Digite..." />
                 </div>
                 <div class="field">
-                    <label for="cpf">CNPJ: <span class="obrigatorio">* </span><span class="text-1">(Somente números)</span></label>
-                    <InputNumber v-tooltip.left="'Digite o CNPJ da empresa'" v-model="form.cnpj" placeholder="Digite..." />
+                    <label for="email">E-mail: <span class="obrigatorio">* </span></label>
+                    <InputNumber v-tooltip.left="'Digite o e-mail do funcionário'" v-model="form.email" placeholder="Digite..." />
                 </div>
                 <div class="field">
-                    <label for="cpf">Inscrição Estadual: <span class="obrigatorio">* </span></label>
-                    <InputNumber v-tooltip.left="'Digite a inscrição estadual da empresa'" v-model="form.inscricao_estadual" placeholder="Digite..." />
+                    <label for="funcao">Função: <span class="obrigatorio">* </span></label>
+                    <Dropdown id="funcao" v-model="form.funcao" :options="funcoes" optionLabel="funcao" placeholder="Selecione..."></Dropdown>
                 </div>
                 <div class="field">
-                    <label for="cpf">Filial: </label>
-                    <InputNumber v-tooltip.left="'Digite a filial da empresa'" v-model="form.filial" placeholder="Digite..." />
+                    <label for="grupo">Grupo: <span class="obrigatorio">* </span></label>
+                    <Dropdown id="Grupo" v-model="form.grupo" :options="grupos" optionLabel="grupo" placeholder="Selecione..."></Dropdown>
                 </div>
                 <hr />
                 <div class="field">
