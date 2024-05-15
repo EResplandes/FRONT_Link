@@ -34,6 +34,13 @@ const model = ref([
         ]
     },
     {
+        label: 'Presidência',
+        items: [
+            { label: 'Emival', icon: 'pi pi-fw pi-users', to: '/emival' },
+            { label: 'Mônica', icon: 'pi pi-fw pi-building', to: '/moniva' }
+        ]
+    },
+    {
         label: 'UI Components',
         items: [
             { label: 'Form Layout', icon: 'pi pi-fw pi-id-card', to: '/uikit/formlayout' },

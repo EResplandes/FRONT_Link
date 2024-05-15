@@ -59,6 +59,11 @@ const router = createRouter({
                     component: () => import('@/views/pages/auth/Usuarios.vue')
                 },
                 {
+                    path: '/emival',
+                    name: 'emival',
+                    component: () => import('@/views/pages/presidencia/Emival.vue')
+                },
+                {
                     path: '/uikit/formlayout',
                     name: 'formlayout',
                     component: () => import('@/views/uikit/FormLayout.vue')

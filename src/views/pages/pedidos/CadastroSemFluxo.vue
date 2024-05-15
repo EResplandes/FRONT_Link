@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import LinkService from '../../../service/LinkService';
 import EmpresaService from '../../../service/EmpresaService';
-import FuncionarioService from '../../../service/FuncionarioService';
+import CadastrarPedidoService from '../../../service/CadastraPedidoService';
 
 export default {
     data() {
@@ -13,11 +13,11 @@ export default {
             displayConfirmationActivation: ref(false),
             linkService: new LinkService(),
             empresaService: new EmpresaService(),
-            funcionarioService: new FuncionarioService(),
+            cadastrarPedidoService: new CadastrarPedidoService(),
             visibleRight: ref(false),
             loading1: ref(null),
             links: ref(null),
-            empresas: ref(null),
+            empresas: ref(null), 
             gerentes: ref(null),
             diretores: ref(null),
             form: ref({}),
@@ -37,26 +37,22 @@ export default {
         this.empresaService.buscaEmpresas().then((data) => {
             if (data.resposta == 'Empresas listados com sucesso!') {
                 this.empresas = data.empresas;
-            }
-        });
-
-        // Metódo responsável por buscar todos gerentes
-        this.funcionarioService.buscaGerentes().then((data) => {
-            if (data.resposta == 'Funcionários listados com sucesso!') {
-                this.gerentes = data.funcionarios;
-            }
-        });
-
-        // Metódo responsável por buscar todos diretores
-        this.funcionarioService.buscaDiretores().then((data) => {
-            if (data.resposta == 'Funcionários listados com sucesso!') {
-                this.diretores = data.funcionarios;
                 this.preloading = false;
             }
         });
     },
 
     methods: {
+        // Metódo responsável por cadastrar pedido
+        cadastrarPedido() {
+            this.cadastrarPedidoService.semFluxo(this.form).then((data) => {
+                if (data.resposta == 'Pedido cadastrado com sucesso!') {
+                    this.showSuccess('Pedido cadastrado com sucesso!');
+                    this.form = {};
+                }
+            });
+        },
+
         showSuccess(mensagem) {
             this.toast.add({ severity: 'success', summary: 'Sucesso!', detail: mensagem, life: 3000 });
         },
@@ -67,6 +63,10 @@ export default {
 
         showError(mensagem) {
             this.toast.add({ severity: 'error', summary: 'Ocorreu um erro!', detail: mensagem, life: 3000 });
+        },
+
+        uploadPdf() {
+            this.form.pdf = this.$refs.pdf.files[0];
         }
     }
 };
@@ -79,9 +79,12 @@ export default {
 
     <div class="grid">
         <div class="col-12">
+            <div class="col-12 lg:col-6">
+                <Toast />
+            </div>
             <div class="card">
                 <h5>Cadastro de Pedido</h5>
-                <TabView :activeIndex="activeIndex" @tabChange="onTabChange()">
+                <TabView :activeIndex="activeIndex">
                     <TabPanel header="Formulário">
                         <div class="p-fluid formgrid grid">
                             <div class="field col-1 md:col-1">
@@ -106,14 +109,14 @@ export default {
                             </div></div
                     ></TabPanel>
                     <TabPanel header="Upload">
-                        <FileUpload v-model="form.pdf" name="demo[]" accept=".pdf,.docx" :maxFileSize="1000000">
+                        <FileUpload @change="uploadPdf" type="file" ref="pdf" name="demo[]" accept=".pdf,.docx" :maxFileSize="1000000">
                             <template #empty>
                                 <p>Arraste para anexar documento.</p>
                             </template> </FileUpload
                         ><br />
                         <div class="p-fluid formgrid grid">
                             <div class="field col-12 md:col-12">
-                                <Button @click.prevent="buscaFiltros()" icon="pi pi-check" label="Cadastrar Pedido" class="mr-2 mb-2 p-button-info" />
+                                <Button @click.prevent="cadastrarPedido()" icon="pi pi-check" label="Cadastrar Pedido" class="mr-2 mb-2 p-button-info" />
                             </div>
                         </div>
                     </TabPanel>

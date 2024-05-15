@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
 import EmpresaService from '../../../service/EmpresaService';
+import FuncionarioService from '../../../service/FuncionarioService';
 
 export default {
     data() {
@@ -10,6 +11,7 @@ export default {
             toast: new useToast(),
             displayConfirmation: ref(false),
             empresaService: new EmpresaService(),
+            funcionarioService: new FuncionarioService(),
             displayConfirmationActivation: ref(false),
             visibleRight: ref(false),
             confirm: new useConfirm(),
@@ -17,12 +19,20 @@ export default {
             form: ref({}),
             editar: ref(false),
             empresas: ref(false),
+            funcionarios: ref(false),
             preloading: ref(true),
             display: ref(false)
         };
     },
 
     mounted: function () {
+        // Metódo responsável por buscar todos funcionários/usuários do sistema
+        this.funcionarioService.buscaFuncionarios().then((data) => {
+            if (data.resposta == 'Usuários listados com sucesso!') {
+                this.funcionarios = data.usuarios;
+            }
+        });
+
         // Metódo responsável por buscar todas empresas
         this.empresaService.buscaEmpresas().then((data) => {
             if (data.resposta == 'Empresas listados com sucesso!') {
@@ -44,25 +54,6 @@ export default {
             });
         },
 
-        // Metódo responsável por cadastrar empresa
-        cadastrarEmpresa() {
-            this.empresaService.cadastrar(this.form).then((data) => {
-                if (data.resposta == 'Empresa cadastrada com sucesso!') {
-                    this.showSuccess('Empresa cadastrada com sucesso!');
-                    this.buscaEmpresas();
-                } else {
-                    for (const campo in data.errors) {
-                        if (Object.hasOwnProperty.call(data.errors, campo)) {
-                            const mensagensErro = data.errors[campo];
-                            for (const mensagem of mensagensErro) {
-                                this.showError(mensagem);
-                            }
-                        }
-                    }
-                }
-            });
-        },
-
         // Metódo responsável por abrir confiramção de exclusão
         confirmDeletar(id_empresa) {
             this.confirm.require({
@@ -77,18 +68,6 @@ export default {
                     this.deletarEmpresa(id_empresa);
                 },
                 reject: () => {}
-            });
-        },
-
-        // Metódo responsável por deletar empresa
-        deletarEmpresa(id) {
-            this.empresaService.deletar(id).then((data) => {
-                if (data.resposta == 'Empresa deletada com sucesso!') {
-                    this.showSuccess('Empresa deletada com sucesso!');
-                    this.buscaEmpresas();
-                } else {
-                    this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
-                }
             });
         },
 
@@ -149,7 +128,7 @@ export default {
             </div>
         </Sidebar>
 
-        <!-- Tabela com todos pedidos com Dr Emival -->
+        <!-- Tabela com todos funcionários -->
         <div class="col-12">
             <div class="col-12 lg:col-6">
                 <Toast />
@@ -157,7 +136,7 @@ export default {
             <div class="card">
                 <DataTable
                     dataKey="id"
-                    :value="empresas"
+                    :value="funcionarios"
                     :paginator="true"
                     :rows="10"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
@@ -177,7 +156,7 @@ export default {
                             </div>
                         </div>
                     </template>
-                    <template #empty> Nenhuma empresa encontrada! </template>
+                    <template #empty> Nenhum funcionário encontrado! </template>
                     <template #loading> Carregando informações... Por favor, aguarde! </template>
 
                     <Column field="Id" header="Id" class="w-1">
@@ -187,31 +166,31 @@ export default {
                         </template>
                     </Column>
 
-                    <Column field="Empresa" header="Empresa" :sortable="true" class="w-4">
+                    <Column field="Nome" header="Nome" :sortable="true" class="w-2">
                         <template #body="slotProps">
-                            <span class="p-column-title">Empresa</span>
-                            {{ slotProps.data.nome_empresa }}
+                            <span class="p-column-title">Nome</span>
+                            {{ slotProps.data.name }}
                         </template>
                     </Column>
 
-                    <Column field="CNPJ" header="CNPJ" :sortable="true" class="w-2">
+                    <Column field="Email" header="Email" :sortable="true" class="w-4">
                         <template #body="slotProps">
-                            <span class="p-column-title">CNPJ</span>
-                            {{ slotProps.data.cnpj }}
+                            <span class="p-column-title">Email</span>
+                            {{ slotProps.data.email }}
                         </template>
                     </Column>
 
-                    <Column field="Incrição Estadual" header="Incrição Estadual" :sortable="true" class="w-2">
+                    <Column field="Função" header="Função" :sortable="true" class="w-1">
                         <template #body="slotProps">
-                            <span class="p-column-title">Incrição Estadual</span>
-                            {{ slotProps.data.inscricao_estadual }}
+                            <span class="p-column-title">Função</span>
+                            {{ slotProps.data.funcao.funcao }}
                         </template>
                     </Column>
 
-                    <Column field="filiar" header="Filial" :sortable="true" class="w-1">
+                    <Column field="Grupo" header="Grupo" :sortable="true" class="w-1">
                         <template #body="slotProps">
-                            <span class="p-column-title">Filial</span>
-                            {{ slotProps.data.filial }}
+                            <span class="p-column-title">Grupo</span>
+                            {{ slotProps.data.grupo.grupo }}
                         </template>
                     </Column>
 
