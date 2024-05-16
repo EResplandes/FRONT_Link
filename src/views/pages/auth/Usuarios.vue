@@ -19,7 +19,7 @@ export default {
             form: ref({}),
             editar: ref(false),
             funcionarios: ref(false),
-            grupo: ref(false),
+            grupos: ref(false),
             funcoes: ref(false),
             preloading: ref(true),
             display: ref(false)
@@ -38,7 +38,7 @@ export default {
         // Metódo responsável por buscar todos grupos
         this.funcionarioService.buscaGrupos().then((data) => {
             if (data.resposta == 'Grupos listados com sucesso!') {
-                this.grupo = data.grupos;
+                this.grupos = data.grupos;
             }
         });
 
@@ -51,22 +51,22 @@ export default {
     },
 
     methods: {
-        // Metódo responsável por buscar todas empresas
-        buscaEmpresas() {
+        // Metódo responsável por buscar todas funcionários
+        buscaFuncionarios() {
             this.preloading = true;
-            this.empresaService.buscaEmpresas().then((data) => {
-                if (data.resposta == 'Empresas listados com sucesso!') {
-                    this.empresas = data.empresas;
+            this.funcionarioService.buscaFuncionarios().then((data) => {
+                if (data.resposta == 'Usuários listados com sucesso!') {
+                    this.funcionarios = data.usuarios;
                     this.preloading = false;
                 }
             });
         },
 
-        // Metódo responsável por abrir confiramção de exclusão
-        confirmDeletar(id_empresa) {
+        // Metódo responsável por abrir confiramção de desativar usuário
+        confirmDesativar(id_empresa) {
             this.confirm.require({
-                message: 'Tem certeza de que deseja excluir a empresa?',
-                header: 'Exclusão de Empresa',
+                message: 'Tem certeza que deseja desativar esse usuário?',
+                header: 'Desativar Usuário?',
                 icon: 'pi pi-info-circle',
                 rejectLabel: 'Cancelar',
                 acceptLabel: 'Deletar',
@@ -118,7 +118,7 @@ export default {
                 </div>
                 <div class="field">
                     <label for="email">E-mail: <span class="obrigatorio">* </span></label>
-                    <InputNumber v-tooltip.left="'Digite o e-mail do funcionário'" v-model="form.email" placeholder="Digite..." />
+                    <InputText type="email" v-tooltip.left="'Digite o e-mail do funcionário'" v-model="form.email" placeholder="Digite..." />
                 </div>
                 <div class="field">
                     <label for="funcao">Função: <span class="obrigatorio">* </span></label>
@@ -206,7 +206,7 @@ export default {
                             <span class="p-column-title"></span>
                             <div class="grid">
                                 <div class="col-6 md:col-4">
-                                    <Button @click.prevent="confirmDeletar(slotProps.data.id)" icon="pi pi-trash" label="Deletar" class="p-button-danger" />
+                                    <Button @click.prevent="confirmDesativar(slotProps.data.id)" icon="pi pi-trash" label="Desativar" class="p-button-danger" />
                                 </div>
                             </div>
                         </template>

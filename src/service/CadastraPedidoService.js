@@ -11,14 +11,13 @@ const headers = {
 export default class CadastraPedidoService {
     semFluxo(form) {
         const formData = new FormData();
-        formData.append('descricao', form.descricao);
-        formData.append('valor', form.valor);
-        formData.append('urgente', form.urgente);
-        formData.append('anexo', form.pdf);
-        formData.append('id_link', form.link?.id);
-        formData.append('id_empresa', form.empresa?.id);
-
-        console.log(formData);
+        formData.append('descricao', form?.descricao ?? null);
+        formData.append('valor', form?.valor ?? null);
+        formData.append('urgente', form?.urgente) ?? null;
+        formData.append('dt_vencimento', this.formatarDataParaYMD(form?.dt_vencimento) ?? null);
+        formData.append('anexo', form?.pdf ?? null);
+        formData.append('id_link', form?.link?.id ?? null);
+        formData.append('id_empresa', form?.empresa?.id ?? null);
 
         return fetch(`${API_URL}/pedidos/cadastrar-sem-fluxo`, {
             method: 'POST',
@@ -65,5 +64,17 @@ export default class CadastraPedidoService {
                 console.error('Error:', error);
                 throw error;
             });
+    }
+
+    formatarDataParaYMD(data) {
+        if (data) {
+            const dia = String(data.getDate()).padStart(2, '0');
+            const mes = String(data.getMonth() + 1).padStart(2, '0'); // Mês começa do zero, então somamos 1
+            const ano = data.getFullYear();
+
+            return `${ano}-${mes}-${dia}`;
+        } else {
+            return `0000-00-00`;
+        }
     }
 }

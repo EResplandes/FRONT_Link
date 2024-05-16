@@ -3,6 +3,18 @@ import { ref } from 'vue';
 
 import AppMenuItem from './AppMenuItem.vue';
 
+const funcaoPresente = localStorage.getItem('funcao') === 'Administrador';
+
+// Filtrar os itens do menu com base na presença da função
+// const menuFiltrado = computed(() => {
+//     if (funcaoPresente) {
+//         return model.value;
+//     } else {
+//         // Se a função não estiver presente, filtre os itens removendo aqueles que requerem a função
+//         return model.value.filter((item) => !item.requerFuncao);
+//     }
+// });
+
 const model = ref([
     {
         label: 'Home',
@@ -14,6 +26,7 @@ const model = ref([
             { label: 'Pedidos com Emival', icon: 'pi pi-fw pi-book', to: '/pedidos-emival' },
             { label: 'Pedidos com Monica', icon: 'pi pi-fw pi-book', to: '/pedidos-monica' },
             { label: 'Todos', icon: 'pi pi-fw pi-book', to: '/pedidos-todos' },
+            { label: 'Pedidos Reprovados', icon: 'pi pi-fw pi-book', to: '/pedidos-reprovados' },
             { label: 'Análise de Fluxo', icon: 'pi pi-fw pi-book', to: '/gestor-fluxo' },
             { label: 'Cadastro sem Fluxo', icon: 'pi pi-fw pi-book', to: '/cadastro-sem-fluxo' }
         ]
@@ -37,7 +50,7 @@ const model = ref([
         label: 'Presidência',
         items: [
             { label: 'Emival', icon: 'pi pi-fw pi-users', to: '/emival' },
-            { label: 'Mônica', icon: 'pi pi-fw pi-building', to: '/moniva' }
+            { label: 'Mônica', icon: 'pi pi-fw pi-building', to: '/monica' }
         ]
     },
     {

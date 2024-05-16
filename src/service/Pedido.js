@@ -29,7 +29,26 @@ export default class PedidoService {
             });
     }
 
-    // Metódo responsável por buscar todos pedidos com Dr Emival
+    // Requisição responsável por listar todos pedidos com emival para o Gestor de Fluxo
+    async pedidosEmival() {
+        return await fetch(`${API_URL}/pedidos/listar-emival`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    // Requisição responsável por listar todos pedidos menor que 500 para app aprovação
     async listarEmivalMenorQuinhentos() {
         return await fetch(`${API_URL}/app/listarEmivalMenorQuinhentos`, {
             method: 'GET',
@@ -47,6 +66,7 @@ export default class PedidoService {
             });
     }
 
+    // Requisição responsável por listar todos pedidos entre 500 e 1000 para app aprovação
     async listarEmivalMenorMil() {
         return await fetch(`${API_URL}/app/listarEmivalMenorMil`, {
             method: 'GET',
@@ -64,6 +84,7 @@ export default class PedidoService {
             });
     }
 
+    // Requisição responsável por listar todos pedidos maior que 1000 para app aprovaçãos
     async listarEmivalMaiorMil() {
         return await fetch(`${API_URL}/app/listarEmivalMaiorMil`, {
             method: 'GET',
@@ -81,7 +102,7 @@ export default class PedidoService {
             });
     }
 
-    // Metódo responsável por buscar todos pedidos enviados para Dr Monica
+    // Requisição responsável por buscar todos pedidos enviados para Dr Monica
     async pedidosMonica() {
         return await fetch(`${API_URL}/pedidos/listar-monica`, {
             method: 'GET',
@@ -100,7 +121,7 @@ export default class PedidoService {
             });
     }
 
-    // Metódo responsável por buscar todos pedidos
+    // Requisição responsável por buscar todos pedidos
     async buscaPedidos() {
         return await fetch(`${API_URL}/pedidos/listar-pedidos`, {
             method: 'GET',
@@ -119,7 +140,7 @@ export default class PedidoService {
             });
     }
 
-    // Metódo responsável por buscar pedidos com status 6
+    // Requisição responsável por buscar pedidos com status 6
     async buscaAnalisando() {
         return await fetch(`${API_URL}/pedidos/listar-analise`, {
             method: 'GET',
@@ -138,7 +159,7 @@ export default class PedidoService {
             });
     }
 
-    // Metódo responsável por buscar todos pedidos com filtros
+    // Requisição responsável por buscar todos pedidos com filtros
     async filtroPedidos(form) {
         let descricao = form.descricao;
         let empresa = form.empresa?.id;
@@ -185,7 +206,7 @@ export default class PedidoService {
         }
     }
 
-    // Metódo responsável por excluir pedido de acordo com id passado
+    // Requisição responsável por excluir pedido de acordo com id passado
     async excluirPedido(id_pedido) {
         return await fetch(`${API_URL}/pedidos/deletar/` + id_pedido, {
             method: 'DELETE',

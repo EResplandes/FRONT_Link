@@ -17,7 +17,7 @@ export default {
             visibleRight: ref(false),
             loading1: ref(null),
             links: ref(null),
-            empresas: ref(null), 
+            empresas: ref(null),
             gerentes: ref(null),
             diretores: ref(null),
             form: ref({}),
@@ -45,12 +45,33 @@ export default {
     methods: {
         // Metódo responsável por cadastrar pedido
         cadastrarPedido() {
-            this.cadastrarPedidoService.semFluxo(this.form).then((data) => {
-                if (data.resposta == 'Pedido cadastrado com sucesso!') {
-                    this.showSuccess('Pedido cadastrado com sucesso!');
-                    this.form = {};
+            // Array com os nomes dos campos obrigatórios
+            const camposObrigatorios = ['valor', 'dt_vencimento', 'link', 'empresa', 'descricao'];
+
+            // Variável para verificar se todos os campos obrigatórios estão preenchidos
+            let todosCamposPreenchidos = true;
+
+            // Iterar sobre os campos obrigatórios
+            for (const campo of camposObrigatorios) {
+                // Verificar se o campo está vazio
+                if (!this.form[campo]) {
+                    // Se estiver vazio, exibir mensagem de erro e definir a variável como falsa
+                    this.showError(`O campo ${campo.toUpperCase()} é obrigatório!`);
+                    todosCamposPreenchidos = false;
                 }
-            });
+            }
+
+            // Verificar se todos os campos obrigatórios foram preenchidos antes de cadastrar o pedido
+            if (todosCamposPreenchidos) {
+                this.cadastrarPedidoService.semFluxo(this.form).then((data) => {
+                    if (data.resposta == 'Pedido cadastrado com sucesso!') {
+                        this.showSuccess('Pedido cadastrado com sucesso!');
+                        this.form = {};
+                    } else {
+                        this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
+                    }
+                });
+            }
         },
 
         showSuccess(mensagem) {
@@ -84,7 +105,7 @@ export default {
             </div>
             <div class="card">
                 <h5>Cadastro de Pedido</h5>
-                <TabView :activeIndex="activeIndex">
+                <TabView>
                     <TabPanel header="Formulário">
                         <div class="p-fluid formgrid grid">
                             <div class="field col-1 md:col-1">
@@ -95,11 +116,15 @@ export default {
                                 <label for="firstname2">Valor <span class="obrigatorio">*</span></label>
                                 <InputNumber v-tooltip.top="'Digite o valor do pedido'" v-model="form.valor" inputId="minmaxfraction" :minFractionDigits="2" :maxFractionDigits="2" placeholder="R$..." />
                             </div>
-                            <div class="field col-12 md:col-4">
+                            <div class="field col-12 md:col-3">
+                                <label for="firstname2">Data de Vencimento <span class="obrigatorio">*</span></label>
+                                <Calendar v-tooltip.top="'Selecione a data de vencimento'" v-model="form.dt_vencimento" showIcon iconDisplay="input" />
+                            </div>
+                            <div class="field col-12 md:col-2">
                                 <label for="Link">Link <span class="obrigatorio">*</span></label>
                                 <Dropdown id="Link" v-model="form.link" :options="links" optionLabel="link" placeholder="Selecione..."></Dropdown>
                             </div>
-                            <div class="field col-12 md:col-4">
+                            <div class="field col-12 md:col-2">
                                 <label for="Empresa">Empresa <span class="obrigatorio">*</span></label>
                                 <Dropdown id="Empresa" v-model="form.empresa" :options="empresas" optionLabel="nome_empresa" placeholder="Selecione..."></Dropdown>
                             </div>

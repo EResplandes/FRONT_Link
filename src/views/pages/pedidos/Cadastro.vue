@@ -61,12 +61,31 @@ export default {
     methods: {
         // Metódo responsável por cadastrar pedido
         cadastrarPedido() {
-            this.cadastrarPedidoService.comFluxo(this.form).then((data) => {
-                if (data.resposta == 'Pedido cadastrado com sucesso!') {
-                    this.showSuccess('Pedido cadastrado com sucesso!');
-                    this.form = {};
+            // Array com os nomes dos campos obrigatórios
+            const camposObrigatorios = ['valor', 'dt_vencimento', 'link', 'empresa', 'descricao', 'fluxo'];
+
+            // Variável para verificar se todos os campos obrigatórios estão preenchidos
+            let todosCamposPreenchidos = true;
+
+            // Iterar sobre os campos obrigatórios
+            for (const campo of camposObrigatorios) {
+                // Verificar se o campo está vazio
+                if (!this.form[campo]) {
+                    // Se estiver vazio, exibir mensagem de erro e definir a variável como falsa
+                    this.showError(`O campo ${campo.toUpperCase()} é obrigatório!`);
+                    todosCamposPreenchidos = false;
                 }
-            });
+            }
+
+            // Verificar se todos os campos obrigatórios foram preenchidos antes de cadastrar o pedido
+            if (todosCamposPreenchidos) {
+                this.cadastrarPedidoService.comFluxo(this.form).then((data) => {
+                    if (data.resposta == 'Pedido cadastrado com sucesso!') {
+                        this.showSuccess('Pedido cadastrado com sucesso!');
+                        this.form = {};
+                    }
+                });
+            }
         },
 
         showSuccess(mensagem) {
