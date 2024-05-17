@@ -26,7 +26,10 @@ export default {
             proximoPedido: ref(null),
             preloading: ref(true),
             ocultaFiltros: ref(false),
+            acimaMil: ref(false),
             display: ref(false),
+            displayAcima: ref(false),
+            pedidoAcima: ref({}),
             urlBase: 'https://www.gruporialma.com.br/wp-content/uploads',
             pdf: ref(null),
             pdfsrc: ref(null)
@@ -37,10 +40,25 @@ export default {
         this.preloading = false;
     },
 
+    watch: {
+        display(newVal) {
+            if (newVal === false) {
+                this.currentIndex = 0;
+            }
+        },
+        displayAcima(newVal) {
+            if (newVal === false) {
+                this.currentIndex = 0;
+                this.listarEmivalMaiorMil();
+            }
+        }
+    },
+
     methods: {
         // Metódo responsável por listagem de pedidos
         listarEmivalMenorQuinhentos() {
             this.preloading = true;
+            this.acimaMil = false;
             this.pedidoService.listarEmivalMenorQuinhentos().then((data) => {
                 this.pedidos = data.pedidos;
                 this.ocultaFiltros = true;
@@ -70,6 +88,7 @@ export default {
         // Metódo responsável por listagem de pedidos
         listarEmivalMenorMil() {
             this.preloading = true;
+            this.acimaMil = false;
             this.pedidoService.listarEmivalMenorMil().then((data) => {
                 this.pedidos = data.pedidos;
                 this.preloading = false;
@@ -79,6 +98,7 @@ export default {
 
         // Metódo responsável por listagem de pedidos
         listarEmivalMaiorMil() {
+            this.acimaMil = true;
             this.preloading = true;
             this.pedidoService.listarEmivalMaiorMil().then((data) => {
                 this.pedidos = data.pedidos;
@@ -87,6 +107,7 @@ export default {
             });
         },
 
+        // Metódo responsávle por buscar proximo pedido
         proximoItem() {
             // Verifica se currentIndex é igual ao comprimento dos pedidos
             if (this.currentIndex === this.pedidos.length) {
@@ -109,6 +130,38 @@ export default {
             }
         },
 
+        // Metódo responsávle por buscar proximo pedidoAcima
+        proximoItemAcima() {
+            // Verifica se currentIndex é igual ao comprimento dos pedidos
+            if (this.currentIndex === this.pedidos.length) {
+                this.showInfo('Você chegou ao último para aprovação!');
+                return;
+            }
+
+            // Incrementa currentIndex e verifica se está dentro dos limites do array
+            if (this.currentIndex < this.pedidos.length) {
+                // Enviando id do pedido
+                this.pedidoService.aprovarPedidoUnico(this.pedidoAcima.id).then((data) => {
+                    if (data.resposta == 'Pedido aprovado com sucesso!') {
+                        this.showSuccess('Pedido aprovado com sucesso!');
+                    }
+
+                    this.currentIndex++;
+
+                    if (this.currentIndex < this.pedidos.length) {
+                        this.visualizarAcima(this.pedidos[this.currentIndex].id, this.pedidos[this.currentIndex]);
+                        localStorage.setItem('ultimoPedidoAprovado', this.currentIndex);
+                    } else {
+                        this.listarEmivalMaiorMil();
+                        this.displayAcima = false;
+                    }
+                });
+            } else {
+                // Se currentIndex for igual ao comprimento dos pedidos, não há próximo pedido
+                this.showInfo('Você chegou ao último para aprovação!');
+            }
+        },
+
         async reprovarItem() {
             this.displayChat = true;
             localStorage.setItem('ultimoPedidoAprovado', this.currentIndex); // Alterado para 'ultimoPedidoAprovado'
@@ -117,8 +170,17 @@ export default {
             }
         },
 
+        async reprovarItemAcima() {
+            this.displayChat = true;
+            localStorage.setItem('ultimoPedidoAprovado', this.currentIndex); // Alterado para 'ultimoPedidoAprovado'
+            if (this.currentIndex == this.pedidos.length) {
+                this.showInfo('Você chegou ao último para aprovação!');
+            }
+        },
+
+        // Abaixo de 1000
         salvaMensagem() {
-            this.chat(this.proximoPedido);
+            // this.chat(this.proximoPedido);
 
             this.proximoPedido = this.pedidos[this.currentIndex];
             // this.pedidosReprovados.push({ id: this.proximoPedido.id, status: 3, mensagem: this.mensagemEmival });
@@ -150,20 +212,47 @@ export default {
             this.mensagemEmival = null;
         },
 
-        async chat(id) {
-            return new Promise((resolve, reject) => {
-                this.chatService.buscaConversa(id).then((data) => {
-                    if (data.resposta == 'Chat listado com sucesso!') {
-                        this.conversa = data.conversa;
-                        resolve();
-                    } else {
-                        this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
-                        reject(new Error('Erro ao buscar conversa'));
-                    }
-                });
+        salvaMensagemAcima() {
+            // this.chat(this.proximoPedido);
+
+            this.proximoPedido = this.pedidos[this.currentIndex];
+            // this.pedidosReprovados.push({ id: this.proximoPedido.id, status: 3, mensagem: this.mensagemEmival });
+            this.pedidoService.aprovarEmival([{ id: this.proximoPedido.id, status: 3, mensagem: this.mensagemEmival }]).then((data) => {
+                this.showSuccess('Pedidos Reprovado com Sucesso!');
+                this.pedidosReprovados = [];
+
+                if (this.currentIndex < this.pedidos.length) {
+                    this.visualizarAcima(1, this.pedidos[this.currentIndex]);
+                } else if (this.pedidos.length > 0) {
+                    this.visualizarAcima(1, this.pedidos[this.currentIndex - 1]);
+                } else {
+                    this.displayAcima = false;
+                    this.displayChat = false;
+
+                    this.listarEmivalMaiorMil();
+                }
             });
+
+            // Agora você pode chamar a função visualizar para exibir o próximo PDF
+            this.displayChat = false;
+            this.mensagemEmival = null;
         },
 
+        // async chat(id) {
+        //     return new Promise((resolve, reject) => {
+        //         this.chatService.buscaConversa(id).then((data) => {
+        //             if (data.resposta == 'Chat listado com sucesso!') {
+        //                 this.conversa = data.conversa;
+        //                 resolve();
+        //             } else {
+        //                 this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
+        //                 reject(new Error('Erro ao buscar conversa'));
+        //             }
+        //         });
+        //     });
+        // },
+
+        // Metódo responsável por voltar com pedidos abaixo de 1000
         voltar() {
             if (this.currentIndex == 0) {
                 return;
@@ -182,9 +271,33 @@ export default {
             localStorage.setItem('currentIndex', this.currentIndex);
         },
 
+        // Metódo responsável por voltar com pedidos acima de 1000
+        voltarAcima() {
+            if (this.currentIndex == 0) {
+                return;
+            }
+
+            // Recuperar o pedido anterior
+            const pedidoAnterior = this.pedidos[--this.currentIndex];
+
+            // Realizar as operações necessárias com o pedido anterior, como visualização, etc.
+            this.visualizarAcima(1, this.pedidos[this.currentIndex]);
+
+            // Atualizar o localStorage com o novo índice
+            localStorage.setItem('currentIndex', this.currentIndex);
+        },
+
         // Metódo responsável por visualizar pdf
         visualizar(id, data) {
             this.display = true;
+            const dataAgora = new Date();
+            this.pdfsrc = `${this.urlBase}/${data.anexo}?t=${dataAgora.getSeconds()}`;
+        },
+
+        visualizarAcima(id, data) {
+            console.log(data.anexo);
+            this.pedidoAcima = data;
+            this.displayAcima = true;
             const dataAgora = new Date();
             this.pdfsrc = `${this.urlBase}/${data.anexo}?t=${dataAgora.getSeconds()}`;
         },
@@ -287,12 +400,13 @@ export default {
                 </div>
                 <hr />
                 <InputText class="col-12" type="text" v-model="mensagemEmival" placeholder="Digite a mensagem..." />
-                <Button @click="salvaMensagem()" label="Enviar Mensagem" class="mr-2 mt-3 p-button-success col-12" />
+                <Button v-if="displayAcima" @click="salvaMensagemAcima()" label="Enviar Mensagem" class="mr-2 mt-3 p-button-success col-12" />
+                <Button v-if="!displayAcima" @click="salvaMensagem()" label="Enviar Mensagem" class="mr-2 mt-3 p-button-success col-12" />
             </div>
         </div>
     </Dialog>
 
-    <!-- Visualizar -->
+    <!-- Visualizar - Abaixo de 1000 reais -->
     <Dialog header="Documento" v-model:visible="display" :style="{ width: '95%' }" :modal="true">
         <div class="grid">
             <div class="col-12 md:col-12">
@@ -324,44 +438,36 @@ export default {
         </div>
     </Dialog>
 
+    <!-- Visualizar - Acima de 1000 reais -->
+    <Dialog header="Documento" v-model:visible="displayAcima" :style="{ width: '95%' }" :modal="true">
+        <div class="grid">
+            <div class="col-12 md:col-12">
+                <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
+            </div>
+            <div class="col-4 md:col-4">
+                <Button icon="pi pi-times" label="Pedido Anterior" class="p-button-secondary" style="width: 100%" @click.prevent="voltarAcima()" :disabled="this.currentIndex == 0" />
+            </div>
+            <div class="col-4 md:col-4">
+                <Button icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%" @click.prevent="reprovarItemAcima()" />
+            </div>
+            <div class="col-4 md:col-4"><Button icon="pi pi-check" label="Aprovar" class="p-button-info" style="width: 100%" @click.prevent="proximoItemAcima()" :disabled="this.currentIndex == this.pedidos.length" /></div>
+
+            <div class="col-12 md:col-12 text-center">
+                <span>Visualizando Pedido {{ this.currentIndex + 1 }} de {{ this.pedidos.length }} Pedidos!</span>
+            </div>
+        </div>
+    </Dialog>
+
     <div class="grid">
         <Toast />
         <ConfirmDialog></ConfirmDialog>
-        <!-- Modal Filtros -->
-        <Sidebar style="width: 500px" v-model:visible="visibleRight" :baseZIndex="1000" position="right">
-            <h3 v-if="this.editar == false" class="titleForm">Filtros</h3>
 
-            <div class="card p-fluid">
-                <div class="field">
-                    <label for="empresa">Empresa:</label>
-                    <Dropdown v-model="form.empresa" :options="empresas" showClear optionLabel="nome_empresa" placeholder="Selecione..." class="w-full" />
-                </div>
-                <div class="field">
-                    <label for="cpf">Descrição: </label>
-                    <InputText v-tooltip.left="'Digite a descrição do pedido'" v-model="form.descricao" id="cnpj" placeholder="Digite..." />
-                </div>
-                <div class="field">
-                    <label for="cpf">Valor: </label>
-                    <InputNumber v-tooltip.left="'Digite o valor do pedido'" v-model="form.valor" inputId="minmaxfraction" :minFractionDigits="2" :maxFractionDigits="2" placeholder="Digite..." />
-                </div>
-                <div class="field">
-                    <label for="cpf">Dt. Inclusão:</label>
-                    <Calendar v-tooltip.left="'Selecione a data de inclusão'" v-model="form.dt_inclusao" showIcon :showOnFocus="false" class="" />
-                </div>
-                <hr />
-                <div class="field">
-                    <Button @click.prevent="buscaFiltros()" label="Filtrar" class="mr-2 mb-2 p-button-secondary" />
-                    <Button @click.prevent="limparFiltro()" label="Limpar Filtros" class="mr-2 mb-2 p-button-danger" />
-                </div>
-            </div>
-        </Sidebar>
-
-        <!-- Tabela com todos pedidos com Dr Emival -->
+        <!-- Tabela com todos pedidos com Dr Emival aprovação em conjunto - Pedidos abaixo de 1000 reais -->
         <div class="col-12">
             <div class="col-12 lg:col-6">
                 <Toast />
             </div>
-            <div v-if="this.pedidos" class="card">
+            <div v-if="this.pedidos && this.acimaMil == false" class="card">
                 <DataTable
                     dataKey="id"
                     :value="pedidos"
@@ -414,6 +520,67 @@ export default {
                             <div class="grid">
                                 <div class="col-4 md:col-4 mr-3">
                                     <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-secondary" />
+                                </div>
+                            </div>
+                        </template>
+                    </Column>
+                </DataTable>
+            </div>
+
+            <!-- Tabela com todos pedidos com Dr Emival aprovação separada acima de 1000 reais -->
+            <div v-if="this.pedidos && this.acimaMil" class="card">
+                <DataTable
+                    dataKey="id"
+                    :value="pedidos"
+                    :paginator="true"
+                    :rows="10"
+                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                    :rowsPerPageOptions="[5, 10, 25, 50, 100]"
+                    currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
+                    responsiveLayout="scroll"
+                    filterDisplay="menu"
+                    stripedRows
+                >
+                    <template #header>
+                        <div class="flex justify-content-between"></div>
+                    </template>
+                    <template #empty> Nenhum pedido encontrado! </template>
+                    <template #loading> Carregando informações... Por favor, aguarde! </template>
+
+                    <Column field="" header="" class="w-1">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Dt. Inclusão</span>
+                            <Tag v-if="slotProps.data.urgente == 1" class="mr-2" severity="danger" value="Urgente"></Tag>
+                            <Tag v-else class="mr-2" severity="info" value="Normal"></Tag>
+                        </template>
+                    </Column>
+
+                    <Column field="Dt. Inclusão" header="Dt. Inclusão" :sortable="true" class="w-2">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Dt. Inclusão</span>
+                            {{ formatarData(slotProps.data.dt_inclusao) }}
+                        </template>
+                    </Column>
+
+                    <Column field="Valor" header="Valor" :sortable="true" class="w-3">
+                        <template #body="slotProps">
+                            <span class="p-column-title">CNPJ</span>
+                            R$ {{ slotProps.data.valor }}
+                        </template>
+                    </Column>
+                    <Column field="Descrição" header="Descrição" :sortable="true" class="w-5">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Descrição</span>
+                            {{ slotProps.data.descricao }}
+                        </template>
+                    </Column>
+
+                    <Column field="..." header="..." :sortable="true" class="w-2">
+                        <template #body="slotProps">
+                            <span class="p-column-title"></span>
+                            <div class="grid">
+                                <div class="col-4 md:col-4 mr-3">
+                                    <Button @click.prevent="visualizarAcima(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-secondary" />
                                 </div>
                             </div>
                         </template>

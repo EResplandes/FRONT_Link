@@ -259,4 +259,23 @@ export default class PedidoService {
                 throw error;
             });
     }
+
+    // Requisição responsável por aprovar apenas 1 pedido
+    async aprovarPedidoUnico(id_pedido) {
+        return await fetch(`${API_URL}/app/aprovar-acima/` + id_pedido, {
+            method: 'PUT',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
 }
