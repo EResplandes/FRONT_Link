@@ -30,6 +30,7 @@ export default {
             display: ref(false),
             displayAcima: ref(false),
             pedidoAcima: ref({}),
+            quantidadesPedidos: ref({}),
             urlBase: 'https://www.gruporialma.com.br/wp-content/uploads',
             pdf: ref(null),
             pdfsrc: ref(null)
@@ -37,7 +38,26 @@ export default {
     },
 
     mounted: function () {
-        this.preloading = false;
+        // Metódo responsável por buscar quantidades de pedidos para aprovação
+        this.pedidoService.buscaQuantidades().then((data) => {
+            console.log(data);
+            this.quantidadesPedidos = data.quantidades;
+            this.preloading = false;
+        });
+    },
+
+    created() {
+        // Método responsável por buscar quantidades de pedidos para aprovação
+        this.pedidoService
+            .buscaQuantidades()
+            .then((data) => {
+                this.quantidadesPedidos = data.quantidades;
+                this.preloading = false;
+            })
+            .catch((error) => {
+                console.error('Error fetching quantities:', error);
+                this.preloading = false;
+            });
     },
 
     watch: {
@@ -55,6 +75,14 @@ export default {
     },
 
     methods: {
+        buscaQuantidades() {
+            this.pedidoService.buscaQuantidades().then((data) => {
+                console.log(data);
+                this.quantidadesPedidos = data.quantidades;
+                this.preloading = false;
+            });
+        },
+
         // Metódo responsável por listagem de pedidos
         listarEmivalMenorQuinhentos() {
             this.preloading = true;
@@ -351,19 +379,31 @@ export default {
         <ProgressSpinner />
     </div>
 
-    <Button v-if="this.pedidos != null" label="Voltar" class="p-button-secondary" style="width: 20%" @click="(this.ocultaFiltros = false), (this.pedidos = null)" />
+    <Button v-if="this.pedidos != null" label="Voltar" class="p-button-secondary" style="width: 20%" @click="(this.ocultaFiltros = false), (this.pedidos = null), buscaQuantidades()" />
 
     <div v-if="this.ocultaFiltros == false" class="grid text-center">
         <div class="col-12">
             <Splitter style="height: 300px">
                 <SplitterPanel @click.prevent="listarEmivalMenorQuinhentos()" class="flex align-items-center justify-content-center splitter-panel">
-                    <h4>até R$ 500,00</h4>
+                    <div>
+                        Total de pedidos com valor até R$ 500,00
+                        <br />
+                        <h3>{{ this.quantidadesPedidos.qtd_abaixoQuinhentos }} pedidos</h3>
+                    </div>
                 </SplitterPanel>
                 <SplitterPanel @click.prevent="listarEmivalMenorMil()" class="flex align-items-center justify-content-center splitter-panel">
-                    <h4>R$ 500,01 à R$ 1000,00</h4>
+                    <div>
+                        Total de pedidos com valor de R$ 500,01 à R$ 1000,00
+                        <br />
+                        <h3>{{ this.quantidadesPedidos.qtd_abaixoMil }} pedidos</h3>
+                    </div>
                 </SplitterPanel>
                 <SplitterPanel @click.prevent="listarEmivalMaiorMil()" class="flex align-items-center justify-content-center splitter-panel">
-                    <h4>Acima de R$ 1000,00</h4>
+                    <div>
+                        Total de pedidos com o valor acima de R$ 1000,00
+                        <br />
+                        <h3>{{ this.quantidadesPedidos.qtd_acimaMil }} pedidos</h3>
+                    </div>
                 </SplitterPanel>
             </Splitter>
         </div>
