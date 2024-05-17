@@ -36,7 +36,7 @@ const model = ref([
         items: [
             { label: 'Cadastro', icon: 'pi pi-fw pi-book', to: '/cadastro-pedido' },
             { label: 'Aprovação', icon: 'pi pi-fw pi-check-circle', to: '/aprovacao-gerentes' },
-            { label: 'Pedidos com Ressalva', icon: 'pi pi-fw pi-check-circle', to: '/' }
+            { label: 'Justificar Pedidos', icon: 'pi pi-fw pi-check-circle', to: '/pedidos-justificar' }
         ]
     },
     {

@@ -93,14 +93,57 @@ export default class FuncionarioService {
             });
     }
 
-    async cadastraFuncionario() {
-        return await fetch(`${API_URL}/funcionarios/listar-funcionarios`, {
+    cadastraFuncionario(form) {
+        return fetch(`${API_URL}/funcionarios/cadastrar-funcionario`, {
             method: 'POST',
             headers: {
+                'Content-Type': 'application/json',
                 Accept: 'application/json',
                 Authorization: 'Bearer ' + token
             },
-            body: JSON.stringify({})
+            body: JSON.stringify({
+                nome: form.nome,
+                email: form.email,
+                id_funcao: form.funcao.id,
+                id_grupo: form.grupo.id
+            })
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                console.log(d);
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    desativarFuncionario(id_funcionario) {
+        return fetch(`${API_URL}/funcionarios/desativa-funcionario/` + id_funcionario, {
+            method: 'PUT',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    async buscaResponsaveis() {
+        return await fetch(`${API_URL}/funcionarios/listar-responsaveis`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
         })
             .then((res) => res.json())
             .then((d) => {

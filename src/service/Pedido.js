@@ -5,9 +5,6 @@ import API_URL from './config.js';
 export default class PedidoService {
     async aprovarEmival(pedidos) {
         const pedidosJSON = JSON.stringify(pedidos); // Convertendo pedidos para JSON
-        console.log(pedidos);
-        console.log('Pedidos enviados para o backend:', pedidosJSON); // Exibindo no console
-
         return fetch(`${API_URL}/app/aprovar`, {
             method: 'PUT',
             headers: {
@@ -90,6 +87,25 @@ export default class PedidoService {
             method: 'GET',
             headers: {
                 Accept: 'application/json'
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    // Requisição responsável por buscar pedidos reprovados para justicar
+    async listarPedidosParaJustificar() {
+        return await fetch(`${API_URL}/pedidos/listar-justificar?id_usuario=` + localStorage.getItem('usuario_id'), {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
             }
         })
             .then((res) => res.json())
@@ -210,6 +226,25 @@ export default class PedidoService {
     async excluirPedido(id_pedido) {
         return await fetch(`${API_URL}/pedidos/deletar/` + id_pedido, {
             method: 'DELETE',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    // Requisição responsável por buscar pedidos reprovados status 3
+    async buscaReprovados() {
+        return await fetch(`${API_URL}/pedidos/listar-reprovados`, {
+            method: 'GET',
             headers: {
                 Accept: 'application/json',
                 Authorization: 'Bearer ' + token

@@ -5,8 +5,7 @@ import { useConfirm } from 'primevue/useconfirm';
 import PedidoService from '../../../service/Pedido';
 import EmpresaService from '../../../service/EmpresaService';
 import StatusService from '../../../service/StatusService';
-import FuncionarioService from '../../../service/FuncionarioService';
-import FluxoService from '../../../service/FluxoService';
+import ChatService from '../../../service/ChatService';
 
 export default {
     data() {
@@ -14,25 +13,21 @@ export default {
             toast: new useToast(),
             displayConfirmation: ref(false),
             pedidoService: new PedidoService(),
-            fluxoService: new FluxoService(),
             empresaService: new EmpresaService(),
             statusService: new StatusService(),
-            funcionarioService: new FuncionarioService(),
+            chatService: new ChatService(),
             displayConfirmationActivation: ref(false),
             visibleRight: ref(false),
             confirm: new useConfirm(),
             loading1: ref(null),
             empresas: ref(null),
+            conversa: ref(null),
             pedidos: ref(null),
-            funcionarios: ref(null),
-            id_pedido: ref(null),
-            id_usuario: ref(null),
             status: ref(null),
             form: ref({}),
-            editar: ref(false),
             preloading: ref(true),
             display: ref(false),
-            displayDelegar: ref(false),
+            displayChat: ref(false),
             urlBase: 'http://localhost:8000/storage',
             pdf: ref(null),
             pdfsrc: ref(null)
@@ -41,14 +36,9 @@ export default {
 
     mounted: function () {
         // Metódo responsável por buscar todas os pedidos reprovados
-        this.pedidoService.buscaReprovados().then((data) => {
+        this.pedidoService.listarPedidosParaJustificar().then((data) => {
             this.pedidos = data.pedidos;
             this.preloading = false;
-        });
-
-        // Metódo responsável por buscar todos responsáveis como gerentes e diretores
-        this.funcionarioService.buscaResponsaveis().then((data) => {
-            this.funcionarios = data.funcionarios;
         });
 
         // Metódo responsável por buscar todas empresas
@@ -70,9 +60,34 @@ export default {
         // Metódo responsável por buscar todos pedidos reprovados
         buscaPedidos() {
             this.preloading = true;
-            this.pedidoService.buscaReprovados().then((data) => {
+            this.pedidoService.listarPedidosParaJustificar().then((data) => {
                 this.pedidos = data.pedidos;
                 this.preloading = false;
+            });
+        },
+
+        // Metódo responsável por buscar chat de um pedido
+        buscarChat(id_pedido) {
+            this.displayChat = true;
+            this.form['id_pedido'] = id_pedido;
+            this.chatService.buscaConversa(id_pedido).then((data) => {
+                if (data.resposta == 'Chat listado com sucesso!') {
+                    this.conversa = data.conversa;
+                } else {
+                    this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
+                }
+            });
+        },
+
+        // Metódo responsável por enviar mensagem respodendo fluxo
+        enviarMensagem() {
+            this.form['mensagem'] = this.novaMensagem;
+            this.chatService.enviarMensagem(this.form).then((data) => {
+                if (data.resposta) {
+                    this.showSuccess('Mensagem enviada com sucesso!');
+                    this.buscaPedidos();
+                    this.displayChat = false;
+                }
             });
         },
 
@@ -99,24 +114,6 @@ export default {
             this.pdf = data.anexo;
             // this.pdfsrc = `${this.urlBase}/${this.pdf}`;
             this.pdfsrc = 'https://www.gruporialma.com.br/wp-content/uploads/2024/05/pdf-teste.pdf';
-        },
-
-        delegarPedido(id_usuario) {
-            this.id_usuario = id_usuario;
-
-            this.fluxoService.cadastrarFluxo(this.id_pedido, this.id_usuario).then((data) => {
-                console.log(data);
-                if (data.resposta == 'Fluxo cadastrado com sucesso!') {
-                    this.showSuccess('Pedido delegado com sucesso!');
-                    this.buscaPedidos();
-                }
-                this.displayDelegar = false;
-            });
-        },
-
-        selecionarFuncionario(id_pedido) {
-            this.displayDelegar = true;
-            this.id_pedido = id_pedido;
         },
 
         filtrar() {
@@ -158,60 +155,39 @@ export default {
             <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
         </Dialog>
 
-        <!-- Delegar Pedido -->
-        <Dialog header="Delegar pedido" v-model:visible="displayDelegar" :style="{ width: '60%' }" :modal="true">
-            <DataTable
-                dataKey="id"
-                :value="funcionarios"
-                :paginator="true"
-                :rows="10"
-                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                :rowsPerPageOptions="[5, 10, 25, 50, 100]"
-                currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
-                responsiveLayout="scroll"
-                filterDisplay="menu"
-                stripedRows
-            >
-                <template #header>
-                    <div class="flex justify-content-between">
-                        <h5 for="empresa">Delegar para:</h5>
+        <!-- Chat -->
+        <Dialog header="Chat" v-model:visible="displayChat" :style="{ width: '40%' }" :modal="true">
+            <div class="grid">
+                <div class="col-12">
+                    <div class="card timeline-container">
+                        <Timeline :value="conversa" align="alternate" class="customized-timeline">
+                            <template #marker="slotProps">
+                                <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
+                                    <i :class="slotProps.item.icon"></i>
+                                </span>
+                            </template>
+                            <template #content="slotProps">
+                                <Card>
+                                    <template #title>
+                                        {{ slotProps.item.id_usuario.name }}
+                                    </template>
+                                    <template #subtitle>
+                                        {{ this.formatarData(slotProps.item.data_mensagem) }}
+                                    </template>
+                                    <template #content>
+                                        <h6>
+                                            {{ slotProps.item.mensagem }}
+                                        </h6>
+                                    </template>
+                                </Card>
+                            </template>
+                        </Timeline>
                     </div>
-                </template>
-                <template #empty> Nenhum pedido encontrado! </template>
-                <template #loading> Carregando informações... Por favor, aguarde! </template>
-
-                <Column field="ID" header="ID" :sortable="true" class="w-1">
-                    <template #body="slotProps">
-                        <span class="p-column-title">ID</span>
-                        {{ slotProps.data.id }}
-                    </template>
-                </Column>
-
-                <Column field="Nome" header="Nome" :sortable="true" class="w-2">
-                    <template #body="slotProps">
-                        <span class="p-column-title">Nome</span>
-                        {{ slotProps.data.name }}
-                    </template>
-                </Column>
-
-                <Column field="Função" header="Função" :sortable="true" class="w-2">
-                    <template #body="slotProps">
-                        <span class="p-column-title">Função</span>
-                        {{ slotProps.data.funcao.funcao }}
-                    </template>
-                </Column>
-
-                <Column field="..." header="..." :sortable="true" class="w-2">
-                    <template #body="slotProps">
-                        <span class="p-column-title"></span>
-                        <div class="grid">
-                            <div class="col-4 md:col-4 mr-3">
-                                <Button @click.prevent="delegarPedido(slotProps.data.id)" label="Selecionar" class="p-button-info" />
-                            </div>
-                        </div>
-                    </template>
-                </Column>
-            </DataTable>
+                    <hr />
+                    <InputText class="col-12" type="text" v-model="novaMensagem" placeholder="Digite a mensagem..." />
+                    <Button @click.prevent="enviarMensagem()" label="Enviar" class="mr-2 mt-3 p-button-success col-12" />
+                </div>
+            </div>
         </Dialog>
 
         <!-- Modal Filtros -->
@@ -267,7 +243,7 @@ export default {
                 >
                     <template #header>
                         <div class="flex justify-content-between">
-                            <h5 for="empresa">Pedidos Reprovados:</h5>
+                            <h5 for="empresa">Pedidos Reprovados - Justificar</h5>
                             <div class="grid">
                                 <div class="col-4 md:col-4 mr-2">
                                     <Button @click.prevent="filtrar()" icon="pi pi-search" label="Filtrar" class="p-button-secondary" style="margin-right: 0.25em" />
@@ -332,7 +308,7 @@ export default {
                                     <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
                                 </div>
                                 <div class="col-4 md:col-4 mr-3">
-                                    <Button @click="selecionarFuncionario(slotProps.data.id)" label="Delegar" class="p-button-secondary" />
+                                    <Button @click="buscarChat(slotProps.data.id)" label="Justificar" class="p-button-secondary" />
                                 </div>
                             </div>
                         </template>

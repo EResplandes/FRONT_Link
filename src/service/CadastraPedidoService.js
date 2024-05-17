@@ -14,10 +14,11 @@ export default class CadastraPedidoService {
         formData.append('descricao', form?.descricao ?? null);
         formData.append('valor', form?.valor ?? null);
         formData.append('urgente', form?.urgente) ?? null;
-        formData.append('dt_vencimento', this.formatarDataParaYMD(form?.dt_vencimento) ?? null);
+        formData.append('dt_vencimento', this.formatarDataParaYMD(form?.dt_vencimento));
         formData.append('anexo', form?.pdf ?? null);
         formData.append('id_link', form?.link?.id ?? null);
         formData.append('id_empresa', form?.empresa?.id ?? null);
+        formData.append('id_local', form?.local?.id ?? null);
 
         return fetch(`${API_URL}/pedidos/cadastrar-sem-fluxo`, {
             method: 'POST',
@@ -35,14 +36,16 @@ export default class CadastraPedidoService {
     }
 
     comFluxo(form) {
-        console.log(form.fluxo);
         const formData = new FormData();
-        formData.append('descricao', form.descricao);
-        formData.append('valor', form.valor);
-        formData.append('urgente', form.urgente);
-        formData.append('anexo', form.pdf);
-        formData.append('id_link', form.link?.id);
-        formData.append('id_empresa', form.empresa?.id);
+        formData.append('descricao', form?.descricao ?? null);
+        formData.append('valor', form?.valor ?? null);
+        formData.append('urgente', form?.urgente) ?? null;
+        formData.append('dt_vencimento', this.formatarDataParaYMD(form?.dt_vencimento));
+        formData.append('anexo', form?.pdf ?? null);
+        formData.append('id_link', form?.link?.id ?? null);
+        formData.append('id_empresa', form?.empresa?.id ?? null);
+        formData.append('id_local', form?.local?.id ?? null);
+        formData.append('id_criador', localStorage.getItem('usuario_id'))
         // Crie um array de objetos com a chave "id_usuario"
         const usuarios = form.fluxo.map((item) => ({ id_usuario: item.id }));
 

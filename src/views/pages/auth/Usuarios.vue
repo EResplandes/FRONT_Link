@@ -63,7 +63,7 @@ export default {
         },
 
         // Metódo responsável por abrir confiramção de desativar usuário
-        confirmDesativar(id_empresa) {
+        confirmDesativar(id_funcionario) {
             this.confirm.require({
                 message: 'Tem certeza que deseja desativar esse usuário?',
                 header: 'Desativar Usuário?',
@@ -73,10 +73,50 @@ export default {
                 rejectClass: 'p-button-secondary p-button-outlined',
                 acceptClass: 'p-button-danger',
                 accept: () => {
-                    this.deletarEmpresa(id_empresa);
+                    this.desativarFuncionario(id_funcionario);
                 },
                 reject: () => {}
             });
+        },
+
+        // Metódo responsável por desativar usuário
+        desativarFuncionario(id_funcionario) {
+            this.desativarFuncionario(id_funcionario).then((data) => {
+                if (data.resposta == 'Funcionário desativado com sucesso!') {
+                    this.showSuccess('Funcionário desativado com sucesso!');
+                }
+            });
+        },
+
+        // Metódo responsável por cadastrar usuário
+        cadastrarUsuario() {
+            // Array com os nomes dos campos obrigatórios
+            const camposObrigatorios = ['nome', 'email', 'funcao', 'grupo'];
+
+            // Variável para verificar se todos os campos obrigatórios estão preenchidos
+            let todosCamposPreenchidos = true;
+
+            // Iterar sobre os campos obrigatórios
+            for (const campo of camposObrigatorios) {
+                // Verificar se o campo está vazio
+                if (!this.form[campo]) {
+                    // Se estiver vazio, exibir mensagem de erro e definir a variável como falsa
+                    this.showError(`O campo ${campo.toUpperCase()} é obrigatório!`);
+                    todosCamposPreenchidos = false;
+                }
+            }
+            // Verificar se todos os campos obrigatórios foram preenchidos antes de cadastrar o pedido
+            if (todosCamposPreenchidos) {
+                this.funcionarioService.cadastraFuncionario(this.form).then((data) => {
+                    if (data.resposta == 'Usuário criado com sucesso!') {
+                        this.buscaFuncionarios();
+                        this.showSuccess('Usuários cadastrado com sucesso!');
+                        this.form = {};
+                    } else {
+                        this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
+                    }
+                });
+            }
         },
 
         cadastrar() {
@@ -114,7 +154,7 @@ export default {
             <div class="card p-fluid">
                 <div class="field">
                     <label for="cpf">Nome: <span class="obrigatorio">* </span></label>
-                    <InputText v-tooltip.left="'Digite a o mome do funcionário'" v-model="form.nome_funcionario" id="nome" placeholder="Digite..." />
+                    <InputText v-tooltip.left="'Digite a o mome do funcionário'" v-model="form.nome" id="nome" placeholder="Digite..." />
                 </div>
                 <div class="field">
                     <label for="email">E-mail: <span class="obrigatorio">* </span></label>
@@ -130,7 +170,7 @@ export default {
                 </div>
                 <hr />
                 <div class="field">
-                    <Button @click.prevent="cadastrarEmpresa()" label="Cadastrar" class="mr-2 mb-2 p-button-secondary" />
+                    <Button @click.prevent="cadastrarUsuario()" label="Cadastrar" class="mr-2 mb-2 p-button-secondary" />
                 </div>
             </div>
         </Sidebar>

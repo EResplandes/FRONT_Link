@@ -34,6 +34,11 @@ const router = createRouter({
                     component: () => import('@/views/pages/pedidos/Reprovados.vue')
                 },
                 {
+                    path: '/pedidos-justificar',
+                    name: 'pedidos-justificar',
+                    component: () => import('@/views/pages/pedidos/Justificar.vue')
+                },
+                {
                     path: '/gestor-fluxo',
                     name: 'gestor-fluxo',
                     component: () => import('@/views/pages/pedidos/GestorFluxo.vue')

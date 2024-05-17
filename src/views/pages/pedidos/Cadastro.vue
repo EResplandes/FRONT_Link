@@ -5,6 +5,7 @@ import LinkService from '../../../service/LinkService';
 import EmpresaService from '../../../service/EmpresaService';
 import CadastrarPedidoService from '../../../service/CadastraPedidoService';
 import FuncionarioService from '../../..//service/FuncionarioService';
+import LocalService from '../../../service/LocalService';
 
 export default {
     data() {
@@ -16,12 +17,14 @@ export default {
             empresaService: new EmpresaService(),
             funcionarioService: new FuncionarioService(),
             cadastrarPedidoService: new CadastrarPedidoService(),
+            localService: new LocalService(),
             visibleRight: ref(false),
             loading1: ref(null),
             links: ref(null),
             empresas: ref(null),
             gerentes: ref(null),
             diretores: ref(null),
+            locais: ref(null),
             form: ref({}),
             preloading: ref(true)
         };
@@ -56,13 +59,21 @@ export default {
                 this.preloading = false;
             }
         });
+
+        // Metódo responsável por buscar todos locais
+        this.localService.buscaLocais().then((data) => {
+            if (data.resposta == 'Locais listados com sucesso!') {
+                this.locais = data.locais;
+                this.preloading = false;
+            }
+        });
     },
 
     methods: {
         // Metódo responsável por cadastrar pedido
         cadastrarPedido() {
             // Array com os nomes dos campos obrigatórios
-            const camposObrigatorios = ['valor', 'dt_vencimento', 'link', 'empresa', 'descricao', 'fluxo'];
+            const camposObrigatorios = ['valor', 'dt_vencimento', 'link', 'empresa', 'descricao', 'fluxo', 'local'];
 
             // Variável para verificar se todos os campos obrigatórios estão preenchidos
             let todosCamposPreenchidos = true;
@@ -130,13 +141,21 @@ export default {
                                 <label for="firstname2">Valor <span class="obrigatorio">*</span></label>
                                 <InputNumber v-tooltip.top="'Digite o valor do pedido'" v-model="form.valor" inputId="minmaxfraction" :minFractionDigits="2" :maxFractionDigits="2" placeholder="R$..." />
                             </div>
-                            <div class="field col-12 md:col-4">
+                            <div class="field col-12 md:col-2">
+                                <label for="firstname2">Dt de Vencimento <span class="obrigatorio">*</span></label>
+                                <Calendar v-tooltip.top="'Selecione a data de vencimento'" v-model="form.dt_vencimento" showIcon iconDisplay="input" />
+                            </div>
+                            <div class="field col-12 md:col-2">
                                 <label for="Link">Link <span class="obrigatorio">*</span></label>
                                 <Dropdown id="Link" v-model="form.link" :options="links" optionLabel="link" placeholder="Selecione..."></Dropdown>
                             </div>
-                            <div class="field col-12 md:col-4">
+                            <div class="field col-12 md:col-2">
                                 <label for="Empresa">Empresa <span class="obrigatorio">*</span></label>
                                 <Dropdown id="Empresa" v-model="form.empresa" :options="empresas" optionLabel="nome_empresa" placeholder="Selecione..."></Dropdown>
+                            </div>
+                            <div class="field col-12 md:col-2">
+                                <label for="Local">Local <span class="obrigatorio">*</span></label>
+                                <Dropdown id="Local" v-model="form.local" :options="locais" optionLabel="local" placeholder="Selecione..."></Dropdown>
                             </div>
                             <div class="field col-12">
                                 <label for="descricao">Descrição: <span class="obrigatorio">*</span></label>

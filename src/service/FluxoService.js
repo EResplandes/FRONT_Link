@@ -38,4 +38,27 @@ export default class FluxoService {
                 throw error;
             });
     }
+
+    async cadastrarFluxo(id_pedido, id_usuario) {
+        return fetch(`${API_URL}/fluxo/cadastrar-fluxo`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                id_pedido: id_pedido,
+                id_usuario: id_usuario
+            })
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
 }
