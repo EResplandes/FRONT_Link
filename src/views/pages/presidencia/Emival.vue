@@ -31,8 +31,8 @@ export default {
             displayAcima: ref(false),
             pedidoAcima: ref({}),
             quantidadesPedidos: ref({}),
-            urlBase: 'https://api-link.gruporialma.com.br/storage', // Ambiente de Produção
-            // urlBase: 'https://www.gruporialma.com.br/wp-content/uploads', // Ambiente de Desenvolvimento
+            // urlBase: 'https://api-link.gruporialma.com.br/storage', // Ambiente de Produção
+            urlBase: 'https://www.gruporialma.com.br/wp-content/uploads', // Ambiente de Desenvolvimento
             pdfsrc: ref(null)
         };
     },
