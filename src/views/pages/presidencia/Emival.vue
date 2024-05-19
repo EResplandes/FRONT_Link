@@ -31,13 +31,23 @@ export default {
             displayAcima: ref(false),
             pedidoAcima: ref({}),
             quantidadesPedidos: ref({}),
-            // urlBase: 'https://api-link.gruporialma.com.br/storage', // Ambiente de Produção
-            urlBase: 'https://www.gruporialma.com.br/wp-content/uploads', // Ambiente de Desenvolvimento
-            pdfsrc: ref(null)
+            pdfsrc: ref(null),
+            urlBase: 'https://api-link.gruporialma.com.br/storage', // Ambiente de Produção
+            // urlBase: 'https://www.gruporialma.com.br/wp-content/uploads', // Ambiente de Desenvolvimento
+            adobeApiReady: false,
+            previewFilePromise: null
         };
     },
 
     mounted: function () {
+        if (window.AdobeDC) {
+            this.adobeApiReady = true;
+        } else {
+            document.addEventListener('adobe_dc_view_sdk.ready', () => {
+                this.adobeApiReady = true;
+            });
+        }
+
         // Metódo responsável por buscar quantidades de pedidos para aprovação
         this.pedidoService.buscaQuantidades().then((data) => {
             console.log(data);
@@ -45,7 +55,6 @@ export default {
             this.preloading = false;
         });
     },
-
     created() {
         // Método responsável por buscar quantidades de pedidos para aprovação
         this.pedidoService
@@ -61,6 +70,13 @@ export default {
     },
 
     watch: {
+        adobeApiReady: {
+            handler() {
+                this.$nextTick(() => {
+                    this.renderPdf(`https://documentcloud.adobe.com/view-sdk-demo/PDFs/Bodea Brochure.pdf`, `teste.pdf`);
+                });
+            }
+        },
         display(newVal) {
             if (newVal === false) {
                 this.currentIndex = 0;
@@ -75,6 +91,116 @@ export default {
     },
 
     methods: {
+        nextPage() {
+            this.previewFilePromise.then((adobeViewer) => {
+                adobeViewer.getAPIs().then((apis) => {
+                    apis.getCurrentPage()
+                        .then((currentPage) => apis.gotoLocation(currentPage + 1))
+                        .catch((error) => console.error(error));
+                });
+            });
+        },
+        previousPage() {
+            this.previewFilePromise.then((adobeViewer) => {
+                adobeViewer.getAPIs().then((apis) => {
+                    apis.getCurrentPage()
+                        .then((currentPage) => {
+                            if (currentPage > 1) {
+                                return apis.gotoLocation(currentPage - 1);
+                            }
+                        })
+                        .catch((error) => console.error(error));
+                });
+            });
+        },
+        zoomIn() {
+            this.previewFilePromise.then((adobeViewer) => {
+                adobeViewer.getAPIs().then((apis) => {
+                    apis.getZoomAPIs()
+                        .zoomIn()
+                        .catch((error) => console.error(error));
+                });
+            });
+        },
+        zoomOut() {
+            this.previewFilePromise.then((adobeViewer) => {
+                adobeViewer.getAPIs().then((apis) => {
+                    apis.getZoomAPIs()
+                        .zoomOut()
+                        .catch((error) => console.error(error));
+                });
+            });
+        },
+        renderPdf(url, fileName) {
+            console.log('passou');
+
+            if (!this.adobeApiReady) {
+                console.log('passou1');
+
+                return;
+            }
+            const previewConfig = {
+                defaultViewMode: 'FIT_WIDTH',
+                showAnnotationTools: false
+            };
+            this.$refs.pdfContainer.innerHTML = '';
+            let viewer = document.createElement('div');
+            viewer.id = 'viewer';
+            this.$refs.pdfContainer.appendChild(viewer);
+            let adobeDCView = new AdobeDC.View({
+                clientId: 'e8c98881c48049bbb03b3c5d5db05129',
+                divId: 'viewer'
+            });
+            this.previewFilePromise = adobeDCView.previewFile(
+                {
+                    content: {
+                        location: {
+                            url: url
+                        }
+                    },
+                    metaData: {
+                        fileName: fileName,
+                        id: fileName
+                    }
+                },
+                previewConfig
+            );
+        },
+        renderPdfAcima(url, fileName) {
+            console.log('passou');
+
+            if (!this.adobeApiReady) {
+                console.log('passou1');
+
+                return;
+            }
+            const previewConfig = {
+                defaultViewMode: 'FIT_WIDTH',
+                showAnnotationTools: false
+            };
+            this.$refs.pdfContainerAcima.innerHTML = '';
+            let vieweracima = document.createElement('div');
+            vieweracima.id = 'vieweracima';
+            this.$refs.pdfContainerAcima.appendChild(vieweracima);
+            let adobeDCView = new AdobeDC.View({
+                clientId: 'API_KEY',
+                divId: 'vieweracima'
+            });
+            this.previewFilePromise = adobeDCView.previewFile(
+                {
+                    content: {
+                        location: {
+                            url: url
+                        }
+                    },
+                    metaData: {
+                        fileName: fileName,
+                        id: fileName
+                    }
+                },
+                previewConfig
+            );
+        },
         buscaQuantidades() {
             this.pedidoService.buscaQuantidades().then((data) => {
                 console.log(data);
@@ -319,7 +445,11 @@ export default {
         visualizar(id, data) {
             this.display = true;
             const dataAgora = new Date();
-            this.pdfsrc = `${this.urlBase}/${data.anexo}?t=${dataAgora.getSeconds()}`;
+            // this.pdfsrc = `${this.urlBase}/${data.anexo}?t=${dataAgora.getSeconds()}`;
+
+            this.$nextTick(() => {
+                this.renderPdf(`${this.urlBase}/${data.anexo}?t=${dataAgora.getSeconds()}`, `${dataAgora.getSeconds()}.pdf`);
+            });
         },
 
         visualizarAcima(id, data) {
@@ -327,7 +457,10 @@ export default {
             this.pedidoAcima = data;
             this.displayAcima = true;
             const dataAgora = new Date();
-            this.pdfsrc = `${this.urlBase}/${data.anexo}?t=${dataAgora.getSeconds()}`;
+            // this.pdfsrc = ;
+            this.$nextTick(() => {
+                this.renderPdfAcima(`${this.urlBase}/${data.anexo}?t=${dataAgora.getSeconds()}`, `${dataAgora.getSeconds()}.pdf`);
+            });
         },
 
         // Metódo responsável por formatar data padrão br
@@ -450,10 +583,8 @@ export default {
     <Dialog header="Documento" v-model:visible="display" :style="{ width: '95%' }" :modal="true">
         <div class="grid">
             <div class="col-12 md:col-12">
-                <pdf :src="this.urlBase"></pdf>
-                <object style="width: 100%; height: 700px; border: none" type="application/pdf" :data="this.pdfsrc">
-                    <p>Ocorreu algum problema.</p>
-                </object>
+                <!-- <pdf :src="this.urlBase"></pdf> -->
+                <div ref="pdfContainer" style="width: 100%; height: 700px; border: none"></div>
                 <!-- <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe> -->
             </div>
             <div class="col-4 md:col-4">
@@ -486,9 +617,8 @@ export default {
     <Dialog header="Documento" v-model:visible="displayAcima" :style="{ width: '95%' }" :modal="true">
         <div class="grid">
             <div class="col-12 md:col-12">
-                <object style="width: 100%; height: 700px; border: none" type="application/pdf" :data="pdfsrc">
-                    <p>Ocorreu algum problema.</p>
-                </object>
+                <!-- <pdf :src="this.urlBase"></pdf> -->
+                <div ref="pdfContainerAcima" style="width: 100%; height: 700px; border: none"></div>
                 <!-- <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe> -->
             </div>
             <div class="col-4 md:col-4">
