@@ -51,6 +51,9 @@ export default {
     },
 
     methods: {
+        changeUrgente(urgente) {
+			this.urgente = urgente;
+		},
         // Metódo responsável por cadastrar pedido
         cadastrarPedido() {
             // Array com os nomes dos campos obrigatórios
@@ -71,14 +74,15 @@ export default {
 
             // Verificar se todos os campos obrigatórios foram preenchidos antes de cadastrar o pedido
             if (todosCamposPreenchidos) {
-                this.cadastrarPedidoService.semFluxo(this.form).then((data) => {
-                    if (data.resposta == 'Pedido cadastrado com sucesso!') {
-                        this.showSuccess('Pedido cadastrado com sucesso!');
-                        this.form = {};
-                    } else {
-                        this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
-                    }
-                });
+                console.log(this.form)
+                // this.cadastrarPedidoService.semFluxo(this.form).then((data) => {
+                //     if (data.resposta == 'Pedido cadastrado com sucesso!') {
+                //         this.showSuccess('Pedido cadastrado com sucesso!');
+                //         this.form = {};
+                //     } else {
+                //         this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
+                //     }
+                // });
             }
         },
 
@@ -118,7 +122,7 @@ export default {
                         <div class="p-fluid formgrid grid">
                             <div class="field col-1 md:col-1">
                                 <label for="firstname2">Urgente</label>
-                                <InputSwitch v-model="form.urgente" />
+                                <InputSwitch :trueValue="1" :falseValue="0" :modelValue="form.urgente" v-model="form.urgente" />
                             </div>
                             <div class="field col-12 md:col-3">
                                 <label for="firstname2">Valor <span class="obrigatorio">*</span></label>
