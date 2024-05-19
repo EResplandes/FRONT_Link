@@ -21,7 +21,7 @@ export default {
             editar: ref(false),
             preloading: ref(true),
             display: ref(false),
-            urlBase: 'http://localhost:8000/storage',
+            urlBase: 'https://api-link.gruporialma.com.br/storage',
             pdf: ref(null),
             pdfsrc: ref(null)
         };
@@ -103,8 +103,7 @@ export default {
         visualizar(id, data) {
             this.display = true;
             this.pdf = data.anexo;
-            // this.pdfsrc = `${this.urlBase}/${this.pdf}`;
-            this.pdfsrc = 'https://www.gruporialma.com.br/wp-content/uploads/2024/05/pdf-teste.pdf';
+            this.pdfsrc = `${this.urlBase}/${this.pdf}`;
         },
 
         filtrar() {

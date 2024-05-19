@@ -31,8 +31,8 @@ export default {
             displayAcima: ref(false),
             pedidoAcima: ref({}),
             quantidadesPedidos: ref({}),
-            urlBase: 'https://www.gruporialma.com.br/wp-content/uploads',
-            pdf: ref(null),
+            urlBase: 'https://api-link.gruporialma.com.br/storage', // Ambiente de Produção
+            // urlBase: 'https://www.gruporialma.com.br/wp-content/uploads', // Ambiente de Desenvolvimento
             pdfsrc: ref(null)
         };
     },
@@ -450,7 +450,11 @@ export default {
     <Dialog header="Documento" v-model:visible="display" :style="{ width: '95%' }" :modal="true">
         <div class="grid">
             <div class="col-12 md:col-12">
-                <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
+                <pdf :src="this.urlBase"></pdf>
+                <object style="width: 100%; height: 700px; border: none" type="application/pdf" :data="this.pdfsrc">
+                    <p>Ocorreu algum problema.</p>
+                </object>
+                <!-- <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe> -->
             </div>
             <div class="col-4 md:col-4">
                 <Button icon="pi pi-times" label="Pedido Anterior" class="p-button-secondary" style="width: 100%" @click.prevent="voltar()" :disabled="this.currentIndex == 0" />
@@ -482,7 +486,10 @@ export default {
     <Dialog header="Documento" v-model:visible="displayAcima" :style="{ width: '95%' }" :modal="true">
         <div class="grid">
             <div class="col-12 md:col-12">
-                <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
+                <object style="width: 100%; height: 700px; border: none" type="application/pdf" :data="pdfsrc">
+                    <p>Ocorreu algum problema.</p>
+                </object>
+                <!-- <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe> -->
             </div>
             <div class="col-4 md:col-4">
                 <Button icon="pi pi-times" label="Pedido Anterior" class="p-button-secondary" style="width: 100%" @click.prevent="voltarAcima()" :disabled="this.currentIndex == 0" />

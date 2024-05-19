@@ -4,7 +4,7 @@ const token = localStorage.getItem('token');
 
 export default class DashboardService {
     async buscaInformacoes() {
-        return await fetch(`${API_URL}/dashboard/`, {
+        return await fetch(`${API_URL}/dashboard`, {
             method: 'GET',
             headers: {
                 Accept: 'application/json',

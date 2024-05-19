@@ -33,8 +33,11 @@ export default {
                     localStorage.setItem('funcao', data.usuario[0].funcao.funcao);
                     localStorage.setItem('grupo', data.usuario[0].grupo.grupo);
 
-                    // Redireciona para login
-                    this.router.push('/'); // Mandando para tela principal
+                    if (data.usuario[0].id == '1') {
+                        this.router.push('/emival'); // Mandando para tela principal
+                    } else {
+                        this.router.push('/'); // Mandando para tela principal
+                    }
                 }
             });
         },

@@ -10,6 +10,8 @@ const headers = {
 
 export default class CadastraPedidoService {
     semFluxo(form) {
+        let idCriador = localStorage.getItem('usuario_id');
+
         const formData = new FormData();
         formData.append('descricao', form?.descricao ?? null);
         formData.append('valor', form?.valor ?? null);
@@ -19,6 +21,7 @@ export default class CadastraPedidoService {
         formData.append('id_link', form?.link?.id ?? null);
         formData.append('id_empresa', form?.empresa?.id ?? null);
         formData.append('id_local', form?.local?.id ?? null);
+        formData.append('id_criador', idCriador);
 
         return fetch(`${API_URL}/pedidos/cadastrar-sem-fluxo`, {
             method: 'POST',
@@ -45,7 +48,7 @@ export default class CadastraPedidoService {
         formData.append('id_link', form?.link?.id ?? null);
         formData.append('id_empresa', form?.empresa?.id ?? null);
         formData.append('id_local', form?.local?.id ?? null);
-        formData.append('id_criador', localStorage.getItem('usuario_id'))
+        formData.append('id_criador', localStorage.getItem('usuario_id'));
         // Crie um array de objetos com a chave "id_usuario"
         const usuarios = form.fluxo.map((item) => ({ id_usuario: item.id }));
 
