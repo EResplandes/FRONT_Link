@@ -32,7 +32,7 @@ export default {
             pedidoAcima: ref({}),
             quantidadesPedidos: ref({}),
             pdfsrc: ref(null),
-            urlBase: 'https://api-link.gruporialma.com.br/storage', // Ambiente de Produção
+            urlBase: 'https://link.gruporialma.com.br/storage', // Ambiente de Produção
             // urlBase: 'https://www.gruporialma.com.br/wp-content/uploads', // Ambiente de Desenvolvimento
             adobeApiReady: false,
             previewFilePromise: null
@@ -183,7 +183,7 @@ export default {
             vieweracima.id = 'vieweracima';
             this.$refs.pdfContainerAcima.appendChild(vieweracima);
             let adobeDCView = new AdobeDC.View({
-                clientId: 'API_KEY',
+                clientId: 'e8c98881c48049bbb03b3c5d5db05129',
                 divId: 'vieweracima'
             });
             this.previewFilePromise = adobeDCView.previewFile(

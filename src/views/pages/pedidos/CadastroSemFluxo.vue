@@ -52,8 +52,8 @@ export default {
 
     methods: {
         changeUrgente(urgente) {
-			this.urgente = urgente;
-		},
+            this.urgente = urgente;
+        },
         // Metódo responsável por cadastrar pedido
         cadastrarPedido() {
             // Array com os nomes dos campos obrigatórios
@@ -74,15 +74,14 @@ export default {
 
             // Verificar se todos os campos obrigatórios foram preenchidos antes de cadastrar o pedido
             if (todosCamposPreenchidos) {
-                console.log(this.form)
-                // this.cadastrarPedidoService.semFluxo(this.form).then((data) => {
-                //     if (data.resposta == 'Pedido cadastrado com sucesso!') {
-                //         this.showSuccess('Pedido cadastrado com sucesso!');
-                //         this.form = {};
-                //     } else {
-                //         this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
-                //     }
-                // });
+                this.cadastrarPedidoService.semFluxo(this.form).then((data) => {
+                    if (data.resposta == 'Pedido cadastrado com sucesso!') {
+                        this.showSuccess('Pedido cadastrado com sucesso!');
+                        this.form = {};
+                    } else {
+                        this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
+                    }
+                });
             }
         },
 
