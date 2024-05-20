@@ -132,40 +132,76 @@ export default {
             });
         },
         renderPdf(url, fileName) {
-            console.log('passou');
-
-            if (!this.adobeApiReady) {
-                console.log('passou1');
-
-                return;
-            }
-            const previewConfig = {
-                defaultViewMode: 'FIT_WIDTH',
-                showAnnotationTools: false
-            };
-            this.$refs.pdfContainer.innerHTML = '';
-            let viewer = document.createElement('div');
-            viewer.id = 'viewer';
-            this.$refs.pdfContainer.appendChild(viewer);
-            let adobeDCView = new AdobeDC.View({
-                clientId: 'e8c98881c48049bbb03b3c5d5db05129',
-                divId: 'viewer'
-            });
-            this.previewFilePromise = adobeDCView.previewFile(
-                {
-                    content: {
-                        location: {
-                            url: url
-                        }
-                    },
-                    metaData: {
-                        fileName: fileName,
-                        id: fileName
+            // Use fetch para obter o PDF como Blob
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch PDF');
                     }
-                },
-                previewConfig
-            );
+                    return response.blob();
+                })
+                .then(pdfBlob => {
+                    // Renderize o PDF a partir do Blob
+                    this.renderPdfFromBlob(pdfBlob, fileName);
+                })
+                .catch(error => {
+                    console.error('Error fetching PDF:', error);
+                });
         },
+        renderPdfFromBlob(pdfBlob, fileName) {
+            // Limpe o conteúdo anterior
+            this.$refs.pdfContainer.innerHTML = "";
+
+            let viewer = document.createElement("div");
+            viewer.id = "viewer";
+            this.$refs.pdfContainer.appendChild(viewer);
+
+            let adobeDCView = new AdobeDC.View({
+                clientId: "API_KEY",
+                divId: "viewer"
+            });
+
+            // Renderize o PDF a partir do Blob
+            adobeDCView.previewFile({
+                content: { promise: Promise.resolve(pdfBlob) },
+                metaData: { fileName: fileName }
+            }, { embedMode: "SIZED_CONTAINER" });
+        },
+        // renderPdf(url, fileName) {
+        //     console.log('passou');
+
+        //     if (!this.adobeApiReady) {
+        //         console.log('passou1');
+
+        //         return;
+        //     }
+        //     const previewConfig = {
+        //         defaultViewMode: 'FIT_WIDTH',
+        //         showAnnotationTools: false
+        //     };
+        //     this.$refs.pdfContainer.innerHTML = '';
+        //     let viewer = document.createElement('div');
+        //     viewer.id = 'viewer';
+        //     this.$refs.pdfContainer.appendChild(viewer);
+        //     let adobeDCView = new AdobeDC.View({
+        //         clientId: 'e8c98881c48049bbb03b3c5d5db05129',
+        //         divId: 'viewer'
+        //     });
+        //     this.previewFilePromise = adobeDCView.previewFile(
+        //         {
+        //             content: {
+        //                 location: {
+        //                     url: url
+        //                 }
+        //             },
+        //             metaData: {
+        //                 fileName: fileName,
+        //                 id: fileName
+        //             }
+        //         },
+        //         previewConfig
+        //     );
+        // },
         renderPdfAcima(url, fileName) {
             console.log('passou');
 
@@ -182,24 +218,14 @@ export default {
             let vieweracima = document.createElement('div');
             vieweracima.id = 'vieweracima';
             this.$refs.pdfContainerAcima.appendChild(vieweracima);
-            let adobeDCView = new AdobeDC.View({
-                clientId: 'API_KEY',
-                divId: 'vieweracima'
-            });
-            this.previewFilePromise = adobeDCView.previewFile(
-                {
-                    content: {
-                        location: {
-                            url: url
-                        }
-                    },
-                    metaData: {
-                        fileName: fileName,
-                        id: fileName
-                    }
-                },
-                previewConfig
-            );
+
+
+            let adobeDCView = new AdobeDC.View({ clientId: "aa0b0f00f5404bb18e91cb77a21bc14d", divId: "vieweracima" });
+
+            this.previewFilePromise = adobeDCView.previewFile({
+                content: { location: { url: url } },
+                metaData: { fileName: "Bodea Brochure.pdf" }
+            }, { embedMode: "SIZED_CONTAINER" });
         },
         buscaQuantidades() {
             this.pedidoService.buscaQuantidades().then((data) => {
@@ -448,7 +474,7 @@ export default {
             // this.pdfsrc = `${this.urlBase}/${data.anexo}?t=${dataAgora.getSeconds()}`;
 
             this.$nextTick(() => {
-                this.renderPdf(`${this.urlBase}/${data.anexo}?t=${dataAgora.getSeconds()}`, `${dataAgora.getSeconds()}.pdf`);
+                this.renderPdf(`https://protheus.gruporialma.com.br/storage/localitys/4f07c6c0df97ae5543f7c0a616817c91.pdf`, `${dataAgora.getSeconds()}.pdf`);
             });
         },
 
@@ -512,26 +538,30 @@ export default {
         <ProgressSpinner />
     </div>
 
-    <Button v-if="this.pedidos != null" label="Voltar" class="p-button-secondary" style="width: 20%" @click="(this.ocultaFiltros = false), (this.pedidos = null), buscaQuantidades()" />
+    <Button v-if="this.pedidos != null" label="Voltar" class="p-button-secondary" style="width: 20%"
+        @click="(this.ocultaFiltros = false), (this.pedidos = null), buscaQuantidades()" />
 
     <div v-if="this.ocultaFiltros == false" class="grid text-center">
         <div class="col-12">
             <Splitter style="height: 300px">
-                <SplitterPanel @click.prevent="listarEmivalMenorQuinhentos()" class="flex align-items-center justify-content-center splitter-panel">
+                <SplitterPanel @click.prevent="listarEmivalMenorQuinhentos()"
+                    class="flex align-items-center justify-content-center splitter-panel">
                     <div>
                         Total de pedidos com valor até R$ 500,00
                         <br />
                         <h3>{{ this.quantidadesPedidos.qtd_abaixoQuinhentos }} pedidos</h3>
                     </div>
                 </SplitterPanel>
-                <SplitterPanel @click.prevent="listarEmivalMenorMil()" class="flex align-items-center justify-content-center splitter-panel">
+                <SplitterPanel @click.prevent="listarEmivalMenorMil()"
+                    class="flex align-items-center justify-content-center splitter-panel">
                     <div>
                         Total de pedidos com valor de R$ 500,01 à R$ 1000,00
                         <br />
                         <h3>{{ this.quantidadesPedidos.qtd_abaixoMil }} pedidos</h3>
                     </div>
                 </SplitterPanel>
-                <SplitterPanel @click.prevent="listarEmivalMaiorMil()" class="flex align-items-center justify-content-center splitter-panel">
+                <SplitterPanel @click.prevent="listarEmivalMaiorMil()"
+                    class="flex align-items-center justify-content-center splitter-panel">
                     <div>
                         Total de pedidos com o valor acima de R$ 1000,00
                         <br />
@@ -549,7 +579,9 @@ export default {
                 <div class="card timeline-container">
                     <Timeline :value="conversa" align="alternate" class="customized-timeline">
                         <template #marker="slotProps">
-                            <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
+                            <span
+                                class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2"
+                                :style="{ backgroundColor: slotProps.item.color }">
                                 <i :class="slotProps.item.icon"></i>
                             </span>
                         </template>
@@ -573,8 +605,10 @@ export default {
                 </div>
                 <hr />
                 <InputText class="col-12" type="text" v-model="mensagemEmival" placeholder="Digite a mensagem..." />
-                <Button v-if="displayAcima" @click="salvaMensagemAcima()" label="Enviar Mensagem" class="mr-2 mt-3 p-button-success col-12" />
-                <Button v-if="!displayAcima" @click="salvaMensagem()" label="Enviar Mensagem" class="mr-2 mt-3 p-button-success col-12" />
+                <Button v-if="displayAcima" @click="salvaMensagemAcima()" label="Enviar Mensagem"
+                    class="mr-2 mt-3 p-button-success col-12" />
+                <Button v-if="!displayAcima" @click="salvaMensagem()" label="Enviar Mensagem"
+                    class="mr-2 mt-3 p-button-success col-12" />
             </div>
         </div>
     </Dialog>
@@ -588,27 +622,26 @@ export default {
                 <!-- <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe> -->
             </div>
             <div class="col-4 md:col-4">
-                <Button icon="pi pi-times" label="Pedido Anterior" class="p-button-secondary" style="width: 100%" @click.prevent="voltar()" :disabled="this.currentIndex == 0" />
+                <Button icon="pi pi-times" label="Pedido Anterior" class="p-button-secondary" style="width: 100%"
+                    @click.prevent="voltar()" :disabled="this.currentIndex == 0" />
             </div>
             <div class="col-4 md:col-4">
-                <Button icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%" @click.prevent="reprovarItem()" />
+                <Button icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%"
+                    @click.prevent="reprovarItem()" />
             </div>
             <div class="col-4 md:col-4">
-                <Button
-                    icon="pi pi-check"
+                <Button icon="pi pi-check"
                     :label="this.currentIndex >= this.pedidos.length - 1 ? 'Aprovar Último Pedido' : 'Próximos Pedidos'"
-                    class="p-button-info"
-                    style="width: 100%"
-                    @click.prevent="proximoItem()"
-                    :disabled="this.currentIndex == this.pedidos.length"
-                />
+                    class="p-button-info" style="width: 100%" @click.prevent="proximoItem()"
+                    :disabled="this.currentIndex == this.pedidos.length" />
             </div>
 
             <div class="col-12 md:col-12 text-center">
                 <span>Pedidos Aprovados {{ this.pedidosAprovados.length }} de {{ this.pedidos.length }} Pedidos!</span>
             </div>
             <div v-if="this.pedidosAprovados.length > 0" class="col-12 md:col-12">
-                <Button icon="pi pi-check" label="Finalizar Aprovações" class="p-button-success" style="width: 100%" @click.prevent="aprovar()" />
+                <Button icon="pi pi-check" label="Finalizar Aprovações" class="p-button-success" style="width: 100%"
+                    @click.prevent="aprovar()" />
             </div>
         </div>
     </Dialog>
@@ -622,12 +655,15 @@ export default {
                 <!-- <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe> -->
             </div>
             <div class="col-4 md:col-4">
-                <Button icon="pi pi-times" label="Pedido Anterior" class="p-button-secondary" style="width: 100%" @click.prevent="voltarAcima()" :disabled="this.currentIndex == 0" />
+                <Button icon="pi pi-times" label="Pedido Anterior" class="p-button-secondary" style="width: 100%"
+                    @click.prevent="voltarAcima()" :disabled="this.currentIndex == 0" />
             </div>
             <div class="col-4 md:col-4">
-                <Button icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%" @click.prevent="reprovarItemAcima()" />
+                <Button icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%"
+                    @click.prevent="reprovarItemAcima()" />
             </div>
-            <div class="col-4 md:col-4"><Button icon="pi pi-check" label="Aprovar" class="p-button-info" style="width: 100%" @click.prevent="proximoItemAcima()" :disabled="this.currentIndex == this.pedidos.length" /></div>
+            <div class="col-4 md:col-4"><Button icon="pi pi-check" label="Aprovar" class="p-button-info" style="width: 100%"
+                    @click.prevent="proximoItemAcima()" :disabled="this.currentIndex == this.pedidos.length" /></div>
 
             <div class="col-12 md:col-12 text-center">
                 <span>Visualizando Pedido {{ this.currentIndex + 1 }} de {{ this.pedidos.length }} Pedidos!</span>
@@ -645,18 +681,11 @@ export default {
                 <Toast />
             </div>
             <div v-if="this.pedidos && this.acimaMil == false" class="card">
-                <DataTable
-                    dataKey="id"
-                    :value="pedidos"
-                    :paginator="true"
-                    :rows="10"
+                <DataTable dataKey="id" :value="pedidos" :paginator="true" :rows="10"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25, 50, 100]"
                     currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
-                    responsiveLayout="scroll"
-                    filterDisplay="menu"
-                    stripedRows
-                >
+                    responsiveLayout="scroll" filterDisplay="menu" stripedRows>
                     <template #header>
                         <div class="flex justify-content-between"></div>
                     </template>
@@ -696,7 +725,8 @@ export default {
                             <span class="p-column-title"></span>
                             <div class="grid">
                                 <div class="col-4 md:col-4 mr-3">
-                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-secondary" />
+                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye"
+                                        class="p-button-secondary" />
                                 </div>
                             </div>
                         </template>
@@ -706,18 +736,11 @@ export default {
 
             <!-- Tabela com todos pedidos com Dr Emival aprovação separada acima de 1000 reais -->
             <div v-if="this.pedidos && this.acimaMil" class="card">
-                <DataTable
-                    dataKey="id"
-                    :value="pedidos"
-                    :paginator="true"
-                    :rows="10"
+                <DataTable dataKey="id" :value="pedidos" :paginator="true" :rows="10"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25, 50, 100]"
                     currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
-                    responsiveLayout="scroll"
-                    filterDisplay="menu"
-                    stripedRows
-                >
+                    responsiveLayout="scroll" filterDisplay="menu" stripedRows>
                     <template #header>
                         <div class="flex justify-content-between"></div>
                     </template>
@@ -757,7 +780,8 @@ export default {
                             <span class="p-column-title"></span>
                             <div class="grid">
                                 <div class="col-4 md:col-4 mr-3">
-                                    <Button @click.prevent="visualizarAcima(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-secondary" />
+                                    <Button @click.prevent="visualizarAcima(slotProps.data.id, slotProps.data)"
+                                        icon="pi pi-eye" class="p-button-secondary" />
                                 </div>
                             </div>
                         </template>
