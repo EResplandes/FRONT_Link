@@ -8,7 +8,7 @@ const userRole = localStorage.getItem('funcao');
 const model = ref([
     {
         label: 'Home',
-        items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' }]
+        items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/', requiredRole: ['Administrador', 'Gestor de Fluxo', 'Diretor', 'Gerente', 'Comprador'] }]
     },
     {
         label: 'Gestor de Fluxo',
@@ -39,8 +39,8 @@ const model = ref([
     {
         label: 'Presidência',
         items: [
-            { label: 'Emival', icon: 'pi pi-fw pi-users', to: '/emival', requiredRole: ['Presidente', 'Administrador'] },
-            { label: 'Mônica', icon: 'pi pi-fw pi-building', to: '/monica', requiredRole: ['Presidente', 'Administrador'] }
+            { label: 'Emival', icon: 'pi pi-fw pi-users', to: '/emival', requiredRole: ['Presidente', 'Administrador'] }
+            // { label: 'Mônica', icon: 'pi pi-fw pi-building', to: '/monica', requiredRole: ['Presidente', 'Administrador'] }
         ]
     }
 ]);

@@ -14,7 +14,6 @@ const logoUrl = computed(() => {
     <div class="layout-footer">
         by
         <span class="font-medium ml-2">Departamento de TI - RIALMA S/A</span>
-        <span class="font-medium ml-2 text-red-500 center text-center">- <b>SISTEMA EM PROCESSO DE TESTES</b></span>
     </div>
 </template>
 <style lang="scss" scoped></style>
