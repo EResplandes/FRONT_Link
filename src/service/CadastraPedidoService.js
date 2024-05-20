@@ -11,7 +11,6 @@ const headers = {
 export default class CadastraPedidoService {
     semFluxo(form) {
         let idCriador = localStorage.getItem('usuario_id');
-
         const formData = new FormData();
         formData.append('descricao', form?.descricao ?? null);
         formData.append('valor', form?.valor ?? null);
@@ -42,7 +41,7 @@ export default class CadastraPedidoService {
         const formData = new FormData();
         formData.append('descricao', form?.descricao ?? null);
         formData.append('valor', form?.valor ?? null);
-        formData.append('urgente', form?.urgente) ?? null;
+        formData.append('urgente', form?.urgente) ?? 0;
         formData.append('dt_vencimento', this.formatarDataParaYMD(form?.dt_vencimento));
         formData.append('anexo', form?.pdf ?? null);
         formData.append('id_link', form?.link?.id ?? null);

@@ -29,7 +29,7 @@ export default {
             preloading: ref(true),
             displayFluxo: ref(false),
             display: ref(false),
-            urlBase: 'https://api-link.gruporialma.com.br/storage',
+            urlBase: 'https://link.gruporialma.com.br/storage',
             pdf: ref(null),
             pdfsrc: ref(null),
             fluxoPedido: ref(null)

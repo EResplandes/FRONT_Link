@@ -24,9 +24,10 @@ const model = ref([
     {
         label: 'Meus pedidos',
         items: [
-            { label: 'Cadastro', icon: 'pi pi-fw pi-book', to: '/cadastro-pedido', requiredRole: ['Diretor', 'Gerente', 'Administrador'] },
-            { label: 'Aprovação', icon: 'pi pi-fw pi-check-circle', to: '/aprovacao-gerentes', requiredRole: ['Diretor', 'Gerente', 'Administrador'] },
-            { label: 'Justificar Pedidos', icon: 'pi pi-fw pi-check-circle', to: '/pedidos-justificar', requiredRole: ['Diretor', 'Gerente', 'Administrador'] }
+            { label: 'Cadastro', icon: 'pi pi-fw pi-book', to: '/cadastro-pedido', requiredRole: ['Diretor', 'Gerente', 'Administrador', 'Comprador'] },
+            { label: 'Aprovação', icon: 'pi pi-fw pi-check-circle', to: '/aprovacao-gerentes', requiredRole: ['Diretor', 'Gerente', 'Administrador', 'Comprador'] },
+            { label: 'Aprovados', icon: 'pi pi-fw pi-check-circle', to: '/pedidos-aprovados', requiredRole: ['Diretor', 'Gerente', 'Administrador', 'Comprador'] },
+            { label: 'Justificar Pedidos', icon: 'pi pi-fw pi-check-circle', to: '/pedidos-justificar', requiredRole: ['Diretor', 'Gerente', 'Administrador', 'Comprador'] }
         ]
     },
     {

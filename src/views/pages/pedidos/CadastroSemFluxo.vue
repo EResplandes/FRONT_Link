@@ -21,7 +21,9 @@ export default {
             links: ref(null),
             empresas: ref(null),
             locais: ref(null),
-            form: ref({}),
+            form: ref({
+                urgente: 0
+            }),
             preloading: ref(true)
         };
     },

@@ -21,7 +21,7 @@ export default {
             editar: ref(false),
             preloading: ref(true),
             display: ref(false),
-            urlBase: 'https://api-link.gruporialma.com.br/storage',
+            urlBase: 'https://link.gruporialma.com.br/storage',
             pdf: ref(null),
             pdfsrc: ref(null)
         };

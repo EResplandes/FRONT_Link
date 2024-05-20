@@ -59,6 +59,11 @@ const router = createRouter({
                     component: () => import('@/views/pages/gerente/Aprovacao.vue')
                 },
                 {
+                    path: '/pedidos-aprovados',
+                    name: 'pedidos-aprovados',
+                    component: () => import('@/views/pages/comprador/PedidosAprovados.vue')
+                },
+                {
                     path: '/empresas',
                     name: 'empresas',
                     component: () => import('@/views/pages/empresa/Empresa.vue')

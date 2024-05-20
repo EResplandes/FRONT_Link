@@ -297,4 +297,42 @@ export default class PedidoService {
                 throw error;
             });
     }
+
+    // Requisição responsável por buscar pedidos aprovador por criador
+    async buscaReprovadosCriador(id) {
+        return await fetch(`${API_URL}/pedidos/pedidos-aprovados/` + id, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    // Requisição responsável por buscar informações e fluxo do pedido
+    async buscaInformacoesPedido(id) {
+        return await fetch(`${API_URL}/pedidos/informacoes-pedido/` + id, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
 }
