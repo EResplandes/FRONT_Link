@@ -135,7 +135,7 @@ export default {
                         <div class="p-fluid formgrid grid">
                             <div class="field col-1 md:col-1">
                                 <label for="firstname2">Urgente</label>
-                                <InputSwitch v-model="form.urgente" />
+                                <InputSwitch :trueValue="1" :falseValue="0" :modelValue="form.urgente" v-model="form.urgente" />
                             </div>
                             <div class="field col-12 md:col-3">
                                 <label for="firstname2">Valor <span class="obrigatorio">*</span></label>

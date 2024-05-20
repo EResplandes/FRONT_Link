@@ -4,6 +4,7 @@ import vue from '@vitejs/plugin-vue';
 
 export default defineConfig(() => {
     return {
+        base: '/site/', // Corrigindo aqui
         plugins: [vue()],
         resolve: {
             alias: {

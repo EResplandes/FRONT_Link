@@ -56,10 +56,10 @@ export default {
 <template>
     <div class="surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden">
         <div class="flex flex-column align-items-center justify-content-center">
-            <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
+            <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--surface-600) 10%, rgba(999, 999, 999, 0) 30%)">
                 <div class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
                     <div class="text-center mb-5">
-                        <div class="text-900 text-3xl font-medium mb-3">Protheus Web</div>
+                        <div class="text-900 text-3xl font-medium mb-3">Link Web</div>
                     </div>
 
                     <transition-group name="p-message" tag="div">

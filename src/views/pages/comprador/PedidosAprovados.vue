@@ -2,53 +2,46 @@
 import { ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
-import PedidoService from '../../../service/Pedido';
 import EmpresaService from '../../../service/EmpresaService';
 import StatusService from '../../../service/StatusService';
-import FuncionarioService from '../../../service/FuncionarioService';
-import FluxoService from '../../../service/FluxoService';
+import PedidoService from '../../../service/Pedido';
+import { generatePDF } from './aprovacao';
 
 export default {
     data() {
         return {
             toast: new useToast(),
             displayConfirmation: ref(false),
-            pedidoService: new PedidoService(),
-            fluxoService: new FluxoService(),
             empresaService: new EmpresaService(),
             statusService: new StatusService(),
-            funcionarioService: new FuncionarioService(),
+            pedidoService: new PedidoService(),
             displayConfirmationActivation: ref(false),
             visibleRight: ref(false),
             confirm: new useConfirm(),
             loading1: ref(null),
             empresas: ref(null),
             pedidos: ref(null),
-            funcionarios: ref(null),
-            id_pedido: ref(null),
-            id_usuario: ref(null),
             status: ref(null),
             form: ref({}),
+            idPedido: ref(null),
+            idFluxo: ref(null),
             editar: ref(false),
             preloading: ref(true),
+            displayFluxo: ref(false),
             display: ref(false),
-            displayDelegar: ref(false),
-            urlBase: 'https://link.gruporialma.com.br/storage',
+            urlBase: 'http://localhost:8000/storage',
             pdf: ref(null),
-            pdfsrc: ref(null)
+            pdfsrc: ref(null),
+            fluxoPedido: ref(null),
+            informacoesPedidos: ref(null)
         };
     },
 
     mounted: function () {
-        // Metódo responsável por buscar todas os pedidos reprovados
-        this.pedidoService.buscaReprovados().then((data) => {
+        // Metódo responsável por buscar todos pedidos relacionas a esse usuário que não foram aprovados
+        this.pedidoService.buscaReprovadosCriador(localStorage.getItem('usuario_id')).then((data) => {
             this.pedidos = data.pedidos;
             this.preloading = false;
-        });
-
-        // Metódo responsável por buscar todos responsáveis como gerentes e diretores
-        this.funcionarioService.buscaResponsaveis().then((data) => {
-            this.funcionarios = data.funcionarios;
         });
 
         // Metódo responsável por buscar todas empresas
@@ -67,10 +60,10 @@ export default {
     },
 
     methods: {
-        // Metódo responsável por buscar todos pedidos reprovados
+        // Metódo responsável por buscar todos pedidos do usuário logado
         buscaPedidos() {
             this.preloading = true;
-            this.pedidoService.buscaReprovados().then((data) => {
+            this.gerenteService.buscaPedidos(localStorage.getItem('usuario_id')).then((data) => {
                 this.pedidos = data.pedidos;
                 this.preloading = false;
             });
@@ -100,22 +93,22 @@ export default {
             this.pdfsrc = `${this.urlBase}/${this.pdf}`;
         },
 
-        delegarPedido(id_usuario) {
-            this.id_usuario = id_usuario;
-
-            this.fluxoService.cadastrarFluxo(this.id_pedido, this.id_usuario).then((data) => {
-                console.log(data);
-                if (data.resposta == 'Fluxo cadastrado com sucesso!') {
-                    this.showSuccess('Pedido delegado com sucesso!');
-                    this.buscaPedidos();
-                }
-                this.displayDelegar = false;
-            });
+        imprimirAutorizacao(data) {
+            this.loading = true;
+            console.log(data);
+            try {
+                generatePDF(data);
+            } catch (error) {
+                console.error('Erro ao gerar PDF:', error);
+            } finally {
+                this.loading = false;
+            }
         },
 
-        selecionarFuncionario(id_pedido) {
-            this.displayDelegar = true;
-            this.id_pedido = id_pedido;
+        buscaInformacoesPedido(id) {
+            this.pedidoService.buscaInformacoesPedido(id).then((data) => {
+                this.imprimirAutorizacao(data);
+            });
         },
 
         filtrar() {
@@ -133,13 +126,6 @@ export default {
 
         showError(mensagem) {
             this.toast.add({ severity: 'error', summary: 'Ocorreu um erro!', detail: mensagem, life: 3000 });
-        },
-
-        // Metódo responsável por limpagem de filtros
-        limparFiltro() {
-            this.buscaPedidos();
-            this.showInfo('Filtro removidos com sucesso!');
-            this.form = {};
         }
     }
 };
@@ -154,63 +140,11 @@ export default {
 
         <!-- Visualizar -->
         <Dialog header="Documento" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
-            <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
-        </Dialog>
-
-        <!-- Delegar Pedido -->
-        <Dialog header="Delegar pedido" v-model:visible="displayDelegar" :style="{ width: '60%' }" :modal="true">
-            <DataTable
-                dataKey="id"
-                :value="funcionarios"
-                :paginator="true"
-                :rows="10"
-                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                :rowsPerPageOptions="[5, 10, 25, 50, 100]"
-                currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
-                responsiveLayout="scroll"
-                filterDisplay="menu"
-                stripedRows
-            >
-                <template #header>
-                    <div class="flex justify-content-between">
-                        <h5 for="empresa">Delegar para:</h5>
-                    </div>
-                </template>
-                <template #empty> Nenhum pedido encontrado! </template>
-                <template #loading> Carregando informações... Por favor, aguarde! </template>
-
-                <Column field="ID" header="ID" :sortable="true" class="w-1">
-                    <template #body="slotProps">
-                        <span class="p-column-title">ID</span>
-                        {{ slotProps.data.id }}
-                    </template>
-                </Column>
-
-                <Column field="Nome" header="Nome" :sortable="true" class="w-2">
-                    <template #body="slotProps">
-                        <span class="p-column-title">Nome</span>
-                        {{ slotProps.data.name }}
-                    </template>
-                </Column>
-
-                <Column field="Função" header="Função" :sortable="true" class="w-2">
-                    <template #body="slotProps">
-                        <span class="p-column-title">Função</span>
-                        {{ slotProps.data.funcao.funcao }}
-                    </template>
-                </Column>
-
-                <Column field="..." header="..." :sortable="true" class="w-2">
-                    <template #body="slotProps">
-                        <span class="p-column-title"></span>
-                        <div class="grid">
-                            <div class="col-4 md:col-4 mr-3">
-                                <Button @click.prevent="delegarPedido(slotProps.data.id)" label="Selecionar" class="p-button-info" />
-                            </div>
-                        </div>
-                    </template>
-                </Column>
-            </DataTable>
+            <div class="grid">
+                <div class="col-12 md:col-12">
+                    <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
+                </div>
+            </div>
         </Dialog>
 
         <!-- Modal Filtros -->
@@ -266,7 +200,7 @@ export default {
                 >
                     <template #header>
                         <div class="flex justify-content-between">
-                            <h5 for="empresa">Pedidos Reprovados:</h5>
+                            <h5 for="empresa">Pedidos Aprovados:</h5>
                             <div class="grid">
                                 <div class="col-4 md:col-4 mr-2">
                                     <Button @click.prevent="filtrar()" icon="pi pi-search" label="Filtrar" class="p-button-secondary" style="margin-right: 0.25em" />
@@ -309,13 +243,6 @@ export default {
                         </template>
                     </Column>
 
-                    <Column field="Presidente" header="Presidente" :sortable="true" class="w-5">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Presidente</span>
-                            Dr. {{ slotProps.data.link.link }}
-                        </template>
-                    </Column>
-
                     <Column field="Valor" header="Valor" :sortable="true" class="w-1">
                         <template #body="slotProps">
                             <span class="p-column-title">CNPJ</span>
@@ -331,7 +258,7 @@ export default {
                                     <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
                                 </div>
                                 <div class="col-4 md:col-4 mr-3">
-                                    <Button @click="selecionarFuncionario(slotProps.data.id)" label="Delegar" class="p-button-secondary" />
+                                    <Button @click.prevent="buscaInformacoesPedido(slotProps.data.id)" icon="pi pi-print" class="p-button-secondary" />
                                 </div>
                             </div>
                         </template>

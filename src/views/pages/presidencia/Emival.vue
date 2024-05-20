@@ -32,7 +32,7 @@ export default {
             pedidoAcima: ref({}),
             quantidadesPedidos: ref({}),
             pdfsrc: ref(null),
-            urlBase: 'https://api-link.gruporialma.com.br/storage', // Ambiente de Produção
+            urlBase: 'https://link.gruporialma.com.br/storage', // Ambiente de Produção
             // urlBase: 'https://www.gruporialma.com.br/wp-content/uploads', // Ambiente de Desenvolvimento
             adobeApiReady: false,
             previewFilePromise: null
@@ -218,14 +218,24 @@ export default {
             let vieweracima = document.createElement('div');
             vieweracima.id = 'vieweracima';
             this.$refs.pdfContainerAcima.appendChild(vieweracima);
-
-
-            let adobeDCView = new AdobeDC.View({ clientId: "aa0b0f00f5404bb18e91cb77a21bc14d", divId: "vieweracima" });
-
-            this.previewFilePromise = adobeDCView.previewFile({
-                content: { location: { url: url } },
-                metaData: { fileName: "Bodea Brochure.pdf" }
-            }, { embedMode: "SIZED_CONTAINER" });
+            let adobeDCView = new AdobeDC.View({
+                clientId: 'e8c98881c48049bbb03b3c5d5db05129',
+                divId: 'vieweracima'
+            });
+            this.previewFilePromise = adobeDCView.previewFile(
+                {
+                    content: {
+                        location: {
+                            url: url
+                        }
+                    },
+                    metaData: {
+                        fileName: fileName,
+                        id: fileName
+                    }
+                },
+                previewConfig
+            );
         },
         buscaQuantidades() {
             this.pedidoService.buscaQuantidades().then((data) => {

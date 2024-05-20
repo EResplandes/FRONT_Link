@@ -1,231 +1,70 @@
 <script setup>
-import { ref } from 'vue';
-
+import { ref, computed } from 'vue';
 import AppMenuItem from './AppMenuItem.vue';
 
-const funcaoPresente = localStorage.getItem('funcao') === 'Administrador';
+const userRole = localStorage.getItem('funcao');
 
-// Filtrar os itens do menu com base na presença da função
-// const menuFiltrado = computed(() => {
-//     if (funcaoPresente) {
-//         return model.value;
-//     } else {
-//         // Se a função não estiver presente, filtre os itens removendo aqueles que requerem a função
-//         return model.value.filter((item) => !item.requerFuncao);
-//     }
-// });
-
+// Adicionando a propriedade `requiredRole` aos itens do menu
 const model = ref([
     {
         label: 'Home',
-        items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' }]
+        items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/', requiredRole: ['Administrador', 'Gestor de Fluxo', 'Diretor', 'Gerente', 'Comprador'] }]
     },
     {
         label: 'Gestor de Fluxo',
         items: [
-            { label: 'Pedidos com Emival', icon: 'pi pi-fw pi-book', to: '/pedidos-emival' },
-            { label: 'Pedidos com Monica', icon: 'pi pi-fw pi-book', to: '/pedidos-monica' },
-            { label: 'Todos', icon: 'pi pi-fw pi-book', to: '/pedidos-todos' },
-            { label: 'Pedidos Reprovados', icon: 'pi pi-fw pi-book', to: '/pedidos-reprovados' },
-            { label: 'Análise de Fluxo', icon: 'pi pi-fw pi-book', to: '/gestor-fluxo' },
-            { label: 'Cadastro sem Fluxo', icon: 'pi pi-fw pi-book', to: '/cadastro-sem-fluxo' }
+            { label: 'Pedidos com Emival', icon: 'pi pi-fw pi-book', to: '/pedidos-emival', requiredRole: ['Gestor de Fluxo', 'Administrador'] },
+            { label: 'Pedidos com Monica', icon: 'pi pi-fw pi-book', to: '/pedidos-monica', requiredRole: ['Gestor de Fluxo', 'Administrador'] },
+            { label: 'Todos', icon: 'pi pi-fw pi-book', to: '/pedidos-todos', requiredRole: ['Gestor de Fluxo', 'Administrador'] },
+            { label: 'Pedidos Reprovados', icon: 'pi pi-fw pi-book', to: '/pedidos-reprovados', requiredRole: ['Gestor de Fluxo', 'Administrador'] },
+            { label: 'Análise de Fluxo', icon: 'pi pi-fw pi-book', to: '/gestor-fluxo', requiredRole: ['Gestor de Fluxo', 'Administrador'] },
+            { label: 'Cadastro sem Fluxo', icon: 'pi pi-fw pi-book', to: '/cadastro-sem-fluxo', requiredRole: ['Gestor de Fluxo', 'Administrador'] }
         ]
     },
     {
         label: 'Meus pedidos',
         items: [
-            { label: 'Cadastro', icon: 'pi pi-fw pi-book', to: '/cadastro-pedido' },
-            { label: 'Aprovação', icon: 'pi pi-fw pi-check-circle', to: '/aprovacao-gerentes' },
-            { label: 'Justificar Pedidos', icon: 'pi pi-fw pi-check-circle', to: '/pedidos-justificar' }
+            { label: 'Cadastro', icon: 'pi pi-fw pi-book', to: '/cadastro-pedido', requiredRole: ['Diretor', 'Gerente', 'Administrador', 'Comprador'] },
+            { label: 'Aprovação', icon: 'pi pi-fw pi-check-circle', to: '/aprovacao-gerentes', requiredRole: ['Diretor', 'Gerente', 'Administrador', 'Comprador'] },
+            { label: 'Aprovados', icon: 'pi pi-fw pi-check-circle', to: '/pedidos-aprovados', requiredRole: ['Diretor', 'Gerente', 'Administrador', 'Comprador'] },
+            { label: 'Justificar Pedidos', icon: 'pi pi-fw pi-check-circle', to: '/pedidos-justificar', requiredRole: ['Diretor', 'Gerente', 'Administrador', 'Comprador'] }
         ]
     },
     {
         label: 'Administração',
         items: [
-            { label: 'Usuários', icon: 'pi pi-fw pi-users', to: '/usuarios' },
-            { label: 'Empresas', icon: 'pi pi-fw pi-building', to: '/empresas' }
+            { label: 'Usuários', icon: 'pi pi-fw pi-users', to: '/usuarios', requiredRole: ['Administrador'] },
+            { label: 'Empresas', icon: 'pi pi-fw pi-building', to: '/empresas', requiredRole: ['Administrador'] }
         ]
     },
     {
         label: 'Presidência',
         items: [
-            { label: 'Emival', icon: 'pi pi-fw pi-users', to: '/emival' },
-            { label: 'Mônica', icon: 'pi pi-fw pi-building', to: '/monica' }
-        ]
-    },
-    {
-        label: 'UI Components',
-        items: [
-            { label: 'Form Layout', icon: 'pi pi-fw pi-id-card', to: '/uikit/formlayout' },
-            { label: 'Input', icon: 'pi pi-fw pi-check-square', to: '/uikit/input' },
-            { label: 'Float Label', icon: 'pi pi-fw pi-bookmark', to: '/uikit/floatlabel' },
-            { label: 'Invalid State', icon: 'pi pi-fw pi-exclamation-circle', to: '/uikit/invalidstate' },
-            { label: 'Button', icon: 'pi pi-fw pi-mobile', to: '/uikit/button', class: 'rotated-icon' },
-            { label: 'Table', icon: 'pi pi-fw pi-table', to: '/uikit/table' },
-            { label: 'List', icon: 'pi pi-fw pi-list', to: '/uikit/list' },
-            { label: 'Tree', icon: 'pi pi-fw pi-share-alt', to: '/uikit/tree' },
-            { label: 'Panel', icon: 'pi pi-fw pi-tablet', to: '/uikit/panel' },
-            { label: 'Overlay', icon: 'pi pi-fw pi-clone', to: '/uikit/overlay' },
-            { label: 'Media', icon: 'pi pi-fw pi-image', to: '/uikit/media' },
-            { label: 'Menu', icon: 'pi pi-fw pi-bars', to: '/uikit/menu', preventExact: true },
-            { label: 'Message', icon: 'pi pi-fw pi-comment', to: '/uikit/message' },
-            { label: 'File', icon: 'pi pi-fw pi-file', to: '/uikit/file' },
-            { label: 'Chart', icon: 'pi pi-fw pi-chart-bar', to: '/uikit/charts' },
-            { label: 'Misc', icon: 'pi pi-fw pi-circle', to: '/uikit/misc' }
-        ]
-    },
-    {
-        label: 'Prime Blocks',
-        items: [
-            { label: 'Free Blocks', icon: 'pi pi-fw pi-eye', to: '/blocks', badge: 'NEW' },
-            { label: 'All Blocks', icon: 'pi pi-fw pi-globe', url: 'https://www.primefaces.org/primeblocks-vue', target: '_blank' }
-        ]
-    },
-    {
-        label: 'Utilities',
-        items: [
-            { label: 'PrimeIcons', icon: 'pi pi-fw pi-prime', to: '/utilities/icons' },
-            { label: 'PrimeFlex', icon: 'pi pi-fw pi-desktop', url: 'https://www.primefaces.org/primeflex/', target: '_blank' }
-        ]
-    },
-    {
-        label: 'Pages',
-        icon: 'pi pi-fw pi-briefcase',
-        to: '/pages',
-        items: [
-            {
-                label: 'Landing',
-                icon: 'pi pi-fw pi-globe',
-                to: '/landing'
-            },
-            {
-                label: 'Auth',
-                icon: 'pi pi-fw pi-user',
-                items: [
-                    {
-                        label: 'Login',
-                        icon: 'pi pi-fw pi-sign-in',
-                        to: '/auth/login'
-                    },
-                    {
-                        label: 'Error',
-                        icon: 'pi pi-fw pi-times-circle',
-                        to: '/auth/error'
-                    },
-                    {
-                        label: 'Access Denied',
-                        icon: 'pi pi-fw pi-lock',
-                        to: '/auth/access'
-                    }
-                ]
-            },
-            {
-                label: 'Crud',
-                icon: 'pi pi-fw pi-pencil',
-                to: '/pages/crud'
-            },
-            {
-                label: 'Timeline',
-                icon: 'pi pi-fw pi-calendar',
-                to: '/pages/timeline'
-            },
-            {
-                label: 'Not Found',
-                icon: 'pi pi-fw pi-exclamation-circle',
-                to: '/pages/notfound'
-            },
-            {
-                label: 'Empty',
-                icon: 'pi pi-fw pi-circle-off',
-                to: '/pages/empty'
-            }
-        ]
-    },
-    {
-        label: 'Hierarchy',
-        items: [
-            {
-                label: 'Submenu 1',
-                icon: 'pi pi-fw pi-bookmark',
-                items: [
-                    {
-                        label: 'Submenu 1.1',
-                        icon: 'pi pi-fw pi-bookmark',
-                        items: [
-                            { label: 'Submenu 1.1.1', icon: 'pi pi-fw pi-bookmark' },
-                            { label: 'Submenu 1.1.2', icon: 'pi pi-fw pi-bookmark' },
-                            { label: 'Submenu 1.1.3', icon: 'pi pi-fw pi-bookmark' }
-                        ]
-                    },
-                    {
-                        label: 'Submenu 1.2',
-                        icon: 'pi pi-fw pi-bookmark',
-                        items: [{ label: 'Submenu 1.2.1', icon: 'pi pi-fw pi-bookmark' }]
-                    }
-                ]
-            },
-            {
-                label: 'Submenu 2',
-                icon: 'pi pi-fw pi-bookmark',
-                items: [
-                    {
-                        label: 'Submenu 2.1',
-                        icon: 'pi pi-fw pi-bookmark',
-                        items: [
-                            { label: 'Submenu 2.1.1', icon: 'pi pi-fw pi-bookmark' },
-                            { label: 'Submenu 2.1.2', icon: 'pi pi-fw pi-bookmark' }
-                        ]
-                    },
-                    {
-                        label: 'Submenu 2.2',
-                        icon: 'pi pi-fw pi-bookmark',
-                        items: [{ label: 'Submenu 2.2.1', icon: 'pi pi-fw pi-bookmark' }]
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        label: 'Get Started',
-        items: [
-            {
-                label: 'Documentation',
-                icon: 'pi pi-fw pi-question',
-                to: '/documentation'
-            },
-            {
-                label: 'Figma',
-                url: 'https://www.dropbox.com/scl/fi/bhfwymnk8wu0g5530ceas/sakai-2023.fig?rlkey=u0c8n6xgn44db9t4zkd1brr3l&dl=0',
-                icon: 'pi pi-fw pi-pencil',
-                target: '_blank'
-            },
-            {
-                label: 'View Source',
-                icon: 'pi pi-fw pi-search',
-                url: 'https://github.com/primefaces/sakai-vue',
-                target: '_blank'
-            },
-            {
-                label: 'Nuxt Version',
-                url: 'https://github.com/primefaces/sakai-nuxt',
-                icon: 'pi pi-fw pi-star'
-            }
+            { label: 'Emival', icon: 'pi pi-fw pi-users', to: '/emival', requiredRole: ['Presidente', 'Administrador'] }
+            // { label: 'Mônica', icon: 'pi pi-fw pi-building', to: '/monica', requiredRole: ['Presidente', 'Administrador'] }
         ]
     }
 ]);
+
+// Função para filtrar o menu com base na função do usuário
+const filteredMenu = computed(() => {
+    return model.value
+        .map((section) => {
+            const filteredItems = section.items.filter((item) => {
+                return !item.requiredRole || item.requiredRole.includes(userRole);
+            });
+            return { ...section, items: filteredItems };
+        })
+        .filter((section) => section.items.length > 0);
+});
 </script>
 
 <template>
     <ul class="layout-menu">
-        <template v-for="(item, i) in model" :key="item">
+        <template v-for="(item, i) in filteredMenu" :key="item.label">
             <app-menu-item v-if="!item.separator" :item="item" :index="i"></app-menu-item>
             <li v-if="item.separator" class="menu-separator"></li>
         </template>
-        <li>
-            <a href="https://www.primefaces.org/primeblocks-vue/#/" target="_blank">
-                <img src="/layout/images/banner-primeblocks.png" alt="Prime Blocks" class="w-full mt-3" />
-            </a>
-        </li>
     </ul>
 </template>
 
