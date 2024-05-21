@@ -133,82 +133,40 @@ export default {
             });
         },
         renderPdf(url, fileName) {
-            // Use fetch para obter o PDF como Blob
-            fetch(url)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch PDF');
-                    }
-                    return response.blob();
-                })
-                .then(pdfBlob => {
-                    // Renderize o PDF a partir do Blob
-                    this.renderPdfFromBlob(pdfBlob, fileName);
-                })
-                .catch(error => {
-                    console.error('Error fetching PDF:', error);
-                });
-        },
-        renderPdfFromBlob(pdfBlob, fileName) {
-            // Limpe o conteúdo anterior
-            this.$refs.pdfContainer.innerHTML = "";
-
-            let viewer = document.createElement("div");
-            viewer.id = "viewer";
-            this.$refs.pdfContainer.appendChild(viewer);
-
-            let adobeDCView = new AdobeDC.View({
-                clientId: "API_KEY",
-                divId: "viewer"
-            });
-
-            // Renderize o PDF a partir do Blob
-            adobeDCView.previewFile({
-                content: { promise: Promise.resolve(pdfBlob) },
-                metaData: { fileName: fileName }
-            }, { embedMode: "SIZED_CONTAINER" });
-        },
-        // renderPdf(url, fileName) {
-        //     console.log('passou');
-
-        //     if (!this.adobeApiReady) {
-        //         console.log('passou1');
-
-        //         return;
-        //     }
-        //     const previewConfig = {
-        //         defaultViewMode: 'FIT_WIDTH',
-        //         showAnnotationTools: false
-        //     };
-        //     this.$refs.pdfContainer.innerHTML = '';
-        //     let viewer = document.createElement('div');
-        //     viewer.id = 'viewer';
-        //     this.$refs.pdfContainer.appendChild(viewer);
-        //     let adobeDCView = new AdobeDC.View({
-        //         clientId: 'e8c98881c48049bbb03b3c5d5db05129',
-        //         divId: 'viewer'
-        //     });
-        //     this.previewFilePromise = adobeDCView.previewFile(
-        //         {
-        //             content: {
-        //                 location: {
-        //                     url: url
-        //                 }
-        //             },
-        //             metaData: {
-        //                 fileName: fileName,
-        //                 id: fileName
-        //             }
-        //         },
-        //         previewConfig
-        //     );
-        // },
-        renderPdfAcima(url, fileName) {
-            console.log('passou');
 
             if (!this.adobeApiReady) {
-                console.log('passou1');
+                return;
+            }
+            const previewConfig = {
+                defaultViewMode: 'FIT_WIDTH',
+                showAnnotationTools: false
+            };
+            this.$refs.pdfContainer.innerHTML = '';
+            let viewer = document.createElement('div');
+            viewer.id = 'viewer';
+            this.$refs.pdfContainer.appendChild(viewer);
+            let adobeDCView = new AdobeDC.View({
+                clientId: 'e8c98881c48049bbb03b3c5d5db05129',
+                divId: 'viewer'
+            });
+            this.previewFilePromise = adobeDCView.previewFile(
+                {
+                    content: {
+                        location: {
+                            url: url
+                        }
+                    },
+                    metaData: {
+                        fileName: fileName,
+                        id: fileName
+                    }
+                },
+                previewConfig
+            );
+        },
+        renderPdfAcima(url, fileName) {
 
+            if (!this.adobeApiReady) {
                 return;
             }
             const previewConfig = {
