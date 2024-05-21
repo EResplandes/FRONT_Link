@@ -2,6 +2,12 @@ const token = localStorage.getItem('token');
 
 import API_URL from './config.js';
 
+const headers = {
+    // Accept: 'multipart/form-data',
+    // 'Content-Type': 'multipart/form-data',
+    Authorization: 'Bearer ' + token
+};
+
 export default class PedidoService {
     async aprovarEmival(pedidos) {
         const pedidosJSON = JSON.stringify(pedidos); // Convertendo pedidos para JSON
@@ -242,8 +248,8 @@ export default class PedidoService {
     }
 
     // Requisição responsável por buscar pedidos reprovados status 3
-    async buscaReprovados() {
-        return await fetch(`${API_URL}/pedidos/listar-reprovados`, {
+    async buscaReprovados(id) {
+        return await fetch(`${API_URL}/pedidos/listar-reprovado/` + id, {
             method: 'GET',
             headers: {
                 Accept: 'application/json',
@@ -299,7 +305,7 @@ export default class PedidoService {
     }
 
     // Requisição responsável por buscar pedidos aprovador por criador
-    async buscaReprovadosCriador(id) {
+    async buscaAprovadosPedidos(id) {
         return await fetch(`${API_URL}/pedidos/pedidos-aprovados/` + id, {
             method: 'GET',
             headers: {
@@ -325,6 +331,29 @@ export default class PedidoService {
                 Accept: 'application/json',
                 Authorization: 'Bearer ' + token
             }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    // Requisição responsável por responder pedido reprovado
+    respondePedidoReprovado(novoAnexo, novaMensagem, id_pedido) {
+        let idCriador = localStorage.getItem('usuario_id');
+        const formData = new FormData();
+        formData.append('mensagem', novaMensagem);
+        formData.append('id_criador', idCriador);
+        formData.append('anexo', novoAnexo ?? null);
+
+        return fetch(`${API_URL}/pedidos/responde-reprovado/` + id_pedido, {
+            method: 'POST',
+            headers: headers,
+            body: formData
         })
             .then((res) => res.json())
             .then((d) => {

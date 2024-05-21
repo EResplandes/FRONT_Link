@@ -135,7 +135,6 @@ export default {
             });
         },
         renderPdf(url, fileName) {
-
             if (!this.adobeApiReady) {
                 return;
             }
@@ -167,7 +166,6 @@ export default {
             );
         },
         renderPdfAcima(url, fileName) {
-
             if (!this.adobeApiReady) {
                 return;
             }
@@ -269,7 +267,7 @@ export default {
             // Incrementa currentIndex e verifica se está dentro dos limites do array
             if (this.currentIndex < this.pedidos.length) {
                 this.pedidosAprovados.push({ id: this.pedidos[this.currentIndex].id, status: 4 });
-                console.log(this.pedidosAprovados)
+                console.log(this.pedidosAprovados);
 
                 this.currentIndex++;
 
@@ -643,30 +641,26 @@ export default {
         <ProgressSpinner />
     </div>
 
-    <Button v-if="this.pedidos != null" label="Voltar" class="p-button-secondary" style="width: 20%"
-        @click="(this.ocultaFiltros = false), (this.pedidos = null), buscaQuantidades()" />
+    <Button v-if="this.pedidos != null" label="Voltar" class="p-button-secondary" style="width: 20%" @click="(this.ocultaFiltros = false), (this.pedidos = null), buscaQuantidades()" />
 
     <div v-if="this.ocultaFiltros == false" class="grid text-center">
         <div class="col-12">
             <Splitter style="height: 300px">
-                <SplitterPanel @click.prevent="listarEmivalMenorQuinhentos()"
-                    class="flex align-items-center justify-content-center splitter-panel">
+                <SplitterPanel @click.prevent="listarEmivalMenorQuinhentos()" class="flex align-items-center justify-content-center splitter-panel">
                     <div>
                         Total de pedidos com valor até R$ 500,00
                         <br />
                         <h3>{{ this.quantidadesPedidos.qtd_abaixoQuinhentos }} pedidos</h3>
                     </div>
                 </SplitterPanel>
-                <SplitterPanel @click.prevent="listarEmivalMenorMil()"
-                    class="flex align-items-center justify-content-center splitter-panel">
+                <SplitterPanel @click.prevent="listarEmivalMenorMil()" class="flex align-items-center justify-content-center splitter-panel">
                     <div>
                         Total de pedidos com valor de R$ 500,01 à R$ 1000,00
                         <br />
                         <h3>{{ this.quantidadesPedidos.qtd_abaixoMil }} pedidos</h3>
                     </div>
                 </SplitterPanel>
-                <SplitterPanel @click.prevent="listarEmivalMaiorMil()"
-                    class="flex align-items-center justify-content-center splitter-panel">
+                <SplitterPanel @click.prevent="listarEmivalMaiorMil()" class="flex align-items-center justify-content-center splitter-panel">
                     <div>
                         Total de pedidos com o valor acima de R$ 1000,00
                         <br />
@@ -684,9 +678,7 @@ export default {
                 <div class="card timeline-container">
                     <Timeline :value="conversa" align="alternate" class="customized-timeline">
                         <template #marker="slotProps">
-                            <span
-                                class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2"
-                                :style="{ backgroundColor: slotProps.item.color }">
+                            <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
                                 <i :class="slotProps.item.icon"></i>
                             </span>
                         </template>
@@ -719,7 +711,6 @@ export default {
     <!-- Visualizar - Abaixo de 1000 reais -->
     <Dialog :header="this.titleDocumento" v-model:visible="display" :style="{ width: '98%' }" :modal="true">
         <div class="grid flex justify-content-center">
-
             <div class="col-12 md:col-12">
                 <!-- <pdf :src="this.urlBase"></pdf> -->
                 <div ref="pdfContainer" style="width: 100%; height: 700px; border: none"></div>
@@ -740,8 +731,11 @@ export default {
             <div class="col-4 md:col-3">
                 <Button icon="pi pi-check"
                     :label="this.currentIndex >= this.pedidos.length - 1 ? 'Aprovar Último Pedido' : 'Próximos Pedidos'"
-                    class="p-button-info" style="width: 100%; height: 50px;" @click.prevent="proximoItem()"
-                    :disabled="this.currentIndex == this.pedidos.length" />
+                    class="p-button-info"
+                    style="width: 100%; height: 50px"
+                    @click.prevent="proximoItem()"
+                    :disabled="this.currentIndex == this.pedidos.length"
+                />
             </div>
 
             <div v-if="this.pedidosAprovados.length > 0" class="col-12 md:col-12">
@@ -790,11 +784,18 @@ export default {
                 <Toast />
             </div>
             <div v-if="this.pedidos && this.acimaMil == false" class="card">
-                <DataTable dataKey="id" :value="pedidos" :paginator="true" :rows="10"
+                <DataTable
+                    dataKey="id"
+                    :value="pedidos"
+                    :paginator="true"
+                    :rows="10"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25, 50, 100]"
                     currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
-                    responsiveLayout="scroll" filterDisplay="menu" stripedRows>
+                    responsiveLayout="scroll"
+                    filterDisplay="menu"
+                    stripedRows
+                >
                     <template #header>
                         <div class="flex justify-content-between"></div>
                     </template>
@@ -834,8 +835,7 @@ export default {
                             <span class="p-column-title"></span>
                             <div class="grid">
                                 <div class="col-4 md:col-4 mr-3">
-                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye"
-                                        class="p-button-secondary" />
+                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-secondary" />
                                 </div>
                             </div>
                         </template>
@@ -845,11 +845,18 @@ export default {
 
             <!-- Tabela com todos pedidos com Dr Emival aprovação separada acima de 1000 reais -->
             <div v-if="this.pedidos && this.acimaMil" class="card">
-                <DataTable dataKey="id" :value="pedidos" :paginator="true" :rows="10"
+                <DataTable
+                    dataKey="id"
+                    :value="pedidos"
+                    :paginator="true"
+                    :rows="10"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25, 50, 100]"
                     currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
-                    responsiveLayout="scroll" filterDisplay="menu" stripedRows>
+                    responsiveLayout="scroll"
+                    filterDisplay="menu"
+                    stripedRows
+                >
                     <template #header>
                         <div class="flex justify-content-between"></div>
                     </template>
@@ -889,8 +896,7 @@ export default {
                             <span class="p-column-title"></span>
                             <div class="grid">
                                 <div class="col-4 md:col-4 mr-3">
-                                    <Button @click.prevent="visualizarAcima(slotProps.data.id, slotProps.data)"
-                                        icon="pi pi-eye" class="p-button-secondary" />
+                                    <Button @click.prevent="visualizarAcima(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-secondary" />
                                 </div>
                             </div>
                         </template>
