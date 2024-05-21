@@ -30,6 +30,7 @@ export default {
             displayFluxo: ref(false),
             display: ref(false),
             urlBase: 'http://localhost:8000/storage',
+            // urlBase: 'https://link.gruporialma.com.br/api'
             pdf: ref(null),
             pdfsrc: ref(null),
             fluxoPedido: ref(null),
@@ -38,8 +39,8 @@ export default {
     },
 
     mounted: function () {
-        // Metódo responsável por buscar todos pedidos relacionas a esse usuário que não foram aprovados
-        this.pedidoService.buscaReprovadosCriador(localStorage.getItem('usuario_id')).then((data) => {
+        // Metódo responsável por buscar todos pedidos relacionas a esse usuário que foram aprovados
+        this.pedidoService.buscaAprovadosPedidos(localStorage.getItem('usuario_id')).then((data) => {
             this.pedidos = data.pedidos;
             this.preloading = false;
         });
@@ -95,9 +96,10 @@ export default {
 
         imprimirAutorizacao(data) {
             this.loading = true;
-            console.log(data);
             try {
+                this.preloading = true;
                 generatePDF(data);
+                this.preloading = false;
             } catch (error) {
                 console.error('Erro ao gerar PDF:', error);
             } finally {
@@ -246,7 +248,7 @@ export default {
                     <Column field="Valor" header="Valor" :sortable="true" class="w-1">
                         <template #body="slotProps">
                             <span class="p-column-title">CNPJ</span>
-                            R$ {{ slotProps.data.valor }}
+                            R$ {{ slotProps.data.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
                         </template>
                     </Column>
 
