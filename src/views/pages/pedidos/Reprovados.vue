@@ -6,7 +6,7 @@ import PedidoService from '../../../service/Pedido';
 import EmpresaService from '../../../service/EmpresaService';
 import StatusService from '../../../service/StatusService';
 import FuncionarioService from '../../../service/FuncionarioService';
-import FluxoService from '../../../service/FluxoService';
+import ChatService from '../../../service/ChatService';
 
 export default {
     data() {
@@ -14,9 +14,9 @@ export default {
             toast: new useToast(),
             displayConfirmation: ref(false),
             pedidoService: new PedidoService(),
-            fluxoService: new FluxoService(),
             empresaService: new EmpresaService(),
             statusService: new StatusService(),
+            chatService: new ChatService(),
             funcionarioService: new FuncionarioService(),
             displayConfirmationActivation: ref(false),
             visibleRight: ref(false),
@@ -28,11 +28,15 @@ export default {
             id_pedido: ref(null),
             id_usuario: ref(null),
             status: ref(null),
+            conversa: ref(null),
+            novaMensagem: ref(null),
+            novoAnexo: ref(null),
             form: ref({}),
             editar: ref(false),
             preloading: ref(true),
             display: ref(false),
-            displayDelegar: ref(false),
+            displayChat: ref(false),
+            displayAnexo: ref(false),
             urlBase: 'https://link.gruporialma.com.br/storage',
             pdf: ref(null),
             pdfsrc: ref(null)
@@ -41,14 +45,9 @@ export default {
 
     mounted: function () {
         // Metódo responsável por buscar todas os pedidos reprovados
-        this.pedidoService.buscaReprovados().then((data) => {
+        this.pedidoService.buscaReprovados(localStorage.getItem('usuario_id')).then((data) => {
             this.pedidos = data.pedidos;
             this.preloading = false;
-        });
-
-        // Metódo responsável por buscar todos responsáveis como gerentes e diretores
-        this.funcionarioService.buscaResponsaveis().then((data) => {
-            this.funcionarios = data.funcionarios;
         });
 
         // Metódo responsável por buscar todas empresas
@@ -70,9 +69,33 @@ export default {
         // Metódo responsável por buscar todos pedidos reprovados
         buscaPedidos() {
             this.preloading = true;
-            this.pedidoService.buscaReprovados().then((data) => {
+            this.pedidoService.buscaReprovados(localStorage.getItem('usuario_id')).then((data) => {
                 this.pedidos = data.pedidos;
                 this.preloading = false;
+            });
+        },
+
+        // Metódo responsável por buscar chat
+        chat(id) {
+            this.id_pedido = id;
+            this.chatService.buscaConversa(id).then((data) => {
+                console.log(data);
+                this.conversa = data.conversa;
+                this.displayChat = true;
+            });
+        },
+
+        // Metódo responsável por enviar mensagem para Dr Emival ou Dr. Monica
+        enviarMensagem() {
+            this.preloading = true;
+            this.pedidoService.respondePedidoReprovado(this.pdf, this.novaMensagem, this.id_pedido).then((data) => {
+                if (data.resposta == 'Mensagem enviada com sucesso!') {
+                    this.showSuccess('Mensagem enviada com sucesso!');
+                    this.displayChat = false;
+                    this.buscaPedidos();
+                } else {
+                    this.showError('Ocorreu algum problema, entre em contato com o Administrador');
+                }
             });
         },
 
@@ -100,24 +123,6 @@ export default {
             this.pdfsrc = `${this.urlBase}/${this.pdf}`;
         },
 
-        delegarPedido(id_usuario) {
-            this.id_usuario = id_usuario;
-
-            this.fluxoService.cadastrarFluxo(this.id_pedido, this.id_usuario).then((data) => {
-                console.log(data);
-                if (data.resposta == 'Fluxo cadastrado com sucesso!') {
-                    this.showSuccess('Pedido delegado com sucesso!');
-                    this.buscaPedidos();
-                }
-                this.displayDelegar = false;
-            });
-        },
-
-        selecionarFuncionario(id_pedido) {
-            this.displayDelegar = true;
-            this.id_pedido = id_pedido;
-        },
-
         filtrar() {
             this.visibleRight = true;
             this.editar = false;
@@ -140,13 +145,17 @@ export default {
             this.buscaPedidos();
             this.showInfo('Filtro removidos com sucesso!');
             this.form = {};
+        },
+
+        uploadPdf() {
+            this.pdf = this.$refs.pdf.files[0];
         }
     }
 };
 </script>
 
 <template>
-    <div style="z-index: 99" v-if="preloading" class="full-screen-spinner">
+    <div style="z-index: 9999" v-if="preloading" class="full-screen-spinner">
         <ProgressSpinner />
     </div>
     <div class="grid">
@@ -157,60 +166,50 @@ export default {
             <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
         </Dialog>
 
-        <!-- Delegar Pedido -->
-        <Dialog header="Delegar pedido" v-model:visible="displayDelegar" :style="{ width: '60%' }" :modal="true">
-            <DataTable
-                dataKey="id"
-                :value="funcionarios"
-                :paginator="true"
-                :rows="10"
-                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                :rowsPerPageOptions="[5, 10, 25, 50, 100]"
-                currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
-                responsiveLayout="scroll"
-                filterDisplay="menu"
-                stripedRows
-            >
-                <template #header>
-                    <div class="flex justify-content-between">
-                        <h5 for="empresa">Delegar para:</h5>
+        <!-- Chat -->
+        <Dialog header="Chat" v-model:visible="displayChat" :style="{ width: '40%' }" :modal="true">
+            <div class="grid">
+                <div class="col-12">
+                    <div class="card timeline-container">
+                        <Timeline :value="conversa" align="alternate" class="customized-timeline">
+                            <template #marker="slotProps">
+                                <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
+                                    <i :class="slotProps.item.icon"></i>
+                                </span>
+                            </template>
+                            <template #content="slotProps">
+                                <Card>
+                                    <template #title>
+                                        {{ slotProps.item.id_usuario.name }}
+                                    </template>
+                                    <template #subtitle>
+                                        {{ this.formatarData(slotProps.item.data_mensagem) }}
+                                    </template>
+                                    <template #content>
+                                        <h6>
+                                            {{ slotProps.item.mensagem }}
+                                        </h6>
+                                    </template>
+                                </Card>
+                            </template>
+                        </Timeline>
                     </div>
-                </template>
-                <template #empty> Nenhum pedido encontrado! </template>
-                <template #loading> Carregando informações... Por favor, aguarde! </template>
+                    <hr />
+                    <InputText class="col-12" type="text" v-model="novaMensagem" placeholder="Digite a mensagem..." />
+                    <Button @click.prevent="enviarMensagem()" label="Enviar" class="mr-2 mt-3 p-button-success col-12" />
+                    <Button @click.prevent="this.displayAnexo = true" label="Alterar Pedido" class="mr-2 mt-3 p-button-secondary col-12" />
+                </div>
+            </div>
+        </Dialog>
 
-                <Column field="ID" header="ID" :sortable="true" class="w-1">
-                    <template #body="slotProps">
-                        <span class="p-column-title">ID</span>
-                        {{ slotProps.data.id }}
-                    </template>
-                </Column>
-
-                <Column field="Nome" header="Nome" :sortable="true" class="w-2">
-                    <template #body="slotProps">
-                        <span class="p-column-title">Nome</span>
-                        {{ slotProps.data.name }}
-                    </template>
-                </Column>
-
-                <Column field="Função" header="Função" :sortable="true" class="w-2">
-                    <template #body="slotProps">
-                        <span class="p-column-title">Função</span>
-                        {{ slotProps.data.funcao.funcao }}
-                    </template>
-                </Column>
-
-                <Column field="..." header="..." :sortable="true" class="w-2">
-                    <template #body="slotProps">
-                        <span class="p-column-title"></span>
-                        <div class="grid">
-                            <div class="col-4 md:col-4 mr-3">
-                                <Button @click.prevent="delegarPedido(slotProps.data.id)" label="Selecionar" class="p-button-info" />
-                            </div>
-                        </div>
-                    </template>
-                </Column>
-            </DataTable>
+        <!-- Anexo -->
+        <Dialog header="Insira novo Anexo" v-model:visible="displayAnexo" :style="{ width: '30%' }" :modal="true">
+            <div class="grid mt-5 text-center flex justify-content-center align-items-center">
+                <FileUpload uploadLabel="Salvar" cancelLabel="Limpar PDF" chooseLabel="Selecione" @change="uploadPdf" type="file" ref="pdf" name="demo[]" accept=".pdf,.docx" :maxFileSize="1000000"></FileUpload>
+            </div>
+            <div>
+                <Button @click.prevent="this.displayAnexo = false" label="Salvar" class="mr-2 mt-3 p-button-success col-12" />
+            </div>
         </Dialog>
 
         <!-- Modal Filtros -->
@@ -319,7 +318,7 @@ export default {
                     <Column field="Valor" header="Valor" :sortable="true" class="w-1">
                         <template #body="slotProps">
                             <span class="p-column-title">CNPJ</span>
-                            R$ {{ slotProps.data.valor }}
+                            {{ slotProps.data.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
                         </template>
                     </Column>
 
@@ -327,11 +326,11 @@ export default {
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
                             <div class="grid">
-                                <div class="col-4 md:col-4 mr-3">
+                                <div class="col-4 md:col-4 mr-4">
                                     <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
                                 </div>
-                                <div class="col-4 md:col-4 mr-3">
-                                    <Button @click="selecionarFuncionario(slotProps.data.id)" label="Delegar" class="p-button-secondary" />
+                                <div class="col-4 md:col-4">
+                                    <Button @click="chat(slotProps.data.id)" icon="pi pi-comments" class="p-button-secondary" />
                                 </div>
                             </div>
                         </template>
