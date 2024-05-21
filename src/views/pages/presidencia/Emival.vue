@@ -35,7 +35,8 @@ export default {
             urlBase: 'https://link.gruporialma.com.br/storage', // Ambiente de Produção
             // urlBase: 'https://www.gruporialma.com.br/wp-content/uploads', // Ambiente de Desenvolvimento
             adobeApiReady: false,
-            previewFilePromise: null
+            previewFilePromise: null,
+            titleDocumento: '',
         };
     },
 
@@ -308,10 +309,17 @@ export default {
             // Incrementa currentIndex e verifica se está dentro dos limites do array
             if (this.currentIndex < this.pedidos.length) {
                 this.pedidosAprovados.push({ id: this.pedidos[this.currentIndex].id, status: 4 });
+                console.log(this.pedidosAprovados)
+
                 this.currentIndex++;
 
                 if (this.currentIndex < this.pedidos.length) {
                     this.visualizar(this.pedidos[this.currentIndex].id, this.pedidos[this.currentIndex]);
+                    localStorage.setItem('ultimoPedidoAprovado', this.currentIndex);
+                }
+
+                if (this.currentIndex == this.pedidos.length) {
+                    this.visualizar(1, this.pedidos[this.currentIndex - 1]);
                     localStorage.setItem('ultimoPedidoAprovado', this.currentIndex);
                 }
             } else {
@@ -410,6 +418,7 @@ export default {
             this.pedidoService.aprovarEmival([{ id: this.proximoPedido.id, status: 3, mensagem: this.mensagemEmival }]).then((data) => {
                 this.showSuccess('Pedidos Reprovado com Sucesso!');
                 this.pedidosReprovados = [];
+                this.pedidos.splice(this.currentIndex, 1);
 
                 if (this.currentIndex < this.pedidos.length) {
                     this.visualizarAcima(1, this.pedidos[this.currentIndex]);
@@ -479,16 +488,22 @@ export default {
 
         // Metódo responsável por visualizar pdf
         visualizar(id, data) {
+            if(!this.display){
+                this.pedidosAprovados = [];
+            }
+            this.titleDocumento = `Pedidos Aprovados ${this.pedidosAprovados.length} de ${this.pedidos.length} Pedidos`;
+
             this.display = true;
             const dataAgora = new Date();
             // this.pdfsrc = `${this.urlBase}/${data.anexo}?t=${dataAgora.getSeconds()}`;
 
             this.$nextTick(() => {
-                this.renderPdf(`https://protheus.gruporialma.com.br/storage/localitys/4f07c6c0df97ae5543f7c0a616817c91.pdf`, `${dataAgora.getSeconds()}.pdf`);
+                this.renderPdf(`${this.urlBase}/${data.anexo}?t=${dataAgora.getSeconds()}`, `${dataAgora.getSeconds()}.pdf`);
             });
         },
 
         visualizarAcima(id, data) {
+            this.titleDocumento = `Visualizando Pedido ${this.currentIndex + 1} de ${this.pedidos.length} Pedidos`;
             console.log(data.anexo);
             this.pedidoAcima = data;
             this.displayAcima = true;
@@ -624,60 +639,57 @@ export default {
     </Dialog>
 
     <!-- Visualizar - Abaixo de 1000 reais -->
-    <Dialog header="Documento" v-model:visible="display" :style="{ width: '95%' }" :modal="true">
-        <div class="grid">
+    <Dialog :header="this.titleDocumento" v-model:visible="display" :style="{ width: '98%' }" :modal="true">
+        <div class="grid flex justify-content-center">
+            
             <div class="col-12 md:col-12">
                 <!-- <pdf :src="this.urlBase"></pdf> -->
                 <div ref="pdfContainer" style="width: 100%; height: 700px; border: none"></div>
                 <!-- <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe> -->
             </div>
             <div class="col-4 md:col-4">
-                <Button icon="pi pi-times" label="Pedido Anterior" class="p-button-secondary" style="width: 100%"
+                <Button icon="pi pi-times" label="Pedido Anterior" class="p-button-secondary" style="width: 100%; height: 50px;"
                     @click.prevent="voltar()" :disabled="this.currentIndex == 0" />
             </div>
             <div class="col-4 md:col-4">
-                <Button icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%"
+                <Button icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%; height: 50px;"
                     @click.prevent="reprovarItem()" />
             </div>
             <div class="col-4 md:col-4">
                 <Button icon="pi pi-check"
                     :label="this.currentIndex >= this.pedidos.length - 1 ? 'Aprovar Último Pedido' : 'Próximos Pedidos'"
-                    class="p-button-info" style="width: 100%" @click.prevent="proximoItem()"
+                    class="p-button-info" style="width: 100%; height: 50px;" @click.prevent="proximoItem()"
                     :disabled="this.currentIndex == this.pedidos.length" />
             </div>
 
-            <div class="col-12 md:col-12 text-center">
-                <span>Pedidos Aprovados {{ this.pedidosAprovados.length }} de {{ this.pedidos.length }} Pedidos!</span>
-            </div>
             <div v-if="this.pedidosAprovados.length > 0" class="col-12 md:col-12">
-                <Button icon="pi pi-check" label="Finalizar Aprovações" class="p-button-success" style="width: 100%"
+                <Button icon="pi pi-check" label="Finalizar Aprovações" class="p-button-success" style="width: 100%; height: 50px;"
                     @click.prevent="aprovar()" />
             </div>
+           
         </div>
     </Dialog>
 
     <!-- Visualizar - Acima de 1000 reais -->
-    <Dialog header="Documento" v-model:visible="displayAcima" :style="{ width: '95%' }" :modal="true">
+    <Dialog :header="this.titleDocumento" v-model:visible="displayAcima" :style="{ width: '95%' }" :modal="true">
         <div class="grid">
             <div class="col-12 md:col-12">
                 <!-- <pdf :src="this.urlBase"></pdf> -->
-                <div ref="pdfContainerAcima" style="width: 100%; height: 700px; border: none"></div>
+                <div ref="pdfContainerAcima" style="width: 100%; height: 750px; border: none"></div>
                 <!-- <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe> -->
             </div>
             <div class="col-4 md:col-4">
-                <Button icon="pi pi-times" label="Pedido Anterior" class="p-button-secondary" style="width: 100%"
+                <Button icon="pi pi-times" label="Pedido Anterior" class="p-button-secondary" style="width: 100%; height: 50px;"
                     @click.prevent="voltarAcima()" :disabled="this.currentIndex == 0" />
             </div>
             <div class="col-4 md:col-4">
-                <Button icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%"
+                <Button icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%; height: 50px;"
                     @click.prevent="reprovarItemAcima()" />
             </div>
-            <div class="col-4 md:col-4"><Button icon="pi pi-check" label="Aprovar" class="p-button-info" style="width: 100%"
+            <div class="col-4 md:col-4"><Button icon="pi pi-check" label="Aprovar" class="p-button-info" style="width: 100%; height: 50px;"
                     @click.prevent="proximoItemAcima()" :disabled="this.currentIndex == this.pedidos.length" /></div>
 
-            <div class="col-12 md:col-12 text-center">
-                <span>Visualizando Pedido {{ this.currentIndex + 1 }} de {{ this.pedidos.length }} Pedidos!</span>
-            </div>
+            
         </div>
     </Dialog>
 
@@ -719,8 +731,8 @@ export default {
 
                     <Column field="Valor" header="Valor" :sortable="true" class="w-3">
                         <template #body="slotProps">
-                            <span class="p-column-title">CNPJ</span>
-                            R$ {{ slotProps.data.valor }}
+                            <span class="p-column-title">Valor</span>
+                            {{ slotProps.data.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
                         </template>
                     </Column>
                     <Column field="Descrição" header="Descrição" :sortable="true" class="w-5">
@@ -775,7 +787,7 @@ export default {
                     <Column field="Valor" header="Valor" :sortable="true" class="w-3">
                         <template #body="slotProps">
                             <span class="p-column-title">CNPJ</span>
-                            R$ {{ slotProps.data.valor }}
+                            {{ slotProps.data.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
                         </template>
                     </Column>
                     <Column field="Descrição" header="Descrição" :sortable="true" class="w-5">
