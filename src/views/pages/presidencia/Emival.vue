@@ -39,6 +39,7 @@ export default {
             titleDocumento: '',
             titleChat: '',
             salvarMensagemPedidoStatus: ref(null),
+            pedidoSelecionado: {}
         };
     },
 
@@ -94,6 +95,15 @@ export default {
     },
 
     methods: {
+        // Metódo responsável por buscar chat
+        chat(id) {
+            this.id_pedido = id;
+            this.chatService.buscaConversa(id).then((data) => {
+                console.log(data);
+                this.conversa = data.conversa;
+                this.displayChat = true;
+            });
+        },
         nextPage() {
             this.previewFilePromise.then((adobeViewer) => {
                 adobeViewer.getAPIs().then((apis) => {
@@ -319,7 +329,7 @@ export default {
         },
 
         async reprovarItem() {
-            this.displayChat = true;
+            this.chat(this.pedidoSelecionado.id);
             this.titleChat = 'Reprovar Pedido';
             this.salvarMensagemPedidoStatus = 0;
             localStorage.setItem('ultimoPedidoAprovado', this.currentIndex); // Alterado para 'ultimoPedidoAprovado'
@@ -329,7 +339,7 @@ export default {
         },
 
         async reprovarItemAcima() {
-            this.displayChat = true;
+            this.chat(this.pedidoSelecionado.id);
             this.titleChat = 'Reprovar Pedido';
             this.salvarMensagemPedidoStatus = 1;
             localStorage.setItem('ultimoPedidoAprovado', this.currentIndex); // Alterado para 'ultimoPedidoAprovado'
@@ -339,7 +349,7 @@ export default {
         },
 
         async ressalvaItem() {
-            this.displayChat = true;
+            this.chat(this.pedidoSelecionado.id);
             this.salvarMensagemPedidoStatus = 2;
             this.titleChat = 'Aprovar com Ressalva';
             localStorage.setItem('ultimoPedidoAprovado', this.currentIndex); // Alterado para 'ultimoPedidoAprovado'
@@ -349,7 +359,7 @@ export default {
         },
 
         async ressalvaItemAcima() {
-            this.displayChat = true;
+            this.chat(this.pedidoSelecionado.id);
             this.titleChat = 'Aprovar com Ressalva';
             this.salvarMensagemPedidoStatus = 3;
             localStorage.setItem('ultimoPedidoAprovado', this.currentIndex); // Alterado para 'ultimoPedidoAprovado'
@@ -575,6 +585,9 @@ export default {
             const dataAgora = new Date();
             // this.pdfsrc = `${this.urlBase}/${data.anexo}?t=${dataAgora.getSeconds()}`;
 
+
+            this.pedidoSelecionado = data;
+
             this.$nextTick(() => {
                 this.renderPdf(`${this.urlBase}/${data.anexo}?t=${dataAgora.getSeconds()}`, `${dataAgora.getSeconds()}.pdf`);
             });
@@ -587,6 +600,7 @@ export default {
             this.displayAcima = true;
             const dataAgora = new Date();
             // this.pdfsrc = ;
+            this.pedidoSelecionado = data;
             this.$nextTick(() => {
                 this.renderPdfAcima(`${this.urlBase}/${data.anexo}?t=${dataAgora.getSeconds()}`, `${dataAgora.getSeconds()}.pdf`);
             });
@@ -641,26 +655,30 @@ export default {
         <ProgressSpinner />
     </div>
 
-    <Button v-if="this.pedidos != null" label="Voltar" class="p-button-secondary" style="width: 20%" @click="(this.ocultaFiltros = false), (this.pedidos = null), buscaQuantidades()" />
+    <Button v-if="this.pedidos != null" label="Voltar" class="p-button-secondary" style="width: 20%"
+        @click="(this.ocultaFiltros = false), (this.pedidos = null), buscaQuantidades()" />
 
     <div v-if="this.ocultaFiltros == false" class="grid text-center">
         <div class="col-12">
             <Splitter style="height: 300px">
-                <SplitterPanel @click.prevent="listarEmivalMenorQuinhentos()" class="flex align-items-center justify-content-center splitter-panel">
+                <SplitterPanel @click.prevent="listarEmivalMenorQuinhentos()"
+                    class="flex align-items-center justify-content-center splitter-panel">
                     <div>
                         Total de pedidos com valor até R$ 500,00
                         <br />
                         <h3>{{ this.quantidadesPedidos.qtd_abaixoQuinhentos }} pedidos</h3>
                     </div>
                 </SplitterPanel>
-                <SplitterPanel @click.prevent="listarEmivalMenorMil()" class="flex align-items-center justify-content-center splitter-panel">
+                <SplitterPanel @click.prevent="listarEmivalMenorMil()"
+                    class="flex align-items-center justify-content-center splitter-panel">
                     <div>
                         Total de pedidos com valor de R$ 500,01 à R$ 1000,00
                         <br />
                         <h3>{{ this.quantidadesPedidos.qtd_abaixoMil }} pedidos</h3>
                     </div>
                 </SplitterPanel>
-                <SplitterPanel @click.prevent="listarEmivalMaiorMil()" class="flex align-items-center justify-content-center splitter-panel">
+                <SplitterPanel @click.prevent="listarEmivalMaiorMil()"
+                    class="flex align-items-center justify-content-center splitter-panel">
                     <div>
                         Total de pedidos com o valor acima de R$ 1000,00
                         <br />
@@ -672,18 +690,20 @@ export default {
     </div>
 
     <!-- Chat -->
-    <Dialog :header="this.titleChat" v-model:visible="displayChat" :style="{ width: '60%' }" :modal="true">
+    <Dialog :header="this.titleChat" v-model:visible="displayChat" :style="{ width: '80%' }" :modal="true">
         <div class="grid">
             <div class="col-12">
                 <div class="card timeline-container">
                     <Timeline :value="conversa" align="alternate" class="customized-timeline">
                         <template #marker="slotProps">
-                            <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
+                            <span
+                                class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2"
+                                :style="{ backgroundColor: slotProps.item.color }">
                                 <i :class="slotProps.item.icon"></i>
                             </span>
                         </template>
                         <template #content="slotProps">
-                            <Card v-if="conversa.length == 0">
+                            <Card>
                                 <template #title>
                                     {{ slotProps.item.id_usuario.name }}
                                 </template>
@@ -694,7 +714,6 @@ export default {
                                     <h6>
                                         {{ slotProps.item.mensagem }}
                                     </h6>
-                                    <h6>Sem mensagens anteriores</h6>
                                 </template>
                             </Card>
                         </template>
@@ -731,11 +750,8 @@ export default {
             <div class="col-4 md:col-3">
                 <Button icon="pi pi-check"
                     :label="this.currentIndex >= this.pedidos.length - 1 ? 'Aprovar Último Pedido' : 'Próximos Pedidos'"
-                    class="p-button-info"
-                    style="width: 100%; height: 50px"
-                    @click.prevent="proximoItem()"
-                    :disabled="this.currentIndex == this.pedidos.length"
-                />
+                    class="p-button-info" style="width: 100%; height: 50px" @click.prevent="proximoItem()"
+                    :disabled="this.currentIndex == this.pedidos.length" />
             </div>
 
             <div v-if="this.pedidosAprovados.length > 0" class="col-12 md:col-12">
@@ -784,18 +800,11 @@ export default {
                 <Toast />
             </div>
             <div v-if="this.pedidos && this.acimaMil == false" class="card">
-                <DataTable
-                    dataKey="id"
-                    :value="pedidos"
-                    :paginator="true"
-                    :rows="10"
+                <DataTable dataKey="id" :value="pedidos" :paginator="true" :rows="10"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25, 50, 100]"
                     currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
-                    responsiveLayout="scroll"
-                    filterDisplay="menu"
-                    stripedRows
-                >
+                    responsiveLayout="scroll" filterDisplay="menu" stripedRows>
                     <template #header>
                         <div class="flex justify-content-between"></div>
                     </template>
@@ -835,7 +844,8 @@ export default {
                             <span class="p-column-title"></span>
                             <div class="grid">
                                 <div class="col-4 md:col-4 mr-3">
-                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-secondary" />
+                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye"
+                                        class="p-button-secondary" />
                                 </div>
                             </div>
                         </template>
@@ -845,18 +855,11 @@ export default {
 
             <!-- Tabela com todos pedidos com Dr Emival aprovação separada acima de 1000 reais -->
             <div v-if="this.pedidos && this.acimaMil" class="card">
-                <DataTable
-                    dataKey="id"
-                    :value="pedidos"
-                    :paginator="true"
-                    :rows="10"
+                <DataTable dataKey="id" :value="pedidos" :paginator="true" :rows="10"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25, 50, 100]"
                     currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
-                    responsiveLayout="scroll"
-                    filterDisplay="menu"
-                    stripedRows
-                >
+                    responsiveLayout="scroll" filterDisplay="menu" stripedRows>
                     <template #header>
                         <div class="flex justify-content-between"></div>
                     </template>
@@ -896,7 +899,8 @@ export default {
                             <span class="p-column-title"></span>
                             <div class="grid">
                                 <div class="col-4 md:col-4 mr-3">
-                                    <Button @click.prevent="visualizarAcima(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-secondary" />
+                                    <Button @click.prevent="visualizarAcima(slotProps.data.id, slotProps.data)"
+                                        icon="pi pi-eye" class="p-button-secondary" />
                                 </div>
                             </div>
                         </template>
