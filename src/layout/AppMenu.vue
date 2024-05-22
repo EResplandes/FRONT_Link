@@ -24,7 +24,7 @@ const model = ref([
         label: 'Meus pedidos',
         items: [
             { label: 'Cadastro', icon: 'pi pi-fw pi-book', to: '/cadastro-pedido', requiredRole: ['Diretor', 'Gerente', 'Administrador', 'Comprador'] },
-            { label: 'Pedidos Reprovados', icon: 'pi pi-fw pi-book', to: '/pedidos-reprovados', requiredRole: ['Gestor de Fluxo', 'Administrador'] },
+            { label: 'Pedidos Reprovados', icon: 'pi pi-fw pi-book', to: '/pedidos-reprovados', requiredRole: ['Gestor de Fluxo', 'Administrador', 'Diretor', 'Gerente', 'Comprador'] },
             { label: 'Pedidos Aprovados', icon: 'pi pi-fw pi-check-circle', to: '/pedidos-aprovados', requiredRole: ['Diretor', 'Gerente', 'Administrador', 'Comprador'] },
             { label: 'Para Aprovação de Fluxo', icon: 'pi pi-fw pi-check-circle', to: '/aprovacao-gerentes', requiredRole: ['Diretor', 'Gerente', 'Administrador', 'Comprador'] },
             // { label: 'Justificar Pedidos', icon: 'pi pi-fw pi-check-circle', to: '/pedidos-justificar', requiredRole: ['Diretor', 'Gerente', 'Administrador', 'Comprador'] }
