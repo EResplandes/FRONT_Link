@@ -25,6 +25,7 @@ export default {
                     this.addMessage('error');
                 } else {
                     // Salva no localStorage os dados do usuário
+                    console.log(data.usuario[0].id);
                     localStorage.clear();
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('usuario_id', data.usuario[0].id);
@@ -32,10 +33,12 @@ export default {
                     localStorage.setItem('nome', data.usuario[0].nome);
                     localStorage.setItem('funcao', data.usuario[0].funcao.funcao);
                     localStorage.setItem('grupo', data.usuario[0].grupo.grupo);
+                    localStorage.setItem('local_id', data.usuario[0]?.local?.id);
 
                     if (data.usuario[0].id == '1') {
                         this.router.push('/emival'); // Mandando para tela principal
                     } else {
+                        console.log('caiu aqui!');
                         this.router.push('/'); // Mandando para tela principal
                     }
                 }

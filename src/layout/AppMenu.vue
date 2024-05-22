@@ -23,18 +23,19 @@ const model = ref([
     {
         label: 'Meus pedidos',
         items: [
-            { label: 'Cadastro', icon: 'pi pi-fw pi-book', to: '/cadastro-pedido', requiredRole: ['Diretor', 'Gerente', 'Administrador', 'Comprador'] },
-            { label: 'Pedidos Reprovados', icon: 'pi pi-fw pi-book', to: '/pedidos-reprovados', requiredRole: ['Gestor de Fluxo', 'Administrador'] },
-            { label: 'Pedidos Aprovados', icon: 'pi pi-fw pi-check-circle', to: '/pedidos-aprovados', requiredRole: ['Diretor', 'Gerente', 'Administrador', 'Comprador'] },
-            { label: 'Para Aprovação de Fluxo', icon: 'pi pi-fw pi-check-circle', to: '/aprovacao-gerentes', requiredRole: ['Diretor', 'Gerente', 'Administrador', 'Comprador'] },
-            // { label: 'Justificar Pedidos', icon: 'pi pi-fw pi-check-circle', to: '/pedidos-justificar', requiredRole: ['Diretor', 'Gerente', 'Administrador', 'Comprador'] }
+            { label: 'Cadastro de Pedido', icon: 'pi pi-fw pi-book', to: '/cadastro-pedido', requiredRole: ['Gerente', 'Administrador', 'Comprador'] },
+            { label: 'Pedidos Aprovados', icon: 'pi pi-fw pi-check-circle', to: '/pedidos-aprovados', requiredRole: ['Gerente', 'Administrador', 'Comprador'] },
+            { label: 'Pedidos Aprovados com Ressalva', icon: 'pi pi-fw pi-check-circle', to: '/pedidos-ressalva', requiredRole: ['Gerente', 'Administrador'] },
+            { label: 'Para Aprovação de Fluxo', icon: 'pi pi-fw pi-check-circle', to: '/aprovacao-gerentes', requiredRole: ['Diretor', 'Gerente', 'Administrador'] },
+            { label: 'Pedidos Reprovados', icon: 'pi pi-fw pi-book', to: '/pedidos-reprovados', requiredRole: ['Gestor de Fluxo', 'Administrador', 'Gerente'] }
         ]
     },
     {
         label: 'Administração',
         items: [
             { label: 'Usuários', icon: 'pi pi-fw pi-users', to: '/usuarios', requiredRole: ['Administrador'] },
-            { label: 'Empresas', icon: 'pi pi-fw pi-building', to: '/empresas', requiredRole: ['Administrador'] }
+            { label: 'Empresas', icon: 'pi pi-fw pi-building', to: '/empresas', requiredRole: ['Administrador'] },
+            { label: 'Link Externo de Aprovação', icon: 'pi pi-fw pi-building', to: '/aprovacao-externa/:id_pedido', requiredRole: ['Administrador'] }
         ]
     },
     {

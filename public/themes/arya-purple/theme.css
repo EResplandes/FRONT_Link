@@ -1238,7 +1238,7 @@
   }
   .p-listbox .p-listbox-list .p-listbox-item.p-highlight {
     color: rgba(255, 255, 255, 0.87);
-    background: rgba(186, 104, 200, 0.16);
+    background: #3dc699;
   }
   .p-listbox .p-listbox-list .p-listbox-item-group {
     margin: 0;

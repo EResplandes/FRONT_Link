@@ -95,9 +95,7 @@ export default {
         },
 
         imprimirAutorizacao(data) {
-            this.loading = true;
             try {
-                this.preloading = true;
                 generatePDF(data);
                 this.preloading = false;
             } catch (error) {
@@ -108,6 +106,7 @@ export default {
         },
 
         buscaInformacoesPedido(id) {
+            this.preloading = true;
             this.pedidoService.buscaInformacoesPedido(id).then((data) => {
                 this.imprimirAutorizacao(data);
             });

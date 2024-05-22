@@ -162,7 +162,7 @@ export default {
                                 <Textarea v-tooltip.top="'Digite a descrição do pedido'" id="descricao" rows="4" v-model="form.descricao" placeholder="Digite a descrição..." />
                             </div></div
                     ></TabPanel>
-                    <TabPanel header="Fluxo">
+                    <TabPanel header="Fluxo" class="p-tabview-selected-secondary">
                         <div class="p-fluid formgrid grid">
                             <div class="field col-4 md:col-4">
                                 <h6>GERENTES</h6>

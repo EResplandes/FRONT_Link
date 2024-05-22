@@ -37,12 +37,15 @@ export function generatePDF(data) {
 
     // Data de Emissão
     doc.setFontSize(8);
-    doc.text(`Data de Emissão: ${dataHoraFormatada}`, 150, 10);
+    doc.text(`Dt. de Emissão`, 175, 10);
+    doc.text(`${dataHoraFormatada}`, 170, 15);
 
     doc.setFontSize(6);
+    doc.setTextColor(255, 0, 0);
     doc.text('Pedido de Compra autorizado pelo LinkWeb', 107, 120, null, null, 'center');
     doc.line(150, 123, 60, 123); // Linha abaixo para Assinatura
     doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
     doc.text('PRESIDENTE', 107, 130, null, null, 'center');
 
     // Define o título da tabela
@@ -71,24 +74,23 @@ export function generatePDF(data) {
         body: tableData,
         startY: 50, // Posição Y inicial da tabela
         theme: 'grid', // Estilo da tabela
-        headStyles: { fillColor: [2, 79, 147], halign: 'center' }, // Cor de fundo e alinhamento centralizado do cabeçalho da tabela
+        headStyles: {
+            fillColor: [240, 240, 240],
+            halign: 'center',
+            textColor: [0, 0, 0]
+        },
         alternateRowStyles: { fillColor: [255, 255, 255] }, // Cor de fundo das linhas alternadas da tabela
         columnStyles: {
-            0: { columnWidth: 20 }, // Registro
-            1: { columnWidth: 20 }, // Local
-            2: { columnWidth: 40 }, // Descrição
-            3: { columnWidth: 30 }, // Status
-            4: { columnWidth: 20 }, // Autorização
-            5: { columnWidth: 25 }, // Dt. Criação
-            6: { columnWidth: 25 } // Dt. Aprovação
+            0: { halign: 'center', columnWidth: 20 },
+            1: { halign: 'center', columnWidth: 20 },
+            2: { halign: 'center', columnWidth: 40 },
+            3: { halign: 'center', columnWidth: 30 },
+            4: { halign: 'center', columnWidth: 20 },
+            5: { halign: 'center', columnWidth: 25 },
+            6: { halign: 'center', columnWidth: 25 }
         },
-        bodyStyles: { halign: 'center' } // Alinhamento centralizado das células da tabela
+        bodyStyles: { halign: 'center' }
     });
 
-    // // Adiciona Assinatura
-    // doc.line(90, 143, 400, 143); // Linha abaixo de "Nº Contrato"
-    // doc.text(`PEDIDO ASSINADO PELO LINK WEB POR`, 130, 50);
-
-    // Salva o documento PDF com o nome 'aprovacao.pdf'
     doc.save('aprovacao.pdf');
 }

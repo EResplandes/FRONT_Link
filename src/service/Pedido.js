@@ -364,4 +364,49 @@ export default class PedidoService {
                 throw error;
             });
     }
+
+    // Requisição responsável por buscar pedidos aprovados com ressalva de acordo com id do criador
+    async buscaPedidosRessalva(id) {
+        return await fetch(`${API_URL}/pedidos/listar-ressalva/` + id, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    // Requisição responsável por responder pedido com status Pedido aprovado com ressalva
+    respondePedidoRessalva(novaMensagem, id_pedido) {
+        return fetch(`${API_URL}/pedidos/responde-ressalva/` + id_pedido, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                id_usuario: parseInt(localStorage.getItem('usuario_id'), 10),
+                mensagem: novaMensagem
+            })
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+
+           
+    }
 }

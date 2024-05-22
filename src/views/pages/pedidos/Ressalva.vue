@@ -5,7 +5,6 @@ import { useConfirm } from 'primevue/useconfirm';
 import PedidoService from '../../../service/Pedido';
 import EmpresaService from '../../../service/EmpresaService';
 import StatusService from '../../../service/StatusService';
-import FuncionarioService from '../../../service/FuncionarioService';
 import ChatService from '../../../service/ChatService';
 
 export default {
@@ -17,7 +16,6 @@ export default {
             empresaService: new EmpresaService(),
             statusService: new StatusService(),
             chatService: new ChatService(),
-            funcionarioService: new FuncionarioService(),
             displayConfirmationActivation: ref(false),
             visibleRight: ref(false),
             confirm: new useConfirm(),
@@ -30,7 +28,6 @@ export default {
             status: ref(null),
             conversa: ref(null),
             novaMensagem: ref(null),
-            novoAnexo: ref(null),
             form: ref({}),
             editar: ref(false),
             preloading: ref(true),
@@ -45,7 +42,7 @@ export default {
 
     mounted: function () {
         // Metódo responsável por buscar todas os pedidos reprovados
-        this.pedidoService.buscaReprovados(localStorage.getItem('local_id')).then((data) => {
+        this.pedidoService.buscaPedidosRessalva(localStorage.getItem('local_id')).then((data) => {
             this.pedidos = data.pedidos;
             this.preloading = false;
         });
@@ -69,7 +66,7 @@ export default {
         // Metódo responsável por buscar todos pedidos reprovados
         buscaPedidos() {
             this.preloading = true;
-            this.pedidoService.buscaReprovados(localStorage.getItem('usuario_id')).then((data) => {
+            this.pedidoService.buscaPedidosRessalva(localStorage.getItem('usuario_id')).then((data) => {
                 this.pedidos = data.pedidos;
                 this.preloading = false;
             });
@@ -79,7 +76,6 @@ export default {
         chat(id) {
             this.id_pedido = id;
             this.chatService.buscaConversa(id).then((data) => {
-                console.log(data);
                 this.conversa = data.conversa;
                 this.displayChat = true;
             });
@@ -88,9 +84,11 @@ export default {
         // Metódo responsável por enviar mensagem para Dr Emival ou Dr. Monica
         enviarMensagem() {
             this.preloading = true;
-            this.pedidoService.respondePedidoReprovado(this.pdf, this.novaMensagem, this.id_pedido).then((data) => {
-                if (data.resposta == 'Mensagem enviada com sucesso!') {
-                    this.showSuccess('Mensagem enviada com sucesso!');
+            console.log(this.id_pedido);
+            this.pedidoService.respondePedidoRessalva(this.novaMensagem, this.id_pedido).then((data) => {
+                console.log(data);
+                if (data.resposta == 'Pedido respondido com sucesso!') {
+                    this.showSuccess('Pedido respondido com sucesso!');
                     this.displayChat = false;
                     this.buscaPedidos();
                 } else {
@@ -145,10 +143,6 @@ export default {
             this.buscaPedidos();
             this.showInfo('Filtro removidos com sucesso!');
             this.form = {};
-        },
-
-        uploadPdf() {
-            this.pdf = this.$refs.pdf.files[0];
         }
     }
 };
@@ -197,18 +191,7 @@ export default {
                     <hr />
                     <InputText class="col-12" type="text" v-model="novaMensagem" placeholder="Digite a mensagem..." />
                     <Button @click.prevent="enviarMensagem()" label="Enviar" class="mr-2 mt-3 p-button-success col-12" />
-                    <Button @click.prevent="this.displayAnexo = true" label="Alterar Pedido" class="mr-2 mt-3 p-button-secondary col-12" />
                 </div>
-            </div>
-        </Dialog>
-
-        <!-- Anexo -->
-        <Dialog header="Insira novo Anexo" v-model:visible="displayAnexo" :style="{ width: '30%' }" :modal="true">
-            <div class="grid mt-5 text-center flex justify-content-center align-items-center">
-                <FileUpload uploadLabel="Salvar" cancelLabel="Limpar PDF" chooseLabel="Selecione" @change="uploadPdf" type="file" ref="pdf" name="demo[]" accept=".pdf,.docx" :maxFileSize="1000000"></FileUpload>
-            </div>
-            <div>
-                <Button @click.prevent="this.displayAnexo = false" label="Salvar" class="mr-2 mt-3 p-button-success col-12" />
             </div>
         </Dialog>
 
@@ -265,7 +248,7 @@ export default {
                 >
                     <template #header>
                         <div class="flex justify-content-between">
-                            <h5 for="empresa">Pedidos Reprovados:</h5>
+                            <h5 for="empresa">Pedidos Aprovados com Ressalva:</h5>
                             <div class="grid">
                                 <div class="col-4 md:col-4 mr-2">
                                     <Button @click.prevent="filtrar()" icon="pi pi-search" label="Filtrar" class="p-button-secondary" style="margin-right: 0.25em" />

@@ -71,7 +71,7 @@ export default {
         // Metódo responsável por aprovar fluxo
         aprovarFluxo() {
             this.fluxoService.aprovarFluxo(this.idPedido).then((data) => {
-                if (data.resposta == 'Fluxo aprovado com sucesso!'){
+                if (data.resposta == 'Fluxo aprovado com sucesso!') {
                     this.showSuccess('Fluxo aprovado com sucesso!');
                     this.preloading = true;
                     this.displayFluxo = false;

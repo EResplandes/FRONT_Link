@@ -34,6 +34,11 @@ const router = createRouter({
                     component: () => import('@/views/pages/pedidos/Reprovados.vue')
                 },
                 {
+                    path: '/pedidos-ressalva',
+                    name: 'pedidos-ressalva',
+                    component: () => import('@/views/pages/pedidos/Ressalva.vue')
+                },
+                {
                     path: '/pedidos-justificar',
                     name: 'pedidos-justificar',
                     component: () => import('@/views/pages/pedidos/Justificar.vue')
@@ -57,6 +62,11 @@ const router = createRouter({
                     path: '/aprovacao-gerentes',
                     name: 'aprovacao-gerentes',
                     component: () => import('@/views/pages/gerente/Aprovacao.vue')
+                },
+                {
+                    path: '/aprovacao-externa/:id_pedido',
+                    name: 'aprovacao-externa',
+                    component: () => import('@/views/pages/gerente/AprovacaoExterna.vue')
                 },
                 {
                     path: '/pedidos-aprovados',
