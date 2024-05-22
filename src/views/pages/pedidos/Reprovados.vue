@@ -69,7 +69,7 @@ export default {
         // Metódo responsável por buscar todos pedidos reprovados
         buscaPedidos() {
             this.preloading = true;
-            this.pedidoService.buscaReprovados(localStorage.getItem('usuario_id')).then((data) => {
+            this.pedidoService.buscaReprovados(localStorage.getItem('local_id')).then((data) => {
                 this.pedidos = data.pedidos;
                 this.preloading = false;
             });
