@@ -406,7 +406,5 @@ export default class PedidoService {
                 console.error('Error:', error);
                 throw error;
             });
-
-           
     }
 }

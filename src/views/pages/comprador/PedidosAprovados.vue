@@ -29,8 +29,8 @@ export default {
             preloading: ref(true),
             displayFluxo: ref(false),
             display: ref(false),
-            urlBase: 'http://localhost:8000/storage',
-            // urlBase: 'https://link.gruporialma.com.br/api'
+            // urlBase: 'http://localhost:8000/storage',
+            urlBase: 'https://link.gruporialma.com.br/storage',
             pdf: ref(null),
             pdfsrc: ref(null),
             fluxoPedido: ref(null),
@@ -247,7 +247,7 @@ export default {
                     <Column field="Valor" header="Valor" :sortable="true" class="w-1">
                         <template #body="slotProps">
                             <span class="p-column-title">CNPJ</span>
-                            R$ {{ slotProps.data.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
+                            {{ slotProps.data.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
                         </template>
                     </Column>
 
