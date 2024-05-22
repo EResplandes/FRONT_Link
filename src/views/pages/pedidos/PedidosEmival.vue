@@ -23,7 +23,8 @@ export default {
             display: ref(false),
             urlBase: 'https://link.gruporialma.com.br/storage',
             pdf: ref(null),
-            pdfsrc: ref(null)
+            pdfsrc: ref(null),
+	    verificaPermisssao: localStorage.getItem('funcao'),	    
         };
     },
 
@@ -266,7 +267,7 @@ export default {
                                 <div class="col-4 md:col-4 mr-3">
                                     <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
                                 </div>
-                                <div class="col-6 md:col-4">
+                                <div v-if="verificaPermissao == 'Gestor de Fluxo'" class="col-6 md:col-4">
                                     <Button @click.prevent="confirmDeletar(slotProps.data.id)" icon="pi pi-trash" class="p-button-danger" />
                                 </div>
                             </div>
