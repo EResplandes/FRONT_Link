@@ -34,6 +34,8 @@ export default {
                     localStorage.setItem('funcao', data.usuario[0].funcao.funcao);
                     localStorage.setItem('grupo', data.usuario[0].grupo.grupo);
                     localStorage.setItem('local_id', data.usuario[0]?.local?.id);
+                    localStorage.setItem('p_acesso', data.usuario[0].p_acesso);
+                    localStorage.setItem('status_usuario', data.usuario[0].status);
 
                     if (data.usuario[0].id == '1') {
                         this.router.push('/emival'); // Mandando para tela principal

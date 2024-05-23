@@ -49,7 +49,7 @@ export function generatePDF(data) {
     doc.text('PRESIDENTE', 107, 130, null, null, 'center');
 
     // Define o título da tabela
-    const headers = [['Registro', 'Local', 'Descrição', 'Status', 'Autorização', 'Criação', 'Aprovação']];
+    const headers = [['Registro', 'Local', 'Descrição', 'Valor', 'Status', 'Autorização', 'Criação', 'Aprovação']];
 
     // Formata os dados da tabela
     const tableData = data.pedido.map((pedido) => {
@@ -65,7 +65,7 @@ export function generatePDF(data) {
         const anoCriacao = dataCriacao.getFullYear();
         const dataFormatadaAprovacao = `${diaCriacao}/${mesCriacao}/${anoCriacao}`;
 
-        return ['Pedido', pedido.local, pedido.descricao, pedido.status, pedido.link, dataFormatadaInclusao, dataFormatadaAprovacao];
+        return ['Pedido', pedido.local, pedido.descricao, pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }), pedido.status, `${pedido.link} @`, `${dataFormatadaInclusao}`, dataFormatadaAprovacao];
     });
 
     // Adiciona a tabela ao documento PDF
@@ -81,15 +81,16 @@ export function generatePDF(data) {
         },
         alternateRowStyles: { fillColor: [255, 255, 255] }, // Cor de fundo das linhas alternadas da tabela
         columnStyles: {
-            0: { halign: 'center', columnWidth: 20 },
-            1: { halign: 'center', columnWidth: 20 },
+            0: { halign: 'center', columnWidth: 15 },
+            1: { halign: 'center', columnWidth: 15 },
             2: { halign: 'center', columnWidth: 40 },
             3: { halign: 'center', columnWidth: 30 },
-            4: { halign: 'center', columnWidth: 20 },
-            5: { halign: 'center', columnWidth: 25 },
-            6: { halign: 'center', columnWidth: 25 }
+            4: { halign: 'center', columnWidth: 25 },
+            5: { halign: 'center', columnWidth: 20 },
+            6: { halign: 'center', columnWidth: 20 },
+            7: { halign: 'center', columnWidth: 15 }
         },
-        bodyStyles: { halign: 'center' }
+        bodyStyles: { halign: 'center', fontSize: 8 }
     });
 
     doc.save('aprovacao.pdf');

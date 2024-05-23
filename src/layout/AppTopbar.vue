@@ -15,10 +15,17 @@ onMounted(() => {
     bindOutsideClickListener();
 
     const token = localStorage.getItem('token');
+    const status = localStorage.getItem('status_usuario');
 
     // Verifica se o usuário está logado
     if (token == '' || token == null || token == undefined) {
         router.push('/auth/login'); // Mandando para tela login
+    }
+
+    // Verifica se o usuário está ativo, se não estiver ele deslogado o usuário
+    if (status != 'Ativo') {
+        localStorage.clear();
+        router.push('/auth/access'); // Mandando para tela login
     }
 });
 

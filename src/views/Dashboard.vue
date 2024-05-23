@@ -2,14 +2,19 @@
 import { ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import DashboardService from '../service/DashboardService';
+import AutenticacaoService from '../service/AutenticacaoService';
 
 export default {
     data() {
         return {
             toast: new useToast(),
             dashboardService: new DashboardService(),
+            autenticacaoService: new AutenticacaoService(),
             informacoes: ref(null),
-            preloading: ref(true)
+            preloading: ref(true),
+            display: ref(false),
+            nova_senha: ref(null),
+            id_usuario: ref(localStorage.getItem('usuario_id'))
         };
     },
 
@@ -19,6 +24,11 @@ export default {
             this.informacoes = data.informacoes;
             this.preloading = false;
         });
+
+        // if (localStorage.getItem('p_acesso') == 1) {
+        //     console.log('teste');
+        //     this.display = true;
+        // }
     },
 
     methods: {
@@ -28,6 +38,31 @@ export default {
             this.gerenteService.buscaPedidos(localStorage.getItem('usuario_id')).then((data) => {
                 this.pedidos = data.pedidos;
             });
+        },
+
+        // Metódo responsável por alterar senha
+        alteraSenha() {
+            this.autenticacaoService.alteraSenha(this.nova_senha, this.id_usuario).then((data) => {
+                if (data.resposta == 'Senha alterada com sucesso!') {
+                    this.showSuccess('Senha alterada com sucesso!');
+                    localStorage.setItem('p_acesso', '0');
+                    this.display = false;
+                } else {
+                    this.showError('Ocorreu algum problema, entre em contato com o Administrador!');
+                }
+            });
+        },
+
+        showSuccess(mensagem) {
+            this.toast.add({ severity: 'success', summary: 'Sucesso!', detail: mensagem, life: 3000 });
+        },
+
+        showInfo(mensagem) {
+            this.toast.add({ severity: 'info', summary: 'Aviso!', detail: mensagem, life: 3000 });
+        },
+
+        showError(mensagem) {
+            this.toast.add({ severity: 'error', summary: 'Ocorreu um erro!', detail: mensagem, life: 3000 });
         }
     }
 };
@@ -38,7 +73,34 @@ export default {
         <ProgressSpinner />
     </div>
 
+    <!-- Alterar senha primeiro login
+    <Dialog header="ALTERAÇÃO DE SENHA" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
+        <Card class="m-1" style="width: 100%; overflow: hidden; background-color: #f8f8ff">
+            <template #header> </template>
+            <template #title>BEM-VINDO!</template>
+            <template #content>
+                <p class="m-0">
+                    Para garantir a sua segurança e proteger suas informações, é necessário redefinir sua senha no primeiro acesso ao sistema. Este processo é fundamental para assegurar que sua conta esteja protegida contra acessos não autorizados.
+                    Agradecemos sua compreensão e colaboração
+                </p>
+                <hr />
+                <div class="flex flex-column gap-2">
+                    <label for="username">Nova senha:</label>
+                    <Password id="password1" v-model="this.nova_senha" :feedback="false" :toggleMask="true" class="w-full mb-3" inputClass="w-full" :inputStyle="{ padding: '1rem' }"></Password>
+                    <small id="username-help">Digite sua nova senha.</small>
+                </div>
+            </template>
+            <template #footer>
+                <div class="flex gap-3 mt-1">
+                    <Button @click.prevent="this.display = false" label="Alterar Mais Tarde" severity="secondary" outlined class="w-full" />
+                    <Button @click.prevent="this.alteraSenha()" label="Atualizar senha" class="w-full" />
+                </div>
+            </template>
+        </Card>
+    </Dialog> -->
+
     <div class="grid">
+        <Toast />
         <div class="col-12 lg:col-6 xl:col-6">
             <div class="card mb-0">
                 <div class="flex justify-content-between mb-3">
