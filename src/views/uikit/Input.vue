@@ -128,7 +128,7 @@ const searchCountry = (event) => {
                 <AutoComplete placeholder="Search" id="dd" :dropdown="true" :multiple="true" v-model="selectedAutoValue" :suggestions="autoFilteredValue" @complete="searchCountry($event)" field="name" />
 
                 <h5>Calendar</h5>
-                <Calendar :showIcon="true" :showButtonBar="true" v-model="calendarValue"></Calendar>
+                <Calendar dateFormat="dd/mm/yy" :showIcon="true" :showButtonBar="true" v-model="calendarValue"></Calendar>
 
                 <h5>Spinner</h5>
                 <InputNumber v-model="inputNumberValue" showButtons mode="decimal"></InputNumber>

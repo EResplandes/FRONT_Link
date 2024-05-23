@@ -131,7 +131,7 @@ export default {
                             </div>
                             <div class="field col-12 md:col-2">
                                 <label for="firstname2">Dt de Vencimento <span class="obrigatorio">*</span></label>
-                                <Calendar v-tooltip.top="'Selecione a data de vencimento'" v-model="form.dt_vencimento" showIcon iconDisplay="input" />
+                                <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de vencimento'" v-model="form.dt_vencimento" showIcon iconDisplay="input" />
                             </div>
                             <div class="field col-12 md:col-2">
                                 <label for="Link">Link <span class="obrigatorio">*</span></label>

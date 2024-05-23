@@ -167,7 +167,7 @@ const calculateCustomerTotal = (name) => {
                             {{ formatDate(data.date) }}
                         </template>
                         <template #filter="{ filterModel }">
-                            <Calendar v-model="filterModel.value" dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" />
+                            <Calendar dateFormat="dd/mm/yy" v-model="filterModel.value" placeholder="mm/dd/yyyy" />
                         </template>
                     </Column>
                     <Column header="Balance" filterField="balance" dataType="numeric" style="min-width: 10rem">

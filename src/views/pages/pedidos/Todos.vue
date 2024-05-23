@@ -6,6 +6,8 @@ import PedidoService from '../../../service/Pedido';
 import EmpresaService from '../../../service/EmpresaService';
 import StatusService from '../../../service/StatusService';
 import ChatService from '../../../service/ChatService';
+import { generatePDF } from '../comprador/aprovacao';
+import { FilterMatchMode } from 'primevue/api';
 
 export default {
     data() {
@@ -20,7 +22,7 @@ export default {
             visibleRight: ref(false),
             confirm: new useConfirm(),
             loading1: ref(null),
-            empresas: ref(null),
+            empresas: ref([]),
             pedidos: ref(null),
             status: ref(null),
             form: ref({}),
@@ -31,21 +33,36 @@ export default {
             urlBase: 'https://link.gruporialma.com.br/storage',
             pdf: ref(null),
             pdfsrc: ref(null),
-            conversa: ref(null)
+            conversa: ref(null),
+            customers: null,
+            filters: {
+                global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                descricao: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                dt_inclusao_formatada: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                'empresa.nome_empresa': { value: null, matchMode: FilterMatchMode.CONTAINS },
+                status: { value: null, matchMode: FilterMatchMode.IN },
+                valor_formatado: { value: null, matchMode: FilterMatchMode.CONTAINS }
+            },
+            loading: true
         };
     },
 
     mounted: function () {
         // Metódo responsável por buscar todas os pedidos
-        this.pedidoService.buscaPedidos().then((data) => {
-            this.pedidos = data.pedidos;
+        this.pedidoService.buscaPedidos(localStorage.getItem('local_id')).then((data) => {
+            this.pedidos = data.pedidos.map(pedido => ({
+                ...pedido,
+                dt_inclusao_formatada: this.formatarData(pedido.dt_inclusao),
+                valor_formatado: pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+            }));
             this.preloading = false;
+            this.loading = false;
         });
 
         // Metódo responsável por buscar todas empresas
         this.empresaService.buscaEmpresas().then((data) => {
             if (data.resposta == 'Empresas listados com sucesso!') {
-                this.empresas = data.empresas;
+                this.empresas = data.empresas.map(empresa => empresa.nome_empresa);
             }
         });
 
@@ -58,6 +75,23 @@ export default {
     },
 
     methods: {
+        imprimirAutorizacao(data) {
+            try {
+                generatePDF(data);
+                this.preloading = false;
+            } catch (error) {
+                console.error('Erro ao gerar PDF:', error);
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        buscaInformacoesPedido(id) {
+            this.preloading = true;
+            this.pedidoService.buscaInformacoesPedido(id).then((data) => {
+                this.imprimirAutorizacao(data);
+            });
+        },
         // Metódo responsável por buscar todos pedidos
         buscaPedidos() {
             this.preloading = true;
@@ -139,6 +173,34 @@ export default {
             this.buscaPedidos();
             this.showInfo('Filtro removidos com sucesso!');
             this.form = {};
+        },
+
+        getSeverity(status) {
+            switch (status) {
+                case 'Reprovado':
+                    return 'danger';
+
+                case 'Excluído':
+                    return 'danger';
+
+                case 'Enviado para Emival':
+                    return 'info';
+
+                case 'Aprovado':
+                    return 'success';
+
+                case 'Aprovado com Ressalva':
+                    return 'success';
+
+                case 'Enviado para Emival':
+                    return 'info';
+
+                case 'negotiation':
+                    return 'warning';
+
+                case 'renewal':
+                    return null;
+            }
         }
     }
 };
@@ -150,7 +212,6 @@ export default {
     </div>
     <div class="grid">
         <Toast />
-
         <!-- Visualizar -->
         <Dialog header="Documento" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
             <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
@@ -163,7 +224,9 @@ export default {
                     <div class="card timeline-container">
                         <Timeline :value="conversa" align="alternate" class="customized-timeline">
                             <template #marker="slotProps">
-                                <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
+                                <span
+                                    class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2"
+                                    :style="{ backgroundColor: slotProps.item.color }">
                                     <i :class="slotProps.item.icon"></i>
                                 </span>
                             </template>
@@ -198,23 +261,28 @@ export default {
             <div class="card p-fluid">
                 <div class="field">
                     <label for="empresa">Empresa:</label>
-                    <Dropdown v-model="form.empresa" :options="empresas" showClear optionLabel="nome_empresa" placeholder="Selecione..." class="w-full" />
+                    <Dropdown v-model="form.empresa" :options="empresas" showClear optionLabel="nome_empresa"
+                        placeholder="Selecione..." class="w-full" />
                 </div>
                 <div class="field">
                     <label for="empresa">Status:</label>
-                    <Dropdown v-model="form.status" :options="status" showClear optionLabel="status" placeholder="Selecione..." class="w-full" />
+                    <Dropdown v-model="form.status" :options="status" showClear optionLabel="status"
+                        placeholder="Selecione..." class="w-full" />
                 </div>
                 <div class="field">
                     <label for="cpf">Descrição: </label>
-                    <InputText v-tooltip.left="'Digite a descrição do pedido'" v-model="form.descricao" id="cnpj" placeholder="Digite..." />
+                    <InputText v-tooltip.left="'Digite a descrição do pedido'" v-model="form.descricao" id="cnpj"
+                        placeholder="Digite..." />
                 </div>
                 <div class="field">
                     <label for="cpf">Valor: </label>
-                    <InputNumber v-tooltip.left="'Digite o valor do pedido'" v-model="form.valor" inputId="minmaxfraction" :minFractionDigits="2" :maxFractionDigits="2" placeholder="Digite..." />
+                    <InputNumber v-tooltip.left="'Digite o valor do pedido'" v-model="form.valor" inputId="minmaxfraction"
+                        :minFractionDigits="2" :maxFractionDigits="2" placeholder="Digite..." />
                 </div>
                 <div class="field">
                     <label for="cpf">Dt. In clusão:</label>
-                    <Calendar v-tooltip.left="'Selecione a data de inclusão'" v-model="form.dt_inclusao" showIcon :showOnFocus="false" class="" />
+                    <Calendar dateFormat="dd/mm/yy" v-tooltip.left="'Selecione a data de inclusão'"
+                        v-model="form.dt_inclusao" showIcon :showOnFocus="false" class="" />
                 </div>
                 <hr />
                 <div class="field">
@@ -230,90 +298,95 @@ export default {
                 <Toast />
             </div>
             <div class="card">
-                <DataTable
-                    dataKey="id"
-                    :value="pedidos"
-                    :paginator="true"
-                    :rows="10"
-                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                    :rowsPerPageOptions="[5, 10, 25, 50, 100]"
-                    currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
-                    responsiveLayout="scroll"
-                    filterDisplay="menu"
-                    stripedRows
-                >
-                    <template #header>
-                        <div class="flex justify-content-between">
-                            <h5 for="empresa">Todos Pedidos:</h5>
-                            <div class="grid">
-                                <div class="col-4 md:col-4 mr-2">
-                                    <Button @click.prevent="filtrar()" icon="pi pi-search" label="Filtrar" class="p-button-secondary" style="margin-right: 0.25em" />
-                                </div>
-                                <div class="col-6 md:col-4">
-                                    <Button @click.prevent="limparFiltro()" icon="pi pi-trash" label="Limpar" class="mr-2 mb-2 p-button-danger" />
-                                </div>
+                <DataTable v-model:filters="filters" :value="pedidos" paginator :rows="10" dataKey="id" filterDisplay="row"
+                    :loading="loading"
+                    :globalFilterFields="['descricao', 'empresa.nome_empresa', 'country.name', 'representative.name', 'status']">
+
+                    <template #empty> Nenhum Pedido Encontrado. </template>
+                    <template #loading> Loading customers data. Please wait. </template>
+                    <Column field="dt_inclusao_formatada" header="Dt. Inclusão" :showFilterMenu="false"
+                        :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
+                        <template #body="{ data }">
+                            {{ data.dt_inclusao_formatada }}
+                        </template>
+                        <template #filter="{ filterModel, filterCallback }">
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()"
+                                class="p-column-filter" placeholder="Procurar pela Dt. de Inclusão" />
+                        </template>
+                    </Column>
+                    <Column field="valor_formatado" header="Valor" style="min-width: 12rem">
+                        <template #body="{ data }">
+                            {{ data.valor_formatado }}
+                        </template>
+                        <template #filter="{ filterModel, filterCallback }">
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()"
+                                class="p-column-filter" placeholder="Procurar pelo Valor" />
+                        </template>
+                    </Column>
+                    <Column field="descricao" header="Descrição" style="min-width: 12rem">
+                        <template #body="{ data }">
+                            {{ data.descricao }}
+                        </template>
+                        <template #filter="{ filterModel, filterCallback }">
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()"
+                                class="p-column-filter" placeholder="Procurar pela Descrição" />
+                        </template>
+                    </Column>
+                    <Column field="empresa.nome_empresa" header="Empresa" :showFilterMenu="false"
+                        :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
+                        <template #body="{ data }">
+                            {{ data.empresa.nome_empresa }}
+                        </template>
+                        <template #filter="{ filterModel, filterCallback }">
+                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="empresas"
+                                placeholder="Selecione uma Empresa" class="p-column-filter" style="min-width: 12rem"
+                                :showClear="true">
+                                <template #option="slotProps">
+                                    {{ slotProps.option }}
+                                </template>
+                            </Dropdown>
+                        </template>
+                    </Column>
+
+                    <Column header="Status" filterField="status" :showFilterMenu="false"
+                        :filterMenuStyle="{ width: '14rem' }" style="min-width: 14rem">
+                        <template #body="{ data }">
+                            <div class="flex align-items-center gap-2">
+                                <Tag :value="data.status.status" :severity="getSeverity(data.status.status)" />
                             </div>
-                        </div>
-                    </template>
-                    <template #empty> Nenhum pedido encontrado! </template>
-                    <template #loading> Carregando informações... Por favor, aguarde! </template>
-
-                    <Column field="" header="" class="w-1">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Dt. Inclusão</span>
-                            <Tag v-if="slotProps.data.urgente == 1" class="mr-2" severity="danger" value="Urgente"></Tag>
-                            <Tag v-else class="mr-2" severity="info" value="Normal"></Tag>
+                        </template>
+                        <template #filter="{ filterModel, filterCallback }">
+                            <MultiSelect v-model="filterModel.value" @change="filterCallback()" :options="status"
+                                optionLabel="status" placeholder="Todos" class="p-column-filter" style="min-width: 14rem"
+                                :maxSelectedLabels="1">
+                                <template #option="slotProps">
+                                    <div class="flex align-items-center gap-2">
+                                        <span>{{ slotProps.option.status }}</span>
+                                    </div>
+                                </template>
+                            </MultiSelect>
                         </template>
                     </Column>
-
-                    <Column field="Dt. Inclusão" header="Dt. Inclusão" :sortable="true" class="w-2">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Dt. Inclusão</span>
-                            {{ formatarData(slotProps.data.dt_inclusao) }}
-                        </template>
-                    </Column>
-
-                    <Column field="Empresa" header="Empresa" :sortable="true" class="w-2">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Empresa</span>
-                            {{ slotProps.data.empresa.nome_empresa }}
-                        </template>
-                    </Column>
-
-                    <Column field="Descrição" header="Descrição" :sortable="true" class="w-5">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Descrição</span>
-                            {{ slotProps.data.descricao }}
-                        </template>
-                    </Column>
-
-                    <Column field="Status" header="Status" :sortable="true" class="w-5">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Status</span>
-                            {{ slotProps.data.status.status }}
-                        </template>
-                    </Column>
-
-                    <Column field="Valor" header="Valor" :sortable="true" class="w-1">
-                        <template #body="slotProps">
-                            <span class="p-column-title">CNPJ</span>
-                            {{ slotProps.data.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
-                        </template>
-                    </Column>
-
                     <Column field="..." header="..." :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
                             <div class="grid">
-                                <div class="col-4 md:col-4 mr-3">
-                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
+                                <div class="col-3 md:col-3 mr-1">
+                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye"
+                                        class="p-button-info" />
                                 </div>
-                                <div v-if="slotProps.data.status.status == 'Reprovado'" class="col-4 md:col-4 ml-1">
-                                    <Button @click.prevent="chat(slotProps.data.id, slotProps.data)" icon="pi pi-comments" class="p-button-secon" />
+                                <div v-if="slotProps.data.status.status == 'Reprovado'" class="col-3 md:col-3">
+                                    <Button @click.prevent="chat(slotProps.data.id, slotProps.data)" icon="pi pi-comments"
+                                        class="p-button-secon" />
+                                </div>
+                                <div v-if="slotProps.data.status.status == 'Aprovado' || slotProps.data.status.status == 'Aprovado com Ressalva'"  class="col-4 md:col-4 mr-3">
+                                    <Button @click.prevent="buscaInformacoesPedido(slotProps.data.id)" icon="pi pi-print"
+                                        class="p-button-secondary" />
                                 </div>
                             </div>
                         </template>
                     </Column>
+
                 </DataTable>
             </div>
         </div>
@@ -359,7 +432,9 @@ export default {
 }
 
 .timeline-container {
-    max-height: 300px; /* Defina a altura máxima desejada */
-    overflow-y: auto; /* Adiciona uma barra de rolagem vertical quando o conteúdo excede a altura máxima */
+    max-height: 300px;
+    /* Defina a altura máxima desejada */
+    overflow-y: auto;
+    /* Adiciona uma barra de rolagem vertical quando o conteúdo excede a altura máxima */
 }
 </style>
