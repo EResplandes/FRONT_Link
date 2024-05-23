@@ -59,7 +59,7 @@ const searchCountry = (event) => {
             </div>
             <div class="field col-12 md:col-4">
                 <span class="p-float-label">
-                    <Calendar inputId="calendar" v-model="value3"></Calendar>
+                    <Calendar dateFormat="dd/mm/yy" inputId="calendar" v-model="value3"></Calendar>
                     <label for="calendar">Calendar</label>
                 </span>
             </div>

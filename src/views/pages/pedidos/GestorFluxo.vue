@@ -223,7 +223,7 @@ export default {
                 </div>
                 <div class="field">
                     <label for="cpf">Dt. In clusão:</label>
-                    <Calendar v-tooltip.left="'Selecione a data de inclusão'" v-model="form.dt_inclusao" showIcon :showOnFocus="false" class="" />
+                    <Calendar dateFormat="dd/mm/yy" v-tooltip.left="'Selecione a data de inclusão'" v-model="form.dt_inclusao" showIcon :showOnFocus="false" class="" />
                 </div>
                 <hr />
                 <div class="field">

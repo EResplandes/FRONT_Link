@@ -144,8 +144,8 @@ export default class PedidoService {
     }
 
     // Requisição responsável por buscar todos pedidos
-    async buscaPedidos() {
-        return await fetch(`${API_URL}/pedidos/listar-pedidos`, {
+    async buscaPedidos(id_local) {
+        return await fetch(`${API_URL}/pedidos/listar-pedidos/` + id_local, {
             method: 'GET',
             headers: {
                 Accept: 'application/json',
