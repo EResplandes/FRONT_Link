@@ -79,6 +79,16 @@ const router = createRouter({
                     component: () => import('@/views/pages/empresa/Empresa.vue')
                 },
                 {
+                    path: '/reprovados-gestor',
+                    name: 'reprovados-gestor',
+                    component: () => import('@/views/pages/comprador/PedidosFluxoReprovados.vue')
+                },
+                {
+                    path: '/reprovados-soleni',
+                    name: 'reprovados-soleni',
+                    component: () => import('@/views/pages/comprador/PedidosAnaliseReprovados.vue')
+                },
+                {
                     path: '/usuarios',
                     name: 'usuarios',
                     component: () => import('@/views/pages/auth/Usuarios.vue')

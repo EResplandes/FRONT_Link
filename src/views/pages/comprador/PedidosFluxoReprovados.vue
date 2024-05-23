@@ -5,7 +5,8 @@ import { useConfirm } from 'primevue/useconfirm';
 import PedidoService from '../../../service/Pedido';
 import EmpresaService from '../../../service/EmpresaService';
 import StatusService from '../../../service/StatusService';
-import FluxoService from '../../../service/FluxoService';
+import FuncionarioService from '../../../service/FuncionarioService';
+import ChatService from '../../../service/ChatService';
 
 export default {
     data() {
@@ -15,31 +16,37 @@ export default {
             pedidoService: new PedidoService(),
             empresaService: new EmpresaService(),
             statusService: new StatusService(),
-            fluxoService: new FluxoService(),
+            chatService: new ChatService(),
+            funcionarioService: new FuncionarioService(),
             displayConfirmationActivation: ref(false),
             visibleRight: ref(false),
             confirm: new useConfirm(),
             loading1: ref(null),
             empresas: ref(null),
             pedidos: ref(null),
+            funcionarios: ref(null),
+            id_pedido: ref(null),
+            id_usuario: ref(null),
             status: ref(null),
+            conversa: ref(null),
+            novaMensagem: ref(null),
+            novoAnexo: ref(null),
             form: ref({}),
-            idPedido: ref(null),
             editar: ref(false),
             preloading: ref(true),
-            displayFluxo: ref(false),
-            displayChat: ref(false),
             display: ref(false),
+            displayChat: ref(false),
+            displayAnexo: ref(false),
             urlBase: 'https://link.gruporialma.com.br/storage',
             pdf: ref(null),
-            pdfsrc: ref(null),
-            fluxoPedido: ref(null)
+            pdfsrc: ref(null)
         };
     },
 
     mounted: function () {
-        // Metódo responsável por buscar todas os pedidos com status 6
-        this.pedidoService.buscaAnalisando().then((data) => {
+        // Metódo responsável por buscar todas os pedidos reprovados por gerente com status 10
+        this.pedidoService.buscaReprovadosFluxo(localStorage.getItem('usuario_id')).then((data) => {
+            console.log(data);
             this.pedidos = data.pedidos;
             this.preloading = false;
         });
@@ -60,46 +67,37 @@ export default {
     },
 
     methods: {
-        // Metódo responsável por buscar todos pedidos com status 6
+        // Metódo responsável por buscar todas os pedidos reprovados por gerente com status 10
         buscaPedidos() {
             this.preloading = true;
-            this.pedidoService.buscaAnalisando().then((data) => {
+            this.pedidoService.buscaReprovadosFluxo(localStorage.getItem('usuario_id')).then((data) => {
                 this.pedidos = data.pedidos;
                 this.preloading = false;
             });
         },
 
-        // Metódo responsável por aprovar fluxo
-        aprovarFluxo() {
-            this.fluxoService.aprovarFluxo(this.idPedido).then((data) => {
-                if (data.resposta == 'Fluxo aprovado com sucesso!') {
-                    this.showSuccess('Fluxo aprovado com sucesso!');
-                    this.preloading = true;
-                    this.displayFluxo = false;
-                    this.buscaPedidos();
-                } else {
-                    this.showError('Ocorreu um erro, entre em contato com o Administrador!');
-                }
+        // Metódo responsável por buscar chat
+        chat(id) {
+            this.id_pedido = id;
+            this.chatService.buscaConversa(id).then((data) => {
+                console.log(data);
+                this.conversa = data.conversa;
+                this.displayChat = true;
             });
         },
 
         // Metódo responsável por enviar mensagem para Dr Emival ou Dr. Monica
         enviarMensagem() {
             this.preloading = true;
-            this.fluxoService.reprovar(this.form, this.idPedido).then((data) => {
-                if (data.resposta == 'Pedido reprovado com sucesso!') {
-                    this.showSuccess('Pedido reprovado com sucesso!');
-                    this.display = false;
+            this.pedidoService.respondePedidoReprovadoFluxo(this.pdf, this.novaMensagem, this.id_pedido).then((data) => {
+                if (data.resposta == 'Mensagem enviada com sucesso!') {
+                    this.showSuccess('Mensagem enviada com sucesso!');
                     this.displayChat = false;
+                    this.buscaPedidos();
+                } else {
+                    this.showError('Ocorreu algum problema, entre em contato com o Administrador');
                 }
-                this.buscaPedidos();
-                this.preloading = false;
             });
-        },
-
-        // Metódo responsável por reprovar fluxo
-        reprovarFluxo() {
-            this.displayChat = true;
         },
 
         // Metódo responsável por formatar data padrão br
@@ -126,16 +124,6 @@ export default {
             this.pdfsrc = `${this.urlBase}/${this.pdf}`;
         },
 
-        fluxo(id, data) {
-            this.idPedido = id;
-            this.displayFluxo = true;
-            this.fluxoService.buscaFluxo(id).then((data) => {
-                if (data.resposta == 'Fluxo listado com sucesso!') {
-                    this.fluxoPedido = data.fluxo;
-                }
-            });
-        },
-
         filtrar() {
             this.visibleRight = true;
             this.editar = false;
@@ -153,33 +141,22 @@ export default {
             this.toast.add({ severity: 'error', summary: 'Ocorreu um erro!', detail: mensagem, life: 3000 });
         },
 
-        // Metódo responsável por buscar pedidos com filtros
-        buscaFiltros() {
-            this.preloading = true;
-            this.pedidoService.filtroPedidos(this.form).then((data) => {
-                if (data.resposta == 'Pedidos para o Dr. Emival Caiado!') {
-                    this.pedidos = data.pedidos;
-                    this.form = {};
-                    this.showInfo('Filtros aplicados com sucesso!');
-                    this.preloading = false;
-                } else {
-                    this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
-                }
-            });
-        },
-
         // Metódo responsável por limpagem de filtros
         limparFiltro() {
             this.buscaPedidos();
             this.showInfo('Filtro removidos com sucesso!');
             this.form = {};
+        },
+
+        uploadPdf() {
+            this.pdf = this.$refs.pdf.files[0];
         }
     }
 };
 </script>
 
 <template>
-    <div style="z-index: 99" v-if="preloading" class="full-screen-spinner">
+    <div style="z-index: 9999" v-if="preloading" class="full-screen-spinner">
         <ProgressSpinner />
     </div>
     <div class="grid">
@@ -219,39 +196,20 @@ export default {
                         </Timeline>
                     </div>
                     <hr />
-                    <InputText class="col-12" type="text" v-model="this.form.mensagem" placeholder="Digite a mensagem..." />
-                    <Button @click.prevent="enviarMensagem()" label="Reprovar e enviar mensagem" class="mr-2 mt-3 p-button-success col-12" />
+                    <InputText class="col-12" type="text" v-model="novaMensagem" placeholder="Digite a mensagem..." />
+                    <Button @click.prevent="enviarMensagem()" label="Enviar" class="mr-2 mt-3 p-button-success col-12" />
+                    <Button @click.prevent="this.displayAnexo = true" label="Alterar Pedido" class="mr-2 mt-3 p-button-secondary col-12" />
                 </div>
             </div>
         </Dialog>
 
-        <!-- Fluxo -->
-        <Dialog header="Fluxo" v-model:visible="displayFluxo" :style="{ width: '40%' }" :modal="true">
-            <div class="grid">
-                <div class="col-12">
-                    <div class="card timeline-container">
-                        <Timeline :value="fluxoPedido" align="alternate" class="customized-timeline">
-                            <template #marker="slotProps">
-                                <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
-                                    <i :class="slotProps.item.icon"></i>
-                                </span>
-                            </template>
-                            <template #content="slotProps">
-                                <Card>
-                                    <template #title>
-                                        {{ slotProps.item.usuario.name }}
-                                    </template>
-                                    <template #subtitle>
-                                        {{ slotProps.item.usuario.funcao.funcao }}
-                                    </template>
-                                </Card>
-                            </template>
-                        </Timeline>
-                    </div>
-                    <hr />
-                    <Button @click.prevent="aprovarFluxo()" label="Aprovar" class="mr-2 mt-3 p-button-success col-12" />
-                    <Button @click.prevent="reprovarFluxo()" label="Reprovar" class="mr-2 mt-3 p-button-danger col-12" />
-                </div>
+        <!-- Anexo -->
+        <Dialog header="Insira novo Anexo" v-model:visible="displayAnexo" :style="{ width: '30%' }" :modal="true">
+            <div class="grid mt-5 text-center flex justify-content-center align-items-center">
+                <FileUpload uploadLabel="Salvar" cancelLabel="Limpar PDF" chooseLabel="Selecione" @change="uploadPdf" type="file" ref="pdf" name="demo[]" accept=".pdf,.docx" :maxFileSize="1000000"></FileUpload>
+            </div>
+            <div>
+                <Button @click.prevent="this.displayAnexo = false" label="Salvar" class="mr-2 mt-3 p-button-success col-12" />
             </div>
         </Dialog>
 
@@ -275,7 +233,7 @@ export default {
                 >
                     <template #header>
                         <div class="flex justify-content-between">
-                            <h5 for="empresa">Análise de Fluxo:</h5>
+                            <h5 for="empresa">Pedidos Reprovados por Gerente ou Diretor:</h5>
                         </div>
                     </template>
                     <template #empty> Nenhum pedido encontrado! </template>
@@ -303,29 +261,36 @@ export default {
                         </template>
                     </Column>
 
-                    <Column field="Descrição" header="Descrição" :sortable="true" class="w-5">
+                    <Column field="Descrição" header="Descrição" :sortable="true" class="w-4">
                         <template #body="slotProps">
                             <span class="p-column-title">Descrição</span>
                             {{ slotProps.data.descricao }}
                         </template>
                     </Column>
 
-                    <Column field="Valor" header="Valor" :sortable="true" class="w-1">
+                    <Column field="Presidente" header="Presidente" :sortable="true" class="w-2">
                         <template #body="slotProps">
-                            <span class="p-column-title">CNPJ</span>
-                            R$ {{ slotProps.data.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
+                            <span class="p-column-title">Presidente</span>
+                            Dr. {{ slotProps.data.link.link }}
                         </template>
                     </Column>
 
-                    <Column field="..." header="..." :sortable="true" class="w-2">
+                    <Column field="Valor" header="Valor" :sortable="true" class="w-1">
+                        <template #body="slotProps">
+                            <span class="p-column-title">CNPJ</span>
+                            {{ slotProps.data.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
+                        </template>
+                    </Column>
+
+                    <Column field="..." header="..." :sortable="true" class="w-3">
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
                             <div class="grid">
-                                <div class="col-4 md:col-4 mr-3">
+                                <div class="col-4 md:col-4 mr-4">
                                     <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
                                 </div>
-                                <div class="col-4 md:col-4 ml-1">
-                                    <Button @click.prevent="fluxo(slotProps.data.id, slotProps.data)" icon="pi pi-sitemap" class="p-button-secon" />
+                                <div class="col-4 md:col-4">
+                                    <Button @click="chat(slotProps.data.id)" icon="pi pi-comments" class="p-button-secondary" />
                                 </div>
                             </div>
                         </template>

@@ -39,6 +39,27 @@ export default class FluxoService {
             });
     }
 
+    async reprovar(form, id_pedido) {
+        return await fetch(`${API_URL}/fluxo/reprovar-fluxo/` + id_pedido + '/' + localStorage.getItem('usuario_id') + '/' + form.mensagem, {
+            method: 'PUT',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                mensagem: form.mensagem
+            })
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
     async cadastrarFluxo(id_pedido, id_usuario) {
         return fetch(`${API_URL}/fluxo/cadastrar-fluxo`, {
             method: 'POST',

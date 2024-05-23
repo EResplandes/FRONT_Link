@@ -407,4 +407,50 @@ export default class PedidoService {
                 throw error;
             });
     }
+
+    // Requisição responsável por buscar pedidos reprovados por gerente ou diretor com statys 10
+    async buscaReprovadosFluxo(id) {
+        return await fetch(`${API_URL}/pedidos/listar-reprovados-fluxo/` + id, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    // Requisição responsável por responder pedido reprovado
+    respondePedidoReprovadoFluxo(novoAnexo, novaMensagem, id_pedido) {
+        let idCriador = localStorage.getItem('usuario_id');
+        const formData = new FormData();
+        formData.append('mensagem', novaMensagem);
+        formData.append('id_usuario', idCriador);
+        formData.append('anexo', novoAnexo ?? null);
+
+        return fetch(`${API_URL}/pedidos/responde-reprovado-fluxo/` + id_pedido, {
+            method: 'POST',
+            headers: {
+                Accept: 'multipart/form-data',
+                'Content-Type': 'multipart/form-data',
+                Authorization: 'Bearer ' + token
+            },
+            body: formData
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
 }
