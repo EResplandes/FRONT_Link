@@ -23,10 +23,10 @@ onMounted(() => {
     }
 
     // Verifica se o usuário está ativo, se não estiver ele deslogado o usuário
-    if (status != 'Ativo') {
-        localStorage.clear();
-        router.push('/auth/access'); // Mandando para tela login
-    }
+    //if (status != 'Ativo') {
+    //    localStorage.clear();
+    //    router.push('/auth/access'); // Mandando para tela login
+   // }
 });
 
 const decrementScale = (v) => {
