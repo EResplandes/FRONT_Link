@@ -30,8 +30,8 @@ export default {
             preloading: ref(true),
             displayFluxo: ref(false),
             display: ref(false),
-            urlBase: 'http://localhost:8000/storage',
-            // urlBase: 'https://link.gruporialma.com.br/storage',
+            // urlBase: 'http://localhost:8000/storage',
+            urlBase: 'https://link.gruporialma.com.br/storage',
             pdf: ref(null),
             pdfsrc: ref(null),
             fluxoPedido: ref(null)
@@ -228,7 +228,7 @@ export default {
                 >
                     <template #header>
                         <div class="flex justify-content-between">
-                            <h5 for="empresa">Minhas Aprovações:</h5>
+                            <h5 for="empresa">Pedidos para Aprovações:</h5>
                             <div class="grid">
                                 <div class="col-4 md:col-4 mr-2">
                                     <Button @click.prevent="filtrar()" icon="pi pi-search" label="Filtrar" class="p-button-secondary" style="margin-right: 0.25em" />

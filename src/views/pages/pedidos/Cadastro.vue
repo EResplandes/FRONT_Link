@@ -90,8 +90,10 @@ export default {
 
             // Verificar se todos os campos obrigatórios foram preenchidos antes de cadastrar o pedido
             if (todosCamposPreenchidos) {
+                this.preloading = true;
                 this.cadastrarPedidoService.comFluxo(this.form).then((data) => {
                     if (data.resposta == 'Pedido cadastrado com sucesso!') {
+                        this.preloading = false;
                         this.showSuccess('Pedido cadastrado com sucesso!');
                         this.form = {};
                     }
