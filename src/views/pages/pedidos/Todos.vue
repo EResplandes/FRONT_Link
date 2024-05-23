@@ -175,6 +175,35 @@ export default {
             this.form = {};
         },
 
+        getStatus(dados) {
+
+            function getnomes(dados) {
+                let nomes = '';
+                let qt = 0
+                dados.forEach(element => {
+                    if(qt > 0){
+                        nomes += `-` + ' ';
+                    }
+
+                    nomes += `${element.nome_usuario} ${element.funcao}` + ' ';
+                    
+                    qt++;
+                });
+                return nomes.trim();
+            }
+
+            switch (dados.status.status) {
+                case 'Analisando':
+                    return `${dados.status.status} - SOLENI `;
+
+                case 'Em Fluxo':
+                    return `${dados.status.status} - ${getnomes(dados.pendentes)} `;
+
+                default:
+                    return dados.status.status;
+            }
+        },
+
         getSeverity(status) {
             switch (status) {
                 case 'Reprovado':
@@ -349,15 +378,15 @@ export default {
                     </Column>
 
                     <Column header="Status" filterField="status" :showFilterMenu="false"
-                        :filterMenuStyle="{ width: '14rem' }" style="min-width: 14rem">
+                        :filterMenuStyle="{ width: '14rem' }" style="min-width: 16rem">
                         <template #body="{ data }">
                             <div class="flex align-items-center gap-2">
-                                <Tag :value="data.status.status" :severity="getSeverity(data.status.status)" />
+                                <Tag :value="getStatus(data)" :severity="getSeverity(data.status.status)" />
                             </div>
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
                             <MultiSelect v-model="filterModel.value" @change="filterCallback()" :options="status"
-                                optionLabel="status" placeholder="Todos" class="p-column-filter" style="min-width: 14rem"
+                                optionLabel="status" placeholder="Todos" class="p-column-filter" style="min-width: 16rem"
                                 :maxSelectedLabels="1">
                                 <template #option="slotProps">
                                     <div class="flex align-items-center gap-2">
@@ -379,7 +408,8 @@ export default {
                                     <Button @click.prevent="chat(slotProps.data.id, slotProps.data)" icon="pi pi-comments"
                                         class="p-button-secon" />
                                 </div>
-                                <div v-if="slotProps.data.status.status == 'Aprovado' || slotProps.data.status.status == 'Aprovado com Ressalva'"  class="col-4 md:col-4 mr-3">
+                                <div v-if="slotProps.data.status.status == 'Aprovado' || slotProps.data.status.status == 'Aprovado com Ressalva'"
+                                    class="col-4 md:col-4 mr-3">
                                     <Button @click.prevent="buscaInformacoesPedido(slotProps.data.id)" icon="pi pi-print"
                                         class="p-button-secondary" />
                                 </div>
