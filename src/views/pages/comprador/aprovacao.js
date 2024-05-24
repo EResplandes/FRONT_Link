@@ -68,7 +68,7 @@ export function generatePDF(data) {
         const dataFormatadaInclusao = `${diaInclusao}/${mesInclusao}/${anoInclusao} ${horaInclusao}:${minutoInclusao}`;
 
         // Formatação da data de aprovação
-        const dataAprovacao = new Date(pedido.dt_aprovacao);
+        const dataAprovacao = new Date(pedido.dt_assinatura);
         const diaAprovacao = pad(dataAprovacao.getDate());
         const mesAprovacao = pad(dataAprovacao.getMonth() + 1);
         const anoAprovacao = dataAprovacao.getFullYear();
