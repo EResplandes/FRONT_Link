@@ -189,7 +189,7 @@ export default {
                         </div>
                     </TabPanel>
                     <TabPanel header="Upload">
-                        <FileUpload @change="uploadPdf" :multiple="false" type="file" ref="pdf" name="demo[]" accept=".pdf,.docx" :maxFileSize="1000000">
+                        <FileUpload @change="uploadPdf" :multiple="false" type="file" ref="pdf" name="demo[]" accept=".pdf,.docx" :maxFileSize="999999999">
                             <template #empty>
                                 <p>Arraste para anexar documento.</p>
                             </template> </FileUpload

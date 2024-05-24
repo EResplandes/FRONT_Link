@@ -94,7 +94,7 @@ export default {
         // Metódo responsável por gerar link
         geraLink(data) {
             let idPedido = data.pedido.id;
-            let link = `https://link.gruporialma.com.br/#/site/aprovacao-externa/${idPedido}`;
+            let link = `https://link.gruporialma.com.br/site/#/aprovacao-externa/${idPedido}`;
             // http://localhost:5173/site/#/aprovacao-externa/47 -> Exemplo
 
             // Cria um elemento de texto temporário

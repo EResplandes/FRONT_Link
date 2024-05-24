@@ -25,7 +25,7 @@ export default {
             this.preloading = false;
         });
 
-        // if (localStorage.getItem('p_acesso') == 1 && localStorage.getItem != 'Emival Caiado') {
+        // if (localStorage.getItem('p_acesso') == 1 && localStorage.getItem('nome') != 'Emival Caiado') {
         //     this.display = true;
         // }
     },
