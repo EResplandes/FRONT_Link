@@ -4,6 +4,7 @@ import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
 import EmpresaService from '../../../service/EmpresaService';
 import FuncionarioService from '../../../service/FuncionarioService';
+import LocalService from '../../../service/LocalService';
 
 export default {
     data() {
@@ -12,6 +13,7 @@ export default {
             displayConfirmation: ref(false),
             empresaService: new EmpresaService(),
             funcionarioService: new FuncionarioService(),
+            localService: new LocalService(),
             displayConfirmationActivation: ref(false),
             visibleRight: ref(false),
             confirm: new useConfirm(),
@@ -21,6 +23,7 @@ export default {
             funcionarios: ref(false),
             grupos: ref(false),
             funcoes: ref(false),
+            locais: ref(false),
             preloading: ref(true),
             display: ref(false)
         };
@@ -30,7 +33,6 @@ export default {
         // Metódo responsável por buscar todos funcionários/usuários do sistema
         this.funcionarioService.buscaFuncionarios().then((data) => {
             if (data.resposta == 'Usuários listados com sucesso!') {
-                console.log(data);
                 this.funcionarios = data.usuarios;
                 this.preloading = false;
             }
@@ -48,6 +50,11 @@ export default {
             if (data.resposta == 'Funções listadas com sucesso!') {
                 this.funcoes = data.funcoes;
             }
+        });
+
+        // Metódo responsável por buscar todos locais
+        this.localService.buscaLocais().then((data) => {
+            this.locais = data.locais;
         });
     },
 
@@ -103,7 +110,7 @@ export default {
         // Metódo responsável por cadastrar usuário
         cadastrarUsuario() {
             // Array com os nomes dos campos obrigatórios
-            const camposObrigatorios = ['nome', 'email', 'funcao', 'grupo'];
+            const camposObrigatorios = ['nome', 'email', 'funcao', 'grupo', 'local'];
 
             // Variável para verificar se todos os campos obrigatórios estão preenchidos
             let todosCamposPreenchidos = true;
@@ -179,6 +186,10 @@ export default {
                 <div class="field">
                     <label for="grupo">Grupo: <span class="obrigatorio">* </span></label>
                     <Dropdown id="Grupo" v-model="form.grupo" :options="grupos" optionLabel="grupo" placeholder="Selecione..."></Dropdown>
+                </div>
+                <div class="field">
+                    <label for="local">Local: <span class="obrigatorio">* </span></label>
+                    <Dropdown id="Local" v-model="form.local" :options="locais" optionLabel="local" placeholder="Selecione..."></Dropdown>
                 </div>
                 <hr />
                 <div class="field">

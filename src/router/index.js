@@ -249,7 +249,7 @@ const router = createRouter({
             ]
         },
         {
-            path: '/landing',
+            path: '/landing/:id_pedido',
             name: 'landing',
             component: () => import('@/views/pages/Landing.vue')
         },

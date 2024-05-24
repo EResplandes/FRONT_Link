@@ -37,6 +37,7 @@ export default {
             customers: null,
             filters: {
                 global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                protheus: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 descricao: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 'local.local': { value: null, matchMode: FilterMatchMode.CONTAINS },
                 dt_inclusao_formatada: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -341,6 +342,14 @@ export default {
                             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pela Dt. de Inclusão" />
                         </template>
                     </Column>
+                    <Column field="protheus" header="Nº Protheus" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
+                        <template #body="{ data }">
+                            {{ data.protheus }}
+                        </template>
+                        <template #filter="{ filterModel, filterCallback }">
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pela Dt. de Inclusão" />
+                        </template>
+                    </Column>
                     <Column field="valor_formatado" header="Valor" style="min-width: 12rem">
                         <template #body="{ data }">
                             {{ data.valor_formatado }}
@@ -373,7 +382,7 @@ export default {
                             {{ data.empresa.nome_empresa }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="empresas" placeholder="Selecione uma Empresa" class="p-column-filter" style="min-width: 12rem" :showClear="true">
+                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="empresas" placeholder="Selecione" class="p-column-filter" style="min-width: 12rem" :showClear="true">
                                 <template #option="slotProps">
                                     {{ slotProps.option }}
                                 </template>

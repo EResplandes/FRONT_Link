@@ -37,6 +37,7 @@ export default {
             customers: null,
             filters: {
                 global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                protheus: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 descricao: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 dt_inclusao_formatada: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 'empresa.nome_empresa': { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -334,6 +335,14 @@ export default {
                     <Column field="dt_inclusao_formatada" header="Dt. Inclusão" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
                         <template #body="{ data }">
                             {{ data.dt_inclusao_formatada }}
+                        </template>
+                        <template #filter="{ filterModel, filterCallback }">
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pela Dt. de Inclusão" />
+                        </template>
+                    </Column>
+                    <Column field="protheus" header="Nº Protheus" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
+                        <template #body="{ data }">
+                            {{ data.protheus }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
                             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pela Dt. de Inclusão" />

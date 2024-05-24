@@ -52,6 +52,18 @@ const model = ref([
             { label: 'Emival', icon: 'pi pi-fw pi-users', to: '/emival', requiredRole: ['Presidente', 'Administrador'] },
             { label: 'Mônica', icon: 'pi pi-fw pi-building', to: '/monica', requiredRole: ['Presidente', 'Administrador'] }
         ]
+    },
+    {
+        label: 'Pages',
+        icon: 'pi pi-fw pi-briefcase',
+        to: '/pages',
+        items: [
+            {
+                label: 'Landing',
+                icon: 'pi pi-fw pi-globe',
+                to: '/landing/:id_pedido'
+            }
+        ]
     }
 ]);
 

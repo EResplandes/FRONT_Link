@@ -67,7 +67,7 @@ export default {
         // Metódo responsável por cadastrar pedido
         cadastrarPedido() {
             // Array com os nomes dos campos obrigatórios
-            const camposObrigatorios = ['valor', 'dt_vencimento', 'link', 'empresa', 'descricao', 'local'];
+            const camposObrigatorios = ['valor', 'dt_vencimento', 'link', 'empresa', 'descricao', 'local', 'protheus'];
 
             // Variável para verificar se todos os campos obrigatórios estão preenchidos
             let todosCamposPreenchidos = true;
@@ -136,43 +136,42 @@ export default {
                                 <label for="firstname2">Urgente</label>
                                 <InputSwitch :trueValue="1" :falseValue="0" :modelValue="form.urgente" v-model="form.urgente" />
                             </div>
-                            <div class="field col-12 md:col-3">
+                            <div class="field col-12 md:col-4">
                                 <label for="firstname2">Valor <span class="obrigatorio">*</span></label>
                                 <InputNumber v-tooltip.top="'Digite o valor do pedido'" v-model="form.valor" inputId="minmaxfraction" :minFractionDigits="2" :maxFractionDigits="2" placeholder="R$..." />
                             </div>
-                            <div class="field col-12 md:col-2">
+                            <div class="field col-12 md:col-3">
+                                <label for="firstname2">Nº Pedido no Protheus <span class="obrigatorio">*</span></label>
+                                <InputText type="number" v-tooltip.top="'Digite o numero do pedido'" v-model="form.protheus" />
+                            </div>
+                            <div class="field col-12 md:col-4">
                                 <label for="firstname2">Dt de Vencimento <span class="obrigatorio">*</span></label>
                                 <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de vencimento'" v-model="form.dt_vencimento" showIcon iconDisplay="input" />
                             </div>
-                            <div class="field col-12 md:col-2">
+                            <div class="field col-12 md:col-4">
                                 <label for="Link">Link <span class="obrigatorio">*</span></label>
                                 <Dropdown id="Link" v-model="form.link" :options="links" optionLabel="link" placeholder="Selecione..."></Dropdown>
                             </div>
-                            <div class="field col-12 md:col-2">
+                            <div class="field col-12 md:col-4">
                                 <label for="Empresa">Empresa <span class="obrigatorio">*</span></label>
                                 <Dropdown id="Empresa" v-model="form.empresa" :options="empresas" optionLabel="nome_empresa" placeholder="Selecione..."></Dropdown>
                             </div>
-                            <div class="field col-12 md:col-2">
+                            <div class="field col-12 md:col-4">
                                 <label for="Local">Local <span class="obrigatorio">*</span></label>
                                 <Dropdown id="Local" v-model="form.local" :options="locais" optionLabel="local" placeholder="Selecione..."></Dropdown>
                             </div>
                             <div class="field col-12">
                                 <label for="descricao">Descrição: <span class="obrigatorio">*</span></label>
                                 <Textarea v-tooltip.top="'Digite a descrição do pedido'" id="descricao" rows="4" v-model="form.descricao" placeholder="Digite a descrição..." />
-                            </div></div
-                    ></TabPanel>
-                    <TabPanel header="Upload">
-                        <FileUpload @change="uploadPdf" type="file" ref="pdf" name="demo[]" accept=".pdf,.docx" :maxFileSize="999999999">
-                            <template #empty>
-                                <p>Arraste para anexar documento.</p>
-                            </template> </FileUpload
-                        ><br />
+                            </div>
+                        </div>
+                        <FileUpload chooseLabel="Selecionar Arquivo" @change="uploadPdf" mode="basic" type="file" ref="pdf" name="demo[]" accept=".pdf,.docx" :maxFileSize="999999999"></FileUpload>
+                        <br />
                         <div class="p-fluid formgrid grid">
                             <div class="field col-12 md:col-12">
                                 <Button @click.prevent="cadastrarPedido()" icon="pi pi-check" label="Cadastrar Pedido" class="mr-2 mb-2 p-button-info" />
-                            </div>
-                        </div>
-                    </TabPanel>
+                            </div></div
+                    ></TabPanel>
                 </TabView>
             </div>
         </div>

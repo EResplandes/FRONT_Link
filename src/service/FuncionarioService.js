@@ -105,7 +105,8 @@ export default class FuncionarioService {
                 nome: form.nome,
                 email: form.email,
                 id_funcao: form.funcao.id,
-                id_grupo: form.grupo.id
+                id_grupo: form.grupo.id,
+                id_local: form.local.id
             })
         })
             .then((res) => res.json())

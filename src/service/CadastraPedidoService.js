@@ -21,6 +21,7 @@ export default class CadastraPedidoService {
         formData.append('id_empresa', form?.empresa?.id ?? null);
         formData.append('id_local', form?.local?.id ?? null);
         formData.append('id_criador', idCriador);
+        formData.append('protheus', form?.protheus);
 
         return fetch(`${API_URL}/pedidos/cadastrar-sem-fluxo`, {
             method: 'POST',
@@ -48,6 +49,8 @@ export default class CadastraPedidoService {
         formData.append('id_empresa', form?.empresa?.id ?? null);
         formData.append('id_local', form?.local?.id ?? null);
         formData.append('id_criador', localStorage.getItem('usuario_id'));
+        formData.append('protheus', form?.protheus);
+
         // Crie um array de objetos com a chave "id_usuario"
         const usuarios = form.fluxo.map((item) => ({ id_usuario: item.id }));
 

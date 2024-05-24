@@ -1,5 +1,6 @@
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
+import QRious from 'qrious';
 import rialmaImg from '../../../../public/assets/img/rialma.png'; // Importa a imagem diretamente
 import API_URL from '../../../service/config';
 
@@ -44,6 +45,16 @@ export function generatePDF(data) {
     doc.setFontSize(8);
     doc.text(`Dt. de Emissão`, 175, 10);
     doc.text(`${dataHoraFormatada}`, 170, 15);
+
+    // Gerar QR Code com o link do pedido
+    const qr = new QRious({
+        value: `https://link.gruporialma.com.br/site/#/landing/${data.pedido[0].id}`, // Link com o ID do pedido
+        size: 50
+    });
+    const qrDataUrl = qr.toDataURL(); // Obtém a URL da imagem do QR code
+
+    // Adiciona o QR code ao PDF
+    doc.addImage(qrDataUrl, 'PNG', 170, 20, 30, 30); // Ajuste a posição e tamanho conforme necessário
 
     doc.setFontSize(6);
     doc.setTextColor(255, 0, 0);
