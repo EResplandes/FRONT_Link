@@ -45,7 +45,7 @@ export default {
 
     mounted: function () {
         // Metódo responsável por buscar todas os pedidos reprovados por gerente com status 10
-        this.pedidoService.buscaReprovadosFluxo(localStorage.getItem('usuario_id')).then((data) => {
+        this.pedidoService.buscaReprovadosSoleni(localStorage.getItem('usuario_id')).then((data) => {
             console.log(data);
             this.pedidos = data.pedidos;
             this.preloading = false;
@@ -67,10 +67,10 @@ export default {
     },
 
     methods: {
-        // Metódo responsável por buscar todas os pedidos reprovados por gerente com status 10
+        // Metódo responsável por buscar todas os pedidos reprovados por Soleni com status 11
         buscaPedidos() {
             this.preloading = true;
-            this.pedidoService.buscaReprovadosFluxo(localStorage.getItem('usuario_id')).then((data) => {
+            this.pedidoService.buscaReprovadosSoleni(localStorage.getItem('usuario_id')).then((data) => {
                 this.pedidos = data.pedidos;
                 this.preloading = false;
             });
@@ -89,7 +89,7 @@ export default {
         // Metódo responsável por enviar mensagem para Dr Emival ou Dr. Monica
         enviarMensagem() {
             this.preloading = true;
-            this.pedidoService.respondePedidoReprovadoFluxo(this.pdf, this.novaMensagem, this.id_pedido).then((data) => {
+            this.pedidoService.respondePedidoReprovadoSoleni(this.pdf, this.novaMensagem, this.id_pedido).then((data) => {
                 if (data.resposta == 'Mensagem enviada com sucesso!') {
                     this.showSuccess('Mensagem enviada com sucesso!');
                     this.displayChat = false;

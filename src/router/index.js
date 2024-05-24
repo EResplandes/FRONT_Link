@@ -24,9 +24,19 @@ const router = createRouter({
                     component: () => import('@/views/pages/pedidos/PedidosMonica.vue')
                 },
                 {
+                    path: '/todos-pedidos-soleni',
+                    name: 'todos-pedidos-soleni',
+                    component: () => import('@/views/pages/gestor_fluxo/TodosPedidos.vue')
+                },
+                {
                     path: '/pedidos-todos',
                     name: 'pedidos-todos',
                     component: () => import('@/views/pages/pedidos/Todos.vue')
+                },
+                {
+                    path: '/pedidos-todos-externo',
+                    name: 'pedidos-todos-externo',
+                    component: () => import('@/views/pages/comprador/TodosPedidosCompradorExterno.vue')
                 },
                 {
                     path: '/pedidos-reprovados',
@@ -86,7 +96,7 @@ const router = createRouter({
                 {
                     path: '/reprovados-soleni',
                     name: 'reprovados-soleni',
-                    component: () => import('@/views/pages/comprador/PedidosAnaliseReprovados.vue')
+                    component: () => import('@/views/pages/comprador/PedidosReprovadosSoleni.vue')
                 },
                 {
                     path: '/usuarios',
@@ -97,6 +107,16 @@ const router = createRouter({
                     path: '/emival',
                     name: 'emival',
                     component: () => import('@/views/pages/presidencia/Emival.vue')
+                },
+                {
+                    path: '/monica',
+                    name: 'monica',
+                    component: () => import('@/views/pages/presidencia/Monica.vue')
+                },
+                {
+                    path: '/relatorio-aprovados',
+                    name: 'relatorio-aprovados',
+                    component: () => import('@/views/pages/relatorios/Aprovados.vue')
                 },
                 {
                     path: '/uikit/formlayout',

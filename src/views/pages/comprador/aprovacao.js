@@ -1,6 +1,7 @@
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import rialmaImg from '../../../../public/assets/img/rialma.png'; // Importa a imagem diretamente
+import API_URL from '../../../service/config';
 
 // Função para adicionar um zero à esquerda para valores menores que 10
 function pad(valor) {
@@ -20,6 +21,10 @@ const segundos = pad(dataAtual.getSeconds());
 const dataHoraFormatada = `${dia}/${mes}/${ano} às ${horas}:${minutos}:${segundos}`;
 
 export function generatePDF(data) {
+    // Verifica o status do pedido
+    const statusDoPedido = data.pedido[0].status;
+    console.log(data);
+
     // Cria um novo documento PDF com orientação paisagem (horizontal)
     const doc = new jsPDF();
 
@@ -49,23 +54,29 @@ export function generatePDF(data) {
     doc.text('PRESIDENTE', 107, 130, null, null, 'center');
 
     // Define o título da tabela
-    const headers = [['Registro', 'Local', 'Descrição', 'Valor', 'Status', 'Autorização', 'Criação', 'Aprovação']];
+    const headers = [['', 'Local', 'Descrição', 'Valor', 'Status', 'Autorização', 'Criação', 'Aprovação']];
 
-    // Formata os dados da tabela
+    // Formatação dos dados da tabela
     const tableData = data.pedido.map((pedido) => {
+        // Formatação da data de inclusão
         const dataInclusao = new Date(pedido.dt_inclusao);
-        const diaAssinatura = String(dataInclusao.getDate()).padStart(2, '0');
-        const mesAssinatura = String(dataInclusao.getMonth() + 1).padStart(2, '0');
-        const anoAssinatura = dataInclusao.getFullYear();
-        const dataFormatadaInclusao = `${diaAssinatura}/${mesAssinatura}/${anoAssinatura}`;
+        const diaInclusao = pad(dataInclusao.getDate());
+        const mesInclusao = pad(dataInclusao.getMonth() + 1);
+        const anoInclusao = dataInclusao.getFullYear();
+        const horaInclusao = pad(dataInclusao.getHours());
+        const minutoInclusao = pad(dataInclusao.getMinutes());
+        const dataFormatadaInclusao = `${diaInclusao}/${mesInclusao}/${anoInclusao} ${horaInclusao}:${minutoInclusao}`;
 
-        const dataCriacao = new Date(pedido.dt_aprovacao);
-        const diaCriacao = String(dataCriacao.getDate()).padStart(2, '0');
-        const mesCriacao = String(dataCriacao.getMonth() + 1).padStart(2, '0');
-        const anoCriacao = dataCriacao.getFullYear();
-        const dataFormatadaAprovacao = `${diaCriacao}/${mesCriacao}/${anoCriacao}`;
+        // Formatação da data de aprovação
+        const dataAprovacao = new Date(pedido.dt_aprovacao);
+        const diaAprovacao = pad(dataAprovacao.getDate());
+        const mesAprovacao = pad(dataAprovacao.getMonth() + 1);
+        const anoAprovacao = dataAprovacao.getFullYear();
+        const horaAprovacao = pad(dataAprovacao.getHours());
+        const minutoAprovacao = pad(dataAprovacao.getMinutes());
+        const dataFormatadaAprovacao = `${diaAprovacao}/${mesAprovacao}/${anoAprovacao} ${horaAprovacao}:${minutoAprovacao}`;
 
-        return ['Pedido', pedido.local, pedido.descricao, pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }), pedido.status, `${pedido.link} @`, `${dataFormatadaInclusao}`, dataFormatadaAprovacao];
+        return ['1', pedido.local, pedido.descricao, pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }), pedido.status, `${pedido.link} @`, dataFormatadaInclusao, dataFormatadaAprovacao];
     });
 
     // Adiciona a tabela ao documento PDF
@@ -81,17 +92,57 @@ export function generatePDF(data) {
         },
         alternateRowStyles: { fillColor: [255, 255, 255] }, // Cor de fundo das linhas alternadas da tabela
         columnStyles: {
-            0: { halign: 'center', columnWidth: 15 },
+            0: { halign: 'center', columnWidth: 5 },
             1: { halign: 'center', columnWidth: 15 },
             2: { halign: 'center', columnWidth: 40 },
             3: { halign: 'center', columnWidth: 30 },
-            4: { halign: 'center', columnWidth: 25 },
+            4: { halign: 'center', columnWidth: 15 },
             5: { halign: 'center', columnWidth: 20 },
-            6: { halign: 'center', columnWidth: 20 },
-            7: { halign: 'center', columnWidth: 15 }
+            6: { halign: 'center', columnWidth: 25 },
+            7: { halign: 'center', columnWidth: 30 }
         },
         bodyStyles: { halign: 'center', fontSize: 8 }
     });
 
-    doc.save('aprovacao.pdf');
+    // Se o status do pedido for "Aprovado com Ressalva", faça a requisição fetch
+    if (statusDoPedido === 'Aprovado com Ressalva') {
+        fetch(`${API_URL}/chat/listar-conversa/` + data.pedido[0].id, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + localStorage.getItem('token')
+            }
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Erro ao fazer requisição');
+                }
+                return response.json();
+            })
+            .then((data) => {
+                if (data.resposta && data.conversa && data.conversa.length > 0) {
+                    const mensagemResposta = data.resposta;
+                    const conversa = data.conversa.map((item) => `${item.id_usuario.name}: ${item.mensagem}`).join('\n');
+                    console.log(data);
+                    // Adiciona as mensagens ao documento PDF
+                    doc.setFontSize(10);
+
+                    doc.line(10, 245, 200, 245); // Define as coordenadas para desenhar a linha horizontal
+                    doc.text('Histórico de Conversa / Ressalva:', 10, 260, { align: 'left' }); // Alinha o texto à direita
+                    doc.setFontSize(8);
+                    doc.text(`${conversa}´`, 10, 265, { align: 'left', maxWidth: 190 }); // Alinha o texto à esquerda e define a largura máxima para ajustar o texto
+
+                    // Salva o PDF após adicionar as mensagens
+                    doc.save('aprovacao.pdf');
+                }
+            })
+            .catch((error) => {
+                console.error('Erro ao fazer requisição:', error);
+                // Em caso de erro na requisição, salva o PDF sem as mensagens
+                doc.save('aprovacao.pdf');
+            });
+    } else {
+        // Se o status do pedido não for "Aprovado com Ressalva", salva o PDF sem fazer a requisição
+        doc.save('aprovacao.pdf');
+    }
 }

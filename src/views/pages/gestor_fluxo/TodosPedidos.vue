@@ -38,6 +38,7 @@ export default {
             filters: {
                 global: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 descricao: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                'local.local': { value: null, matchMode: FilterMatchMode.CONTAINS },
                 dt_inclusao_formatada: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 'empresa.nome_empresa': { value: null, matchMode: FilterMatchMode.CONTAINS },
                 status: { value: null, matchMode: FilterMatchMode.IN },
@@ -49,7 +50,8 @@ export default {
 
     mounted: function () {
         // Metódo responsável por buscar todas os pedidos
-        this.pedidoService.buscaPedidos(localStorage.getItem('local_id')).then((data) => {
+        this.pedidoService.buscaTodosPedidos(localStorage.getItem('local_id')).then((data) => {
+            console.log(data);
             this.pedidos = data.pedidos.map((pedido) => ({
                 ...pedido,
                 dt_inclusao_formatada: this.formatarData(pedido.dt_inclusao),
@@ -95,7 +97,7 @@ export default {
         // Metódo responsável por buscar todos pedidos
         buscaPedidos() {
             this.preloading = true;
-            this.pedidoService.buscaPedidos(localStorage.getItem('local_id')).then((data) => {
+            this.pedidoService.buscaPedidos().then((data) => {
                 this.pedidos = data.pedidos;
                 this.preloading = false;
             });
@@ -347,6 +349,7 @@ export default {
                             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pelo Valor" />
                         </template>
                     </Column>
+
                     <Column field="descricao" header="Descrição" style="min-width: 12rem">
                         <template #body="{ data }">
                             {{ data.descricao }}
@@ -355,6 +358,16 @@ export default {
                             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pela Descrição" />
                         </template>
                     </Column>
+
+                    <Column field="local.local" header="Local" style="min-width: 12rem">
+                        <template #body="{ data }">
+                            {{ data.local.local }}
+                        </template>
+                        <template #filter="{ filterModel, filterCallback }">
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pela Descrição" />
+                        </template>
+                    </Column>
+
                     <Column field="empresa.nome_empresa" header="Empresa" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
                         <template #body="{ data }">
                             {{ data.empresa.nome_empresa }}
@@ -391,7 +404,7 @@ export default {
                                 <div class="col-3 md:col-3 mr-1">
                                     <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
                                 </div>
-                                <div v-if="slotProps.data.status.status == 'Reprovado'" class="col-3 md:col-3">
+                                <div v-if="slotProps.data.status.status == 'Reprovado' || slotProps.data.status.status == 'Aprovado com Ressalva'" class="col-3 md:col-3">
                                     <Button @click.prevent="chat(slotProps.data.id, slotProps.data)" icon="pi pi-comments" class="p-button-secon" />
                                 </div>
                                 <div v-if="slotProps.data.status.status == 'Aprovado' || slotProps.data.status.status == 'Aprovado com Ressalva'" class="col-4 md:col-4 mr-3">

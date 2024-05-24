@@ -6,6 +6,7 @@ import PedidoService from '../../../service/Pedido';
 import EmpresaService from '../../../service/EmpresaService';
 import StatusService from '../../../service/StatusService';
 import FluxoService from '../../../service/FluxoService';
+import ChatService from '../../../service/ChatService';
 
 export default {
     data() {
@@ -15,6 +16,7 @@ export default {
             pedidoService: new PedidoService(),
             empresaService: new EmpresaService(),
             statusService: new StatusService(),
+            chatService: new ChatService(),
             fluxoService: new FluxoService(),
             displayConfirmationActivation: ref(false),
             visibleRight: ref(false),
@@ -42,6 +44,7 @@ export default {
         this.pedidoService.buscaAnalisando().then((data) => {
             this.pedidos = data.pedidos;
             this.preloading = false;
+            console.log(data);
         });
 
         // Metódo responsável por buscar todas empresas
@@ -91,6 +94,7 @@ export default {
                     this.showSuccess('Pedido reprovado com sucesso!');
                     this.display = false;
                     this.displayChat = false;
+                    this.displayFluxo = false;
                 }
                 this.buscaPedidos();
                 this.preloading = false;
@@ -99,7 +103,10 @@ export default {
 
         // Metódo responsável por reprovar fluxo
         reprovarFluxo() {
-            this.displayChat = true;
+            this.chatService.buscaConversa(this.idPedido).then((data) => {
+                this.conversa = data.conversa;
+                this.displayChat = true;
+            });
         },
 
         // Metódo responsável por formatar data padrão br
@@ -303,7 +310,7 @@ export default {
                         </template>
                     </Column>
 
-                    <Column field="Descrição" header="Descrição" :sortable="true" class="w-5">
+                    <Column field="Descrição" header="Descrição" :sortable="true" class="w-4">
                         <template #body="slotProps">
                             <span class="p-column-title">Descrição</span>
                             {{ slotProps.data.descricao }}
@@ -313,7 +320,14 @@ export default {
                     <Column field="Valor" header="Valor" :sortable="true" class="w-1">
                         <template #body="slotProps">
                             <span class="p-column-title">CNPJ</span>
-                            R$ {{ slotProps.data.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
+                            {{ slotProps.data.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
+                        </template>
+                    </Column>
+
+                    <Column field="Tipo Pedido" header="Tipo Pedido" :sortable="true" class="w-2">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Tipo Pedido</span>
+                            {{ slotProps.data.tipo_pedido }}
                         </template>
                     </Column>
 

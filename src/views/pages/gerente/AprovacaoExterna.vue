@@ -3,8 +3,8 @@ import { ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import { useRouter } from 'vue-router';
 import { useRoute } from 'vue-router';
-import API_URL from '../../../service/config';
 import PedidoExterno from '../../../service/PedidoExternoService';
+import GerenteService from '../../../service/GerenteService';
 
 export default {
     data() {
@@ -12,6 +12,7 @@ export default {
             toast: new useToast(),
             router: useRouter(),
             route: useRoute(),
+            gerenteService: new GerenteService(),
             pedidoExternoService: new PedidoExterno(),
             urlBase: 'https://link.gruporialma.com.br/storage',
             pdf: ref(null),
@@ -21,7 +22,8 @@ export default {
             adobeApiReady: false,
             previewFilePromise: null,
             form: ref({}),
-            fluxoValidado: ref(false)
+            confirmaAprovacao: ref(false),
+            fluxoValidado: ref(true)
         };
     },
 
@@ -35,7 +37,9 @@ export default {
         this.pedidoExternoService.buscaInformacoes(this.id_pedido).then((data) => {
             this.informacoes = data;
         });
+    },
 
+    mounted: function () {
         // Metódo responsável por verificar se tem fluxo para esse usuário
         if (localStorage.getItem('usuario_id')) {
             this.form.id_pedido = this.id_pedido;
@@ -43,19 +47,15 @@ export default {
 
             this.pedidoExternoService.validaFluxo(this.form).then((data) => {
                 if (data.resposta == 'Fluxo válido!') {
-                    this.fluxoValidado = false;
-                } else {
                     this.fluxoValidado = true;
+                } else {
+                    this.fluxoValidado = false;
                 }
             });
-        } else {
-            localStorage.setItem('linkAprovacao', true);
-            this.router.push('/'); // Mandando para tela principal
         }
-    },
 
-    mounted: function () {
         if (window.AdobeDC) {
+            File;
             this.adobeApiReady = true;
         } else {
             document.addEventListener('adobe_dc_view_sdk.ready', () => {
@@ -67,6 +67,15 @@ export default {
     },
 
     methods: {
+        // Metódo responsável por aprovar fluxo
+        aprovarPedido() {
+            this.gerenteService.aprovarExterno(this.id_pedido).then((data) => {
+                if (data.resposta == 'Pedido aprovado com sucesso!') {
+                    this.confirmaAprovacao = true;
+                    console.log(data.resposta);
+                }
+            });
+        },
         showSuccess(mensagem) {
             this.toast.add({ severity: 'success', summary: 'Sucesso!', detail: mensagem, life: 3000 });
         },
@@ -175,26 +184,39 @@ export default {
 </script>
 
 <template>
-    <div class="grid">
+    <div v-if="this.fluxoValidado && this.confirmaAprovacao == false" class="grid">
         <Toast />
-        <Card v-if="!this.validaFluxo" style="overflow: hidden; width: 100%">
+        <Card style="overflow: hidden; width: 100%">
             <template #header>
                 <div ref="pdfContainer" style="width: 100%; height: 60vh; border: none"></div>
             </template>
             <template #footer>
                 <div class="flex gap-3">
-                    <Button label="Reprovar" severity="danger" class="w-full" />
-                    <Button label="Aprovar" severity="success" class="w-full" />
+                    <Button @click.prevent="this.aprovarPedido()" label="Aprovar" severity="success" class="w-full" />
                 </div>
             </template>
         </Card>
-
-        <div v-else class="surface-ground flex align-items-center justify-content-center mt-6 w-full">
+    </div>
+    <div class="grid">
+        <div v-if="this.confirmaAprovacao" class="surface-ground flex align-items-center justify-content-center mt-6 w-full">
             <div class="flex flex-column align-items-center justify-content-center">
-                <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, rgba(0, 0, 0, 0.4) 10%, rgba(0, 0, 0, 0) 30%)">
+                <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, rgba(0, 128, 0, 0.6) 0%, rgba(0, 128, 0, 0.4) 20%, rgba(0, 128, 0, 0.2) 50%, rgba(0, 128, 0, 0) 100%)">
                     <div class="w-full surface-card py-8 px-5 sm:px-8 flex flex-column align-items-center" style="border-radius: 53px">
-                        <span class="font-bold text-3xl">Link inválido!</span><br />
-                        <div class="text-600 mb-5">Esse fluxo não existe ou já foi assinado!</div>
+                        <span class="font-bold text-3xl">Pedido Aprovado com Sucesso!</span><br />
+                        <div class="text-600 mb-5">O pedido de número {{ this.id_pedido }} foi aprovado com sucesso!!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div v-if="this.fluxoValidado == false" class="surface-ground flex align-items-center justify-content-center mt-6 w-full">
+            <div class="flex flex-column align-items-center justify-content-center">
+                <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, rgba(255, 0, 0, 0.6) 0%, rgba(255, 0, 0, 0.4) 20%, rgba(255, 0, 0, 0.2) 50%, rgba(255, 0, 0, 0) 100%)">
+                    <div class="w-full surface-card py-8 px-5 sm:px-8 flex flex-column align-items-center" style="border-radius: 53px">
+                        <span class="font-bold text-3xl">Link Inválido!</span><br />
+                        <div class="text-600 mb-5">O pedido de número {{ this.id_pedido }} já foi aprovado ou não pertence ao seu fluxo!</div>
                     </div>
                 </div>
             </div>

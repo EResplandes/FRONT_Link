@@ -91,11 +91,39 @@ export default {
             this.displayChat = true;
         },
 
+        // Metódo responsável por gerar link
+        geraLink(data) {
+            let idPedido = data.pedido.id;
+            let link = `https://link.gruporialma.com.br/#/site/aprovacao-externa/${idPedido}`;
+            // http://localhost:5173/site/#/aprovacao-externa/47 -> Exemplo
+
+            // Cria um elemento de texto temporário
+            const tempInput = document.createElement('input');
+            tempInput.style.position = 'absolute';
+            tempInput.style.left = '-9999px';
+            tempInput.value = link;
+            document.body.appendChild(tempInput);
+
+            // Seleciona e copia o valor do input temporário
+            tempInput.select();
+            document.execCommand('copy');
+
+            // Remove o input temporário
+            document.body.removeChild(tempInput);
+
+            // Opcional: informar o usuário que o link foi copiado
+            alert('Link copiado para a área de transferência: ' + link);
+        },
+
         // Metódo responsável por enviar mensagem para Dr Emival ou Dr. Monica
         enviarMensagem() {
             this.preloading = true;
-            this.gerenteService.reprovar(this.form, this.idFluxo).then((data) => {
-                console.log(data);
+            this.gerenteService.reprovar(this.idFluxo, this.novaMensagem).then((data) => {
+                if (data.resposta == 'Pedido reprovado com sucesso!') {
+                    this.display = false;
+                    this.displayChat = false;
+                    this.showSuccess('Pedido reprovado com sucesso!');
+                }
                 this.buscaPedidos();
                 this.preloading = false;
             });
@@ -121,6 +149,9 @@ export default {
         // Metódo responsável por visualizar pdf
         visualizar(id, data) {
             this.display = true;
+            if (data.pedido.status.status == 'Fluxo Reprovado') {
+                this.erroPedidoReprovado = true;
+            }
             this.idFluxo = id;
             this.pdf = data.pedido.anexo;
             this.pdfsrc = `${this.urlBase}/${this.pdf}`;
@@ -180,10 +211,10 @@ export default {
         <Dialog header="Documento" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
             <div class="grid">
                 <div class="col-6 md:col-6">
-                    <Button @click.prevent="aprovarPedido()" icon="pi pi-check" label="Aprovar" class="p-button-success" style="width: 100%" />
+                    <Button v-if="!this.erroPedidoReprovado" @click.prevent="aprovarPedido()" icon="pi pi-check" label="Aprovar" class="p-button-success" style="width: 100%" />
                 </div>
                 <div class="col-6 md:col-6">
-                    <Button @click.prevent="reprovarPedido()" icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%" />
+                    <Button v-if="!this.erroPedidoReprovado" @click.prevent="reprovarPedido()" icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%" />
                 </div>
                 <div class="col-12 md:col-12">
                     <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
@@ -220,7 +251,7 @@ export default {
                         </Timeline>
                     </div>
                     <hr />
-                    <InputText class="col-12" type="text" v-model="this.form.mensagem" placeholder="Digite a mensagem..." />
+                    <InputText class="col-12" type="text" v-model="this.novaMensagem" placeholder="Digite a mensagem..." />
                     <Button @click.prevent="enviarMensagem()" label="Reprovar e enviar mensagem" class="mr-2 mt-3 p-button-success col-12" />
                 </div>
             </div>
@@ -274,7 +305,7 @@ export default {
                         </template>
                     </Column>
 
-                    <Column field="Descrição" header="Descrição" :sortable="true" class="w-5">
+                    <Column field="Descrição" header="Descrição" :sortable="true" class="w-4">
                         <template #body="slotProps">
                             <span class="p-column-title">Descrição</span>
                             {{ slotProps.data.pedido.descricao }}
@@ -288,12 +319,22 @@ export default {
                         </template>
                     </Column>
 
+                    <Column field="Status" header="Status" :sortable="true" class="w-2">
+                        <template #body="slotProps">
+                            <span class="p-column-title">CNPJ</span>
+                            {{ slotProps.data.pedido.status.status }}
+                        </template>
+                    </Column>
+
                     <Column field="..." header="..." :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
                             <div class="grid">
                                 <div class="col-4 md:col-4 mr-3">
                                     <Button @click.prevent="visualizar(slotProps.data.id_fluxo, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
+                                </div>
+                                <div class="col-4 md:col-4 mr-3">
+                                    <Button @click.prevent="geraLink(slotProps.data)" icon="pi pi-link" class="p-button-secondary" />
                                 </div>
                             </div>
                         </template>

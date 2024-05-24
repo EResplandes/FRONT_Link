@@ -40,17 +40,32 @@ export default class GerenteService {
             });
     }
 
-    async reprovar(form, id_fluxo) {
-        return await fetch(`${API_URL}/pedidos/reprovar-fluxo/` + id_fluxo, {
-            method: 'PUT',
+    async aprovarExterno(id_pedido) {
+        return await fetch(`${API_URL}/pedidos/aprovar-fluxo-externo/` + id_pedido + '/' + localStorage.getItem('usuario_id'), {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    async reprovar(id_fluxo, mensagem) {
+        return await fetch(`${API_URL}/pedidos/reprovar-fluxo/` + id_fluxo + '/' + localStorage.getItem('usuario_id') + '/' + mensagem, {
+            method: 'GET',
             headers: {
                 Accept: 'application/json',
                 Authorization: 'Bearer ' + token
-            },
-            body: JSON.stringify({
-                mensagem: form.mensagem,
-                id_usuario: parseInt(form.id_usuario, 10)
-            })
+            }
         })
             .then((res) => res.json())
             .then((d) => {

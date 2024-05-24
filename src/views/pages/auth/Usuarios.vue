@@ -30,6 +30,7 @@ export default {
         // Metódo responsável por buscar todos funcionários/usuários do sistema
         this.funcionarioService.buscaFuncionarios().then((data) => {
             if (data.resposta == 'Usuários listados com sucesso!') {
+                console.log(data);
                 this.funcionarios = data.usuarios;
                 this.preloading = false;
             }
@@ -69,7 +70,7 @@ export default {
                 header: 'Desativar Usuário?',
                 icon: 'pi pi-info-circle',
                 rejectLabel: 'Cancelar',
-                acceptLabel: 'Deletar',
+                acceptLabel: 'Desativar',
                 rejectClass: 'p-button-secondary p-button-outlined',
                 acceptClass: 'p-button-danger',
                 accept: () => {
@@ -79,11 +80,22 @@ export default {
             });
         },
 
+        // Metódo responsável por ativar usuário
+        ativar(id_funcionario) {
+            this.funcionarioService.ativaFuncionario(id_funcionario).then((data) => {
+                if (data.resposta == 'Funcionário ativado com sucesso!') {
+                    this.showSuccess('Funcionário ativado com sucesso!');
+                    this.buscaFuncionarios();
+                }
+            });
+        },
+
         // Metódo responsável por desativar usuário
         desativarFuncionario(id_funcionario) {
-            this.desativarFuncionario(id_funcionario).then((data) => {
+            this.funcionarioService.desativarFuncionario(id_funcionario).then((data) => {
                 if (data.resposta == 'Funcionário desativado com sucesso!') {
                     this.showSuccess('Funcionário desativado com sucesso!');
+                    this.buscaFuncionarios();
                 }
             });
         },
@@ -220,7 +232,7 @@ export default {
                         </template>
                     </Column>
 
-                    <Column field="Email" header="Email" :sortable="true" class="w-4">
+                    <Column field="Email" header="Email" :sortable="true" class="w-3">
                         <template #body="slotProps">
                             <span class="p-column-title">Email</span>
                             {{ slotProps.data.email }}
@@ -234,10 +246,10 @@ export default {
                         </template>
                     </Column>
 
-                    <Column field="Grupo" header="Grupo" :sortable="true" class="w-1">
+                    <Column field="Status" header="Status" :sortable="true" class="w-1">
                         <template #body="slotProps">
-                            <span class="p-column-title">Grupo</span>
-                            {{ slotProps.data.grupo.grupo }}
+                            <span class="p-column-title">Status</span>
+                            {{ slotProps.data.status }}
                         </template>
                     </Column>
 
@@ -246,7 +258,8 @@ export default {
                             <span class="p-column-title"></span>
                             <div class="grid">
                                 <div class="col-6 md:col-4">
-                                    <Button @click.prevent="confirmDesativar(slotProps.data.id)" icon="pi pi-trash" label="Desativar" class="p-button-danger" />
+                                    <Button v-if="slotProps.data.status == 'Ativo'" @click.prevent="confirmDesativar(slotProps.data.id)" icon="pi pi-trash" label="Desativar" class="p-button-danger" />
+                                    <Button v-else @click.prevent="ativar(slotProps.data.id)" icon="pi pi-check" label="Ativar" class="p-button-secondary" />
                                 </div>
                             </div>
                         </template>

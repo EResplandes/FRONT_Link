@@ -32,13 +32,21 @@ export default {
         // Metódo responsável por buscar todos Links
         this.linkService.buscaLinks().then((data) => {
             if (data.resposta == 'Links listados com sucesso!') {
-                this.links = data.links;
+                const localId = localStorage.getItem('local_id');
+
+                if (localId != '1') {
+                    // Filtra o link para remover aquelas com local_id diferente de 1
+                    this.links = data.links.filter((links) => links.id == 2);
+                } else {
+                    // Se o local_id não estiver definido no localStorage ou for 1, mantenha todas as empresas
+                    this.links = data.links;
+                }
             }
         });
 
         // Metódo responsável por buscar todas empresas
         this.empresaService.buscaEmpresas().then((data) => {
-            if (data.resposta == 'Empresas listados com sucesso!') {
+            if (data.resposta === 'Empresas listados com sucesso!') {
                 this.empresas = data.empresas;
             }
         });

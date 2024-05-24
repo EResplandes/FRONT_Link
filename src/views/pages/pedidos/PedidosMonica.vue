@@ -23,7 +23,8 @@ export default {
             display: ref(false),
             urlBase: 'https://link.gruporialma.com.br/storage',
             pdf: ref(null),
-            pdfsrc: ref(null)
+            pdfsrc: ref(null),
+            validaExclusaoButton: localStorage.getItem('grupo')
         };
     },
 
@@ -268,7 +269,7 @@ export default {
                                     <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
                                 </div>
                                 <div class="col-6 md:col-4">
-                                    <Button @click.prevent="confirmDeletar(slotProps.data.id)" icon="pi pi-trash" class="p-button-danger" />
+                                    <Button v-if="this.validaExclusaoButton == 'Gestor de Fluxo' || this.validaExclusaoButton == 'Administrador'" @click.prevent="confirmDeletar(slotProps.data.id)" icon="pi pi-trash" class="p-button-danger" />
                                 </div>
                             </div>
                         </template>

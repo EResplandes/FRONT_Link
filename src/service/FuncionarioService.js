@@ -119,9 +119,27 @@ export default class FuncionarioService {
             });
     }
 
+    ativaFuncionario(id_funcionario) {
+        return fetch(`${API_URL}/funcionarios/ativa-funcionario/` + id_funcionario, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
     desativarFuncionario(id_funcionario) {
         return fetch(`${API_URL}/funcionarios/desativa-funcionario/` + id_funcionario, {
-            method: 'PUT',
+            method: 'GET',
             headers: {
                 Accept: 'application/json',
                 Authorization: 'Bearer ' + token

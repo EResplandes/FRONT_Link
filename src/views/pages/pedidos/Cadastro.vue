@@ -34,7 +34,15 @@ export default {
         // Metódo responsável por buscar todos Links
         this.linkService.buscaLinks().then((data) => {
             if (data.resposta == 'Links listados com sucesso!') {
-                this.links = data.links;
+                const localId = localStorage.getItem('local_id');
+
+                if (localId != '1') {
+                    // Filtra o link para remover aquelas com local_id diferente de 1
+                    this.links = data.links.filter((links) => links.id == 2);
+                } else {
+                    // Se o local_id não estiver definido no localStorage ou for 1, mantenha todas as empresas
+                    this.links = data.links;
+                }
             }
         });
 
@@ -181,7 +189,7 @@ export default {
                         </div>
                     </TabPanel>
                     <TabPanel header="Upload">
-                        <FileUpload @change="uploadPdf" type="file" ref="pdf" name="demo[]" accept=".pdf,.docx" :maxFileSize="1000000">
+                        <FileUpload @change="uploadPdf" :multiple="false" type="file" ref="pdf" name="demo[]" accept=".pdf,.docx" :maxFileSize="1000000">
                             <template #empty>
                                 <p>Arraste para anexar documento.</p>
                             </template> </FileUpload

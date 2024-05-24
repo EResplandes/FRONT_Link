@@ -143,9 +143,47 @@ export default class PedidoService {
             });
     }
 
-    // Requisição responsável por buscar todos pedidos
+    // Requisição responsável por buscar todos pedidos de acordo com local
     async buscaPedidos(id_local) {
         return await fetch(`${API_URL}/pedidos/listar-pedidos/` + id_local, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    // Requisição responsável por buscar todos pedidos com local 2 e 3
+    async buscaTodosPedidosExternos() {
+        return await fetch(`${API_URL}/pedidos/listar-pedidos-externos`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    // Requisição responsável por buscar todos pedidos
+    async buscaTodosPedidos() {
+        return await fetch(`${API_URL}/pedidos/listar-pedidos/`, {
             method: 'GET',
             headers: {
                 Accept: 'application/json',
@@ -285,7 +323,7 @@ export default class PedidoService {
             });
     }
 
-    // Requisição responsável por buscar pedidos reprovados status 3
+    // Requisição responsável por buscar quantidades
     async buscaQuantidades() {
         return await fetch(`${API_URL}/app/listarQuantidades`, {
             method: 'GET',
@@ -427,6 +465,25 @@ export default class PedidoService {
             });
     }
 
+    // Requisição responsável por buscar pedidos reprovados por Soleni com statys 11
+    async buscaReprovadosSoleni(id) {
+        return await fetch(`${API_URL}/pedidos/listar-reprovados-soleni/` + id, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
     // Requisição responsável por responder pedido reprovado
     respondePedidoReprovadoFluxo(novoAnexo, novaMensagem, id_pedido) {
         let idCriador = localStorage.getItem('usuario_id');
@@ -440,6 +497,31 @@ export default class PedidoService {
             headers: {
                 Accept: 'multipart/form-data',
                 'Content-Type': 'multipart/form-data',
+                Authorization: 'Bearer ' + token
+            },
+            body: formData
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    // Requisição responsável por responder pedido reprovado pela Soleni
+    respondePedidoReprovadoSoleni(novoAnexo, novaMensagem, id_pedido) {
+        let idCriador = localStorage.getItem('usuario_id');
+        const formData = new FormData();
+        formData.append('mensagem', novaMensagem);
+        formData.append('id_usuario', idCriador);
+        formData.append('anexo', novoAnexo ?? null);
+
+        return fetch(`${API_URL}/pedidos/responde-reprovado-soleni/` + id_pedido, {
+            method: 'POST',
+            headers: {
                 Authorization: 'Bearer ' + token
             },
             body: formData

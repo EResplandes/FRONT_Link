@@ -23,7 +23,7 @@ export default class FluxoService {
 
     async aprovarFluxo(id) {
         return await fetch(`${API_URL}/fluxo/aprovar-fluxo/` + id, {
-            method: 'PUT',
+            method: 'GET',
             headers: {
                 Accept: 'application/json',
                 Authorization: 'Bearer ' + token
