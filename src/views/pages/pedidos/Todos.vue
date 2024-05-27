@@ -400,7 +400,7 @@ export default {
                                 <div class="col-3 md:col-3 mr-1">
                                     <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
                                 </div>
-                                <div v-if="slotProps.data.status.status == 'Reprovado'" class="col-3 md:col-3">
+                                <div v-if="slotProps.data.status.status == 'Reprovado' || slotProps.data.status.status == 'Aprovado com Ressalva' " class="col-3 md:col-3">
                                     <Button @click.prevent="chat(slotProps.data.id, slotProps.data)" icon="pi pi-comments" class="p-button-secon" />
                                 </div>
                                 <div v-if="slotProps.data.status.status == 'Aprovado' || slotProps.data.status.status == 'Aprovado com Ressalva'" class="col-4 md:col-4 mr-3">
