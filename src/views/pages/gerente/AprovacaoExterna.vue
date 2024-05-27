@@ -23,7 +23,8 @@ export default {
             previewFilePromise: null,
             form: ref({}),
             confirmaAprovacao: ref(false),
-            fluxoValidado: ref(true)
+            fluxoValidado: ref(true),
+	    API_URL: 'https://link.gruporialma.com.br/storage'
         };
     },
 
@@ -126,8 +127,8 @@ export default {
                 {
                     content: {
                         location: {
-                            url: 'https://www.gruporialma.com.br/wp-content/uploads/2024/05/pdf-teste.pdf'
-                            // url: `${API_URL}/${this.informacoes.pedido[0].anexo}`
+                            //url: 'https://www.gruporialma.com.br/wp-content/uploads/2024/05/pdf-teste.pdf'
+                            url: `${this.API_URL}/${this.informacoes.pedido[0].anexo}`
                         }
                     },
                     metaData: {
