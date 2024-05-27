@@ -150,7 +150,7 @@ export default {
         visualizar(id, data) {
             this.display = true;
             if (data.pedido.status.status == 'Fluxo Reprovado') {
-                this.erroPedidoReprovado = true;
+                this.erroPedidoRepwrovado = true;
             }
             this.idFluxo = id;
             this.pdf = data.pedido.anexo;
@@ -211,10 +211,10 @@ export default {
         <Dialog header="Documento" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
             <div class="grid">
                 <div class="col-6 md:col-6">
-                    <Button v-if="!this.erroPedidoReprovado" @click.prevent="aprovarPedido()" icon="pi pi-check" label="Aprovar" class="p-button-success" style="width: 100%" />
+                    <Button @click.prevent="aprovarPedido()" icon="pi pi-check" label="Aprovar" class="p-button-success" style="width: 100%" />
                 </div>
                 <div class="col-6 md:col-6">
-                    <Button v-if="!this.erroPedidoReprovado" @click.prevent="reprovarPedido()" icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%" />
+                    <Button @click.prevent="reprovarPedido()" icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%" />
                 </div>
                 <div class="col-12 md:col-12">
                     <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>

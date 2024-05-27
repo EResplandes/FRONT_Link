@@ -16,7 +16,7 @@ const model = ref([
             { label: 'Pedidos com Emival', icon: 'pi pi-fw pi-book', to: '/pedidos-emival', requiredRole: ['Gestor de Fluxo', 'Administrador', 'Comprador Externo'] },
             { label: 'Pedidos com Monica', icon: 'pi pi-fw pi-book', to: '/pedidos-monica', requiredRole: ['Gestor de Fluxo', 'Administrador'] },
             { label: 'Análise de Fluxo', icon: 'pi pi-fw pi-book', to: '/gestor-fluxo', requiredRole: ['Gestor de Fluxo', 'Administrador'] },
-            { label: 'Cadastro sem Fluxo', icon: 'pi pi-fw pi-book', to: '/cadastro-sem-fluxo', requiredRole: ['Gestor de Fluxo', 'Administrador', 'Comprador Externo'] },
+            { label: 'Cadastro sem Fluxo', icon: 'pi pi-fw pi-book', to: '/cadastro-sem-fluxo', requiredRole: ['Gestor de Fluxo', 'Administrador', 'Comprador Externo', 'Comprador'] },
             { label: 'Todos', icon: 'pi pi-fw pi-book', to: '/todos-pedidos-soleni', requiredRole: ['Gestor de Fluxo', 'Administrador'] }
         ]
     },
@@ -61,7 +61,8 @@ const model = ref([
             {
                 label: 'Landing',
                 icon: 'pi pi-fw pi-globe',
-                to: '/landing/:id_pedido'
+                to: '/landing/:id_pedido',
+		requiredRole: ['Administrador']
             }
         ]
     }
