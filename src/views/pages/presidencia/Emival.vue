@@ -172,7 +172,7 @@ export default {
                         id: fileName
                     }
                 },
-                {embedMode: "SIZED_CONTAINER"}
+                { embedMode: "SIZED_CONTAINER" }
             );
         },
         renderPdfAcima(url, fileName) {
@@ -203,7 +203,7 @@ export default {
                         id: fileName
                     }
                 },
-                {embedMode: "SIZED_CONTAINER"}
+                { embedMode: "SIZED_CONTAINER" }
             );
         },
         buscaQuantidades() {
@@ -594,13 +594,13 @@ export default {
         },
 
         visualizarAcima(id, data) {
+            this.pedidoSelecionado = data;
             this.titleDocumento = `Visualizando Pedido ${this.currentIndex + 1} de ${this.pedidos.length} Pedidos`;
             console.log(data.anexo);
             this.pedidoAcima = data;
             this.displayAcima = true;
             const dataAgora = new Date();
             // this.pdfsrc = ;
-            this.pedidoSelecionado = data;
             this.$nextTick(() => {
                 this.renderPdfAcima(`${this.urlBase}/${data.anexo}?t=${dataAgora.getSeconds()}`, `${dataAgora.getSeconds()}.pdf`);
             });
@@ -645,6 +645,25 @@ export default {
             this.buscaPedidos();
             this.showInfo('Filtro removidos com sucesso!');
             this.form = {};
+        },
+
+        formattedMessage(message) {
+            const nomeUsuario = message.nome_usuario;
+            const funcao = message.funcao;
+            const dataAssinatura = message.data_assinatura
+                ? new Date(message.data_assinatura).toLocaleString('pt-BR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                })
+                : 'Data não disponível';
+
+            const res = `${nomeUsuario} ${funcao} - ${dataAssinatura}`;
+            console.log('Formatted Message:', res);
+            return res;
         }
     }
 };
@@ -729,6 +748,7 @@ export default {
 
     <!-- Visualizar - Abaixo de 1000 reais -->
     <Dialog :header="this.titleDocumento" v-model:visible="display" :style="{ width: '98%' }" :modal="true">
+
         <div class="grid flex justify-content-center">
             <div class="col-12 md:col-12">
                 <!-- <pdf :src="this.urlBase"></pdf> -->
@@ -764,6 +784,15 @@ export default {
 
     <!-- Visualizar - Acima de 1000 reais -->
     <Dialog :header="this.titleDocumento" v-model:visible="displayAcima" :style="{ width: '95%' }" :modal="true">
+        <div class="flex align-items-center justify-content-start" v-if="this.pedidoSelecionado.assinados.length > 0">
+            <label for="buttondisplay" class="font-bold block mb-2">Autorizações: </label>
+            <div v-for="(message, index) in this.pedidoSelecionado.assinados" :key="index">
+                <InlineMessage class="m-2" severity="success">
+                    {{ formattedMessage(message) }}
+                </InlineMessage>
+            </div>
+        </div>
+
         <div class="grid">
             <div class="col-12 md:col-12">
                 <!-- <pdf :src="this.urlBase"></pdf> -->
