@@ -17,13 +17,14 @@ export default {
             urlBase: 'https://link.gruporialma.com.br/storage',
             pdf: ref(null),
             pdfsrc: ref(null),
-            informacoes: ref(null),
+            informacoes: ref({}),
             id_pedido: ref(this.$route.params.id_pedido),
             adobeApiReady: false,
             previewFilePromise: null,
             form: ref({}),
             confirmaAprovacao: ref(false),
-            fluxoValidado: ref(true)
+            fluxoValidado: ref(true),
+            API_URL: 'https://link.gruporialma.com.br/storage'
         };
     },
 
@@ -32,11 +33,6 @@ export default {
             localStorage.setItem('id_pedido_externo', this.id_pedido);
             this.router('/');
         }
-
-        // Requisição para buscar informações do pedido
-        this.pedidoExternoService.buscaInformacoes(this.id_pedido).then((data) => {
-            this.informacoes = data;
-        });
     },
 
     mounted: function () {
@@ -63,7 +59,11 @@ export default {
             });
         }
 
-        this.renderPdf();
+        // Requisição para buscar informações do pedido
+        this.pedidoExternoService.buscaInformacoes(this.id_pedido).then((data) => {
+            this.informacoes = data.pedido[0];
+            this.renderPdf();
+        });
     },
 
     methods: {
@@ -126,8 +126,8 @@ export default {
                 {
                     content: {
                         location: {
-                            url: 'https://www.gruporialma.com.br/wp-content/uploads/2024/05/pdf-teste.pdf'
-                            // url: `${API_URL}/${this.informacoes.pedido[0].anexo}`
+                            // url: 'https://www.gruporialma.com.br/wp-content/uploads/2024/05/pdf-teste.pdf'
+                            url: `${this.API_URL}/${this.informacoes?.anexo}`
                         }
                     },
                     metaData: {

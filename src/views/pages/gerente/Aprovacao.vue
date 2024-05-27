@@ -166,7 +166,6 @@ export default {
             this.idFluxo = id;
             this.pdf = data.pedido.anexo;
             this.pdfsrc = `${this.urlBase}/${this.pdf}`;
-            // this.pdfsrc = 'https://www.gruporialma.com.br/wp-content/uploads/2024/05/pdf-teste.pdf';
         },
 
         filtrar() {
