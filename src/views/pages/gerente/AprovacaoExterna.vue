@@ -137,6 +137,12 @@ export default {
                 },
                 previewConfig
             );
+
+		this.zoomIn();
+		this.zoomIn();
+		this.zoomIn();
+		this.zoomIn();
+
         },
 
         nextPage() {
