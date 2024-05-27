@@ -14,8 +14,7 @@ export default class PedidoExternoService {
         })
             .then((res) => res.json())
             .then((d) => {
-                this.informacoes = d;
-                console.log(this.informacoes);
+                return d;
             })
             .catch((error) => {
                 console.error('Error:', error);
