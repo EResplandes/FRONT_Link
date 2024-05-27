@@ -35,13 +35,15 @@ export default {
             urlBase: 'https://link.gruporialma.com.br/storage',
             pdf: ref(null),
             pdfsrc: ref(null),
-            fluxoPedido: ref(null)
+            fluxoPedido: ref(null),
+            localGerente: localStorage.getItem('local_id')
         };
     },
 
     mounted: function () {
         // Metódo responsável por buscar todos pedidos relacionas a esse usuário que não foram aprovados por ele mesmo
         this.gerenteService.buscaPedidos(localStorage.getItem('usuario_id')).then((data) => {
+            console.log(data);
             this.pedidos = data.pedidos;
             this.preloading = false;
         });
@@ -83,6 +85,15 @@ export default {
                     this.display = false;
                     this.buscaPedidos();
                 }
+            });
+        },
+
+        // Metódo responsável por diretor aprovar pedido
+        aprovarPedidoDiretor(idLink) {
+            this.gerenteService.aprovarPedidoDiretor(this.idFluxo, idLink).then((data) => {
+                this.display = false;
+                this.showSuccess('Pedido aprovado com sucesso!');
+                this.buscaPedidos();
             });
         },
 
@@ -209,16 +220,22 @@ export default {
 
         <!-- Visualizar -->
         <Dialog header="Documento" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
-            <div class="grid">
-                <div class="col-6 md:col-6">
+            <div class="flex justify-content-center">
+                <div v-if="this.localGerente != '1'" class="flex-1 m-1">
                     <Button @click.prevent="aprovarPedido()" icon="pi pi-check" label="Aprovar" class="p-button-success" style="width: 100%" />
                 </div>
-                <div class="col-6 md:col-6">
+                <div v-if="this.localGerente == '1'" class="flex-1 m-1">
+                    <Button @click.prevent="aprovarPedidoDiretor(2)" icon="pi pi-check" label="Aprovar e Enviar Dr. Emival" class="p-button-success" style="width: 100%" />
+                </div>
+                <div v-if="this.localGerente == '1'" class="flex-1 m-1">
+                    <Button @click.prevent="aprovarPedidoDiretor(1)" icon="pi pi-check" label="Aprovar e Enviar Dr. Mônica" class="p-button-warning" style="width: 100%" />
+                </div>
+                <div class="flex-1 m-1">
                     <Button @click.prevent="reprovarPedido()" icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%" />
                 </div>
-                <div class="col-12 md:col-12">
-                    <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
-                </div>
+            </div>
+            <div class="col-12 md:col-12">
+                <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
             </div>
         </Dialog>
 
@@ -294,14 +311,14 @@ export default {
                     <Column field="Dt. Inclusão" header="Dt. Inclusão" :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">Dt. Inclusão</span>
-                            {{ formatarData(slotProps.data.pedido.dt_inclusao) }}
+                            {{ formatarData(slotProps.data.data_criacao) }}
                         </template>
                     </Column>
 
                     <Column field="Empresa" header="Empresa" :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">Empresa</span>
-                            {{ slotProps.data.pedido.empresa.nome_empresa }}
+                            {{ slotProps.data.pedido.empresa?.nome_empresa }}
                         </template>
                     </Column>
 
