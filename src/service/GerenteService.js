@@ -40,6 +40,26 @@ export default class GerenteService {
             });
     }
 
+    async aprovarPedidoDiretor(id, idLink) {
+        console.log(id, idLink);
+        return await fetch(`${API_URL}/pedidos/aprovar-fluxo-diretor/` + id + '/' + idLink, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
     async aprovarExterno(id_pedido) {
         return await fetch(`${API_URL}/pedidos/aprovar-fluxo-externo/` + id_pedido + '/' + localStorage.getItem('usuario_id'), {
             method: 'GET',
