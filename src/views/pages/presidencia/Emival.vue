@@ -172,7 +172,7 @@ export default {
                         id: fileName
                     }
                 },
-                previewConfig
+                {embedMode: "SIZED_CONTAINER"}
             );
         },
         renderPdfAcima(url, fileName) {
@@ -203,7 +203,7 @@ export default {
                         id: fileName
                     }
                 },
-                previewConfig
+                {embedMode: "SIZED_CONTAINER"}
             );
         },
         buscaQuantidades() {
