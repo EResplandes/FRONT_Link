@@ -24,7 +24,7 @@ export default {
             form: ref({}),
             confirmaAprovacao: ref(false),
             fluxoValidado: ref(true),
-            API_URL: 'https://link.gruporialma.com.br/storage'
+	    API_URL: 'https://link.gruporialma.com.br/storage'
         };
     },
 
@@ -135,7 +135,7 @@ export default {
                         id: 'fileName'
                     }
                 },
-                { embedMode: 'SIZED_CONTAINER' }
+                previewConfig
             );
         },
 
