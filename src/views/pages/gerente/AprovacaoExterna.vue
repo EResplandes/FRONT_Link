@@ -24,7 +24,9 @@ export default {
             form: ref({}),
             confirmaAprovacao: ref(false),
             fluxoValidado: ref(true),
-	    API_URL: 'https://link.gruporialma.com.br/storage'
+            displayChat: ref(false),
+            novaMensagem: ref(),
+            API_URL: 'https://link.gruporialma.com.br/storage'
         };
     },
 
@@ -68,14 +70,29 @@ export default {
 
     methods: {
         // Metódo responsável por aprovar fluxo
-        aprovarPedido() {
-            this.gerenteService.aprovarExterno(this.id_pedido).then((data) => {
+        aprovarPedido(idLink) {
+            this.gerenteService.aprovarExterno(this.id_pedido, idLink, localStorage.getItem('usuario_id')).then((data) => {
                 if (data.resposta == 'Pedido aprovado com sucesso!') {
                     this.confirmaAprovacao = true;
-                    console.log(data.resposta);
                 }
             });
         },
+
+        // Metódo responsável por reprovar abrir modal mensagem
+        chat() {
+            this.displayChat = true;
+        },
+
+        // Metódo responsável por reprovar pedido
+        reprovarPedido() {
+            this.gerenteService.reprovarExterno(this.id_pedido, localStorage.getItem('usuario_id'), this.novaMensagem).then((data) => {
+                if (data.resposta == 'Pedido reprovado com sucesso!') {
+                    this.confirmaAprovacao = true;
+                    this.displayChat = false;
+                }
+            });
+        },
+
         showSuccess(mensagem) {
             this.toast.add({ severity: 'success', summary: 'Sucesso!', detail: mensagem, life: 3000 });
         },
@@ -137,6 +154,9 @@ export default {
                 },
                 previewConfig
             );
+
+            this.zoomIn();
+            this.zoomIn();
         },
 
         nextPage() {
@@ -184,6 +204,41 @@ export default {
 </script>
 
 <template>
+    <!-- Chat -->
+    <Dialog header="Chat" v-model:visible="displayChat" :style="{ width: '40%' }" :modal="true">
+        <div class="grid">
+            <div class="col-12">
+                <div class="card timeline-container">
+                    <Timeline :value="conversa" align="alternate" class="customized-timeline">
+                        <template #marker="slotProps">
+                            <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
+                                <i :class="slotProps.item.icon"></i>
+                            </span>
+                        </template>
+                        <template #content="slotProps">
+                            <Card>
+                                <template #title>
+                                    {{ slotProps.item.id_usuario.name }}
+                                </template>
+                                <template #subtitle>
+                                    {{ this.formatarData(slotProps.item.data_mensagem) }}
+                                </template>
+                                <template #content>
+                                    <h6>
+                                        {{ slotProps.item.mensagem }}
+                                    </h6>
+                                </template>
+                            </Card>
+                        </template>
+                    </Timeline>
+                </div>
+                <hr />
+                <InputText class="col-12" type="text" v-model="novaMensagem" placeholder="Digite a mensagem..." />
+                <Button @click.prevent="reprovarPedido()" label="Enviar" class="mr-2 mt-3 p-button-success col-12" />
+            </div>
+        </div>
+    </Dialog>
+
     <div v-if="this.fluxoValidado && this.confirmaAprovacao == false" class="grid">
         <Toast />
         <Card style="overflow: hidden; width: 100%">
@@ -192,7 +247,9 @@ export default {
             </template>
             <template #footer>
                 <div class="flex gap-3">
-                    <Button @click.prevent="this.aprovarPedido()" label="Aprovar" severity="success" class="w-full" />
+                    <Button @click.prevent="this.aprovarPedido(2)" label="Aprovar e Enviar Dr. Emival" severity="success" class="w-full" />
+                    <Button @click.prevent="this.aprovarPedido(1)" label="Aprovar e Enviar Dr. Mônica" severity="warning" class="w-full" />
+                    <Button @click.prevent="this.chat()" label="Reprovar" severity="danger" class="w-full" />
                 </div>
             </template>
         </Card>
@@ -202,8 +259,8 @@ export default {
             <div class="flex flex-column align-items-center justify-content-center">
                 <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, rgba(0, 128, 0, 0.6) 0%, rgba(0, 128, 0, 0.4) 20%, rgba(0, 128, 0, 0.2) 50%, rgba(0, 128, 0, 0) 100%)">
                     <div class="w-full surface-card py-8 px-5 sm:px-8 flex flex-column align-items-center" style="border-radius: 53px">
-                        <span class="font-bold text-3xl">Pedido Aprovado com Sucesso!</span><br />
-                        <div class="text-600 mb-5">O pedido de número {{ this.id_pedido }} foi aprovado com sucesso!!</div>
+                        <span class="font-bold text-3xl">Pedido finalizado com sucesso!</span><br />
+                        <div class="text-600 mb-5">O pedido de número {{ this.id_pedido }} foi finalizado com sucesso!!</div>
                     </div>
                 </div>
             </div>
@@ -216,7 +273,7 @@ export default {
                 <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, rgba(255, 0, 0, 0.6) 0%, rgba(255, 0, 0, 0.4) 20%, rgba(255, 0, 0, 0.2) 50%, rgba(255, 0, 0, 0) 100%)">
                     <div class="w-full surface-card py-8 px-5 sm:px-8 flex flex-column align-items-center" style="border-radius: 53px">
                         <span class="font-bold text-3xl">Link Inválido!</span><br />
-                        <div class="text-600 mb-5">O pedido de número {{ this.id_pedido }} já foi aprovado ou não pertence ao seu fluxo!</div>
+                        <div class="text-600 mb-5">O pedido de número {{ this.id_pedido }} foi finalizado ou não pertence ao seu fluxo!</div>
                     </div>
                 </div>
             </div>
