@@ -44,7 +44,10 @@ const model = ref([
     },
     {
         label: 'Relatórios',
-        items: [{ label: 'Pedidos Aprovados', icon: 'pi pi-fw pi-users', to: '/relatorio-aprovados', requiredRole: ['Administrador', 'Gestor de Fluxo'] }]
+        items: [
+            { label: 'Pedidos Aprovados', icon: 'pi pi-fw pi-users', to: '/relatorio-aprovados', requiredRole: ['Administrador', 'Gestor de Fluxo'] },
+            { label: 'Pedidos Reprovados', icon: 'pi pi-fw pi-users', to: '/relatorio-reprovados', requiredRole: ['Administrador', 'Gestor de Fluxo'] }
+        ]
     },
     {
         label: 'Presidência',
@@ -62,7 +65,7 @@ const model = ref([
                 label: 'Landing',
                 icon: 'pi pi-fw pi-globe',
                 to: '/landing/:id_pedido',
-		requiredRole: ['Administrador']
+                requiredRole: ['Administrador']
             }
         ]
     }

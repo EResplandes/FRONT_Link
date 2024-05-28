@@ -172,7 +172,7 @@ export default {
                         id: fileName
                     }
                 },
-                { embedMode: "SIZED_CONTAINER" }
+                { embedMode: 'SIZED_CONTAINER' }
             );
         },
         renderPdfAcima(url, fileName) {
@@ -203,7 +203,7 @@ export default {
                         id: fileName
                     }
                 },
-                { embedMode: "SIZED_CONTAINER" }
+                { embedMode: 'SIZED_CONTAINER' }
             );
         },
         buscaQuantidades() {
@@ -368,7 +368,6 @@ export default {
             }
         },
 
-
         // Abaixo de 1000
         salvaMensagemPedido(status) {
             // this.chat(this.proximoPedido);
@@ -400,7 +399,6 @@ export default {
 
                         this.displayChat = false;
                         this.mensagemEmival = null;
-
                     });
 
                     break;
@@ -452,7 +450,6 @@ export default {
 
                         this.displayChat = false;
                         this.mensagemEmival = null;
-
                     });
                     break;
                 case 3:
@@ -479,11 +476,7 @@ export default {
                 default:
                     console.log('Status Não Encontrado.');
             }
-
-
         },
-
-
 
         // Abaixo de 1000
         salvaMensagem() {
@@ -521,8 +514,6 @@ export default {
 
         salvaMensagemAcima() {
             // this.chat(this.proximoPedido);
-
-
         },
 
         // async chat(id) {
@@ -584,7 +575,6 @@ export default {
             this.display = true;
             const dataAgora = new Date();
             // this.pdfsrc = `${this.urlBase}/${data.anexo}?t=${dataAgora.getSeconds()}`;
-
 
             this.pedidoSelecionado = data;
 
@@ -652,13 +642,13 @@ export default {
             const funcao = message.funcao;
             const dataAssinatura = message.data_assinatura
                 ? new Date(message.data_assinatura).toLocaleString('pt-BR', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                })
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit'
+                  })
                 : 'Data não disponível';
 
             const res = `${nomeUsuario} ${funcao} - ${dataAssinatura}`;
@@ -674,30 +664,26 @@ export default {
         <ProgressSpinner />
     </div>
 
-    <Button v-if="this.pedidos != null" label="Voltar" class="p-button-secondary" style="width: 20%"
-        @click="(this.ocultaFiltros = false), (this.pedidos = null), buscaQuantidades()" />
+    <Button v-if="this.pedidos != null" label="Voltar" class="p-button-secondary" style="width: 20%" @click="(this.ocultaFiltros = false), (this.pedidos = null), buscaQuantidades()" />
 
     <div v-if="this.ocultaFiltros == false" class="grid text-center">
         <div class="col-12">
             <Splitter style="height: 300px">
-                <SplitterPanel @click.prevent="listarEmivalMenorQuinhentos()"
-                    class="flex align-items-center justify-content-center splitter-panel">
+                <SplitterPanel @click.prevent="listarEmivalMenorQuinhentos()" class="flex align-items-center justify-content-center splitter-panel">
                     <div>
                         Total de pedidos com valor até R$ 500,00
                         <br />
                         <h3>{{ this.quantidadesPedidos.qtd_abaixoQuinhentos }} pedidos</h3>
                     </div>
                 </SplitterPanel>
-                <SplitterPanel @click.prevent="listarEmivalMenorMil()"
-                    class="flex align-items-center justify-content-center splitter-panel">
+                <SplitterPanel @click.prevent="listarEmivalMenorMil()" class="flex align-items-center justify-content-center splitter-panel">
                     <div>
                         Total de pedidos com valor de R$ 500,01 à R$ 1000,00
                         <br />
                         <h3>{{ this.quantidadesPedidos.qtd_abaixoMil }} pedidos</h3>
                     </div>
                 </SplitterPanel>
-                <SplitterPanel @click.prevent="listarEmivalMaiorMil()"
-                    class="flex align-items-center justify-content-center splitter-panel">
+                <SplitterPanel @click.prevent="listarEmivalMaiorMil()" class="flex align-items-center justify-content-center splitter-panel">
                     <div>
                         Total de pedidos com o valor acima de R$ 1000,00
                         <br />
@@ -715,9 +701,7 @@ export default {
                 <div class="card timeline-container">
                     <Timeline :value="conversa" align="alternate" class="customized-timeline">
                         <template #marker="slotProps">
-                            <span
-                                class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2"
-                                :style="{ backgroundColor: slotProps.item.color }">
+                            <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
                                 <i :class="slotProps.item.icon"></i>
                             </span>
                         </template>
@@ -740,15 +724,13 @@ export default {
                 </div>
                 <hr />
                 <InputText class="col-12" type="text" v-model="mensagemEmival" placeholder="Digite a mensagem..." />
-                <Button @click="salvaMensagemPedido(this.salvarMensagemPedidoStatus)" label="Enviar Mensagem"
-                    class="mr-2 mt-3 p-button-success col-12" />
+                <Button @click="salvaMensagemPedido(this.salvarMensagemPedidoStatus)" label="Enviar Mensagem" class="mr-2 mt-3 p-button-success col-12" />
             </div>
         </div>
     </Dialog>
 
     <!-- Visualizar - Abaixo de 1000 reais -->
     <Dialog :header="this.titleDocumento" v-model:visible="display" :style="{ width: '98%' }" :modal="true">
-
         <div class="grid flex justify-content-center">
             <div class="col-12 md:col-12">
                 <!-- <pdf :src="this.urlBase"></pdf> -->
@@ -756,29 +738,28 @@ export default {
                 <!-- <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe> -->
             </div>
             <div class="col-4 md:col-3">
-                <Button icon="pi pi-times" label="Pedido Anterior" class="p-button-secondary"
-                    style="width: 100%; height: 50px;" @click.prevent="voltar()" :disabled="this.currentIndex == 0" />
+                <Button icon="pi pi-times" label="Pedido Anterior" class="p-button-secondary" style="width: 100%; height: 50px" @click.prevent="voltar()" :disabled="this.currentIndex == 0" />
             </div>
             <div class="col-4 md:col-3">
-                <Button icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%; height: 50px;"
-                    @click.prevent="reprovarItem()" />
+                <Button icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%; height: 50px" @click.prevent="reprovarItem()" />
             </div>
             <div class="col-4 md:col-3">
-                <Button icon="pi pi-times" label="Aprovar c/ Ressalva " class="p-button-warning"
-                    style="width: 100%; height: 50px;" @click.prevent="ressalvaItem()" />
+                <Button icon="pi pi-times" label="Aprovar c/ Ressalva " class="p-button-warning" style="width: 100%; height: 50px" @click.prevent="ressalvaItem()" />
             </div>
             <div class="col-4 md:col-3">
-                <Button icon="pi pi-check"
+                <Button
+                    icon="pi pi-check"
                     :label="this.currentIndex >= this.pedidos.length - 1 ? 'Aprovar Último Pedido' : 'Próximos Pedidos'"
-                    class="p-button-info" style="width: 100%; height: 50px" @click.prevent="proximoItem()"
-                    :disabled="this.currentIndex == this.pedidos.length" />
+                    class="p-button-info"
+                    style="width: 100%; height: 50px"
+                    @click.prevent="proximoItem()"
+                    :disabled="this.currentIndex == this.pedidos.length"
+                />
             </div>
 
             <div v-if="this.pedidosAprovados.length > 0" class="col-12 md:col-12">
-                <Button icon="pi pi-check" label="Finalizar Aprovações" class="p-button-success"
-                    style="width: 100%; height: 50px;" @click.prevent="aprovar()" />
+                <Button icon="pi pi-check" label="Finalizar Aprovações" class="p-button-success" style="width: 100%; height: 50px" @click.prevent="aprovar()" />
             </div>
-
         </div>
     </Dialog>
 
@@ -800,22 +781,15 @@ export default {
                 <!-- <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe> -->
             </div>
             <div class="col-4 md:col-3">
-                <Button icon="pi pi-times" label="Pedido Anterior" class="p-button-secondary"
-                    style="width: 100%; height: 50px;" @click.prevent="voltarAcima()" :disabled="this.currentIndex == 0" />
+                <Button icon="pi pi-times" label="Pedido Anterior" class="p-button-secondary" style="width: 100%; height: 50px" @click.prevent="voltarAcima()" :disabled="this.currentIndex == 0" />
             </div>
             <div class="col-4 md:col-3">
-                <Button icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%; height: 50px;"
-                    @click.prevent="reprovarItemAcima()" />
+                <Button icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%; height: 50px" @click.prevent="reprovarItemAcima()" />
             </div>
             <div class="col-4 md:col-3">
-                <Button icon="pi pi-times" label="Aprovar c/ Ressalva " class="p-button-warning"
-                    style="width: 100%; height: 50px;" @click.prevent="ressalvaItemAcima()" />
+                <Button icon="pi pi-times" label="Aprovar c/ Ressalva " class="p-button-warning" style="width: 100%; height: 50px" @click.prevent="ressalvaItemAcima()" />
             </div>
-            <div class="col-4 md:col-3"><Button icon="pi pi-check" label="Aprovar" class="p-button-info"
-                    style="width: 100%; height: 50px;" @click.prevent="proximoItemAcima()"
-                    :disabled="this.currentIndex == this.pedidos.length" /></div>
-
-
+            <div class="col-4 md:col-3"><Button icon="pi pi-check" label="Aprovar" class="p-button-info" style="width: 100%; height: 50px" @click.prevent="proximoItemAcima()" :disabled="this.currentIndex == this.pedidos.length" /></div>
         </div>
     </Dialog>
 
@@ -829,11 +803,18 @@ export default {
                 <Toast />
             </div>
             <div v-if="this.pedidos && this.acimaMil == false" class="card">
-                <DataTable dataKey="id" :value="pedidos" :paginator="true" :rows="10"
+                <DataTable
+                    dataKey="id"
+                    :value="pedidos"
+                    :paginator="true"
+                    :rows="10"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25, 50, 100]"
                     currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
-                    responsiveLayout="scroll" filterDisplay="menu" stripedRows>
+                    responsiveLayout="scroll"
+                    filterDisplay="menu"
+                    stripedRows
+                >
                     <template #header>
                         <div class="flex justify-content-between"></div>
                     </template>
@@ -873,8 +854,7 @@ export default {
                             <span class="p-column-title"></span>
                             <div class="grid">
                                 <div class="col-4 md:col-4 mr-3">
-                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye"
-                                        class="p-button-secondary" />
+                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-secondary" />
                                 </div>
                             </div>
                         </template>
@@ -884,11 +864,18 @@ export default {
 
             <!-- Tabela com todos pedidos com Dr Emival aprovação separada acima de 1000 reais -->
             <div v-if="this.pedidos && this.acimaMil" class="card">
-                <DataTable dataKey="id" :value="pedidos" :paginator="true" :rows="10"
+                <DataTable
+                    dataKey="id"
+                    :value="pedidos"
+                    :paginator="true"
+                    :rows="10"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25, 50, 100]"
                     currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
-                    responsiveLayout="scroll" filterDisplay="menu" stripedRows>
+                    responsiveLayout="scroll"
+                    filterDisplay="menu"
+                    stripedRows
+                >
                     <template #header>
                         <div class="flex justify-content-between"></div>
                     </template>
@@ -928,8 +915,7 @@ export default {
                             <span class="p-column-title"></span>
                             <div class="grid">
                                 <div class="col-4 md:col-4 mr-3">
-                                    <Button @click.prevent="visualizarAcima(slotProps.data.id, slotProps.data)"
-                                        icon="pi pi-eye" class="p-button-secondary" />
+                                    <Button @click.prevent="visualizarAcima(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-secondary" />
                                 </div>
                             </div>
                         </template>

@@ -155,16 +155,8 @@ export default {
                 previewConfig
             );
 
-<<<<<<< HEAD
             this.zoomIn();
             this.zoomIn();
-=======
-		this.zoomIn();
-		this.zoomIn();
-		this.zoomIn();
-		this.zoomIn();
-
->>>>>>> d2ad42ac77cb7c841f3685d28909730c6ab489fb
         },
 
         nextPage() {
