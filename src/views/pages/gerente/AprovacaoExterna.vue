@@ -205,7 +205,7 @@ export default {
 
 <template>
     <!-- Chat -->
-    <Dialog header="Chat" v-model:visible="displayChat" :style="{ width: '40%' }" :modal="true">
+    <Dialog header="Chat" v-model:visible="displayChat" :style="{ width: '80%' }" :modal="true">
         <div class="grid">
             <div class="col-12">
                 <div class="card timeline-container">
