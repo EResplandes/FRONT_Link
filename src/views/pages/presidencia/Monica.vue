@@ -82,15 +82,6 @@ export default {
     },
 
     methods: {
-        // Metódo responsável por buscar todos pedidos
-        buscaPedidos() {
-            this.preloading = true;
-            this.pedidoService.pedidosMonica().then((data) => {
-                this.pedidos = data.pedidos;
-                this.preloading = false;
-            });
-        },
-
         // Metódo responsável por buscar chat
         chat(id) {
             this.id_pedido = id;
@@ -202,6 +193,13 @@ export default {
                 { embedMode: 'SIZED_CONTAINER' }
             );
         },
+        buscaQuantidades() {
+            this.pedidoService.buscaQuantidades().then((data) => {
+                console.log(data);
+                this.quantidadesPedidos = data.quantidades;
+                this.preloading = false;
+            });
+        },
 
         // Metódo responsável por listagem de pedidos
         listarEmivalMenorQuinhentos() {
@@ -285,10 +283,52 @@ export default {
             }
         },
 
+        // Metódo responsávle por buscar proximo pedidoAcima
+        proximoItemAcima() {
+            // Verifica se currentIndex é igual ao comprimento dos pedidos
+            if (this.currentIndex === this.pedidos.length) {
+                this.showInfo('Você chegou ao último para aprovação!');
+                return;
+            }
+
+            // Incrementa currentIndex e verifica se está dentro dos limites do array
+            if (this.currentIndex < this.pedidos.length) {
+                // Enviando id do pedido
+                this.pedidoService.aprovarPedidoUnico(this.pedidoAcima.id).then((data) => {
+                    if (data.resposta == 'Pedido aprovado com sucesso!') {
+                        this.showSuccess('Pedido aprovado com sucesso!');
+                    }
+
+                    this.currentIndex++;
+
+                    if (this.currentIndex < this.pedidos.length) {
+                        this.visualizarAcima(this.pedidos[this.currentIndex].id, this.pedidos[this.currentIndex]);
+                        localStorage.setItem('ultimoPedidoAprovado', this.currentIndex);
+                    } else {
+                        this.listarEmivalMaiorMil();
+                        this.displayAcima = false;
+                    }
+                });
+            } else {
+                // Se currentIndex for igual ao comprimento dos pedidos, não há próximo pedido
+                this.showInfo('Você chegou ao último para aprovação!');
+            }
+        },
+
         async reprovarItem() {
             this.chat(this.pedidoSelecionado.id);
             this.titleChat = 'Reprovar Pedido';
             this.salvarMensagemPedidoStatus = 0;
+            localStorage.setItem('ultimoPedidoAprovado', this.currentIndex); // Alterado para 'ultimoPedidoAprovado'
+            if (this.currentIndex == this.pedidos.length) {
+                this.showInfo('Você chegou ao último para aprovação!');
+            }
+        },
+
+        async reprovarItemAcima() {
+            this.chat(this.pedidoSelecionado.id);
+            this.titleChat = 'Reprovar Pedido';
+            this.salvarMensagemPedidoStatus = 1;
             localStorage.setItem('ultimoPedidoAprovado', this.currentIndex); // Alterado para 'ultimoPedidoAprovado'
             if (this.currentIndex == this.pedidos.length) {
                 this.showInfo('Você chegou ao último para aprovação!');
@@ -305,7 +345,20 @@ export default {
             }
         },
 
+        async ressalvaItemAcima() {
+            this.chat(this.pedidoSelecionado.id);
+            this.titleChat = 'Aprovar com Ressalva';
+            this.salvarMensagemPedidoStatus = 3;
+            localStorage.setItem('ultimoPedidoAprovado', this.currentIndex); // Alterado para 'ultimoPedidoAprovado'
+            if (this.currentIndex == this.pedidos.length) {
+                this.showInfo('Você chegou ao último para aprovação!');
+            }
+        },
+
+        // Abaixo de 1000
         salvaMensagemPedido(status) {
+            // this.chat(this.proximoPedido);
+
             switch (status) {
                 case 0: // REPROVAR PEDIDO ABAIXO DE MIL
                     this.pedidoService.aprovarEmival([{ id: this.pedidos[this.currentIndex].id, status: 3, mensagem: this.mensagemEmival }]).then((data) => {
@@ -322,7 +375,13 @@ export default {
                             this.display = false;
                             this.displayChat = false;
 
-                            this.buscaPedidos();
+                            if (this.pedidos[0].valor <= 500) {
+                                this.listarEmivalMenorQuinhentos();
+                            } else if (this.pedidos[0].valor > 500 && this.pedidos[0].valor < 1000) {
+                                this.listarEmivalMenorMil();
+                            } else {
+                                this.listarEmivalMaiorMil();
+                            }
                         }
 
                         this.displayChat = false;
@@ -443,6 +502,20 @@ export default {
         salvaMensagemAcima() {
             // this.chat(this.proximoPedido);
         },
+
+        // async chat(id) {
+        //     return new Promise((resolve, reject) => {
+        //         this.chatService.buscaConversa(id).then((data) => {
+        //             if (data.resposta == 'Chat listado com sucesso!') {
+        //                 this.conversa = data.conversa;
+        //                 resolve();
+        //             } else {
+        //                 this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
+        //                 reject(new Error('Erro ao buscar conversa'));
+        //             }
+        //         });
+        //     });
+        // },
 
         // Metódo responsável por voltar com pedidos abaixo de 1000
         voltar() {

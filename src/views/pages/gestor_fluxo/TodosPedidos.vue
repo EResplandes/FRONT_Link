@@ -416,7 +416,15 @@ export default {
                                 <div v-if="slotProps.data.status.status == 'Reprovado' || slotProps.data.status.status == 'Aprovado com Ressalva'" class="col-3 md:col-3">
                                     <Button @click.prevent="chat(slotProps.data.id, slotProps.data)" icon="pi pi-comments" class="p-button-secon" />
                                 </div>
-                                <div v-if="slotProps.data.status.status == 'Aprovado' || slotProps.data.status.status == 'Aprovado com Ressalva'" class="col-4 md:col-4 mr-3">
+                                <div
+                                    v-if="
+                                        slotProps.data.status.status == 'Aprovado' ||
+                                        slotProps.data.status.status == 'Aprovado com Ressalva' ||
+                                        slotProps.data.status.status == 'Resposta do Pedido de Compra Aprovado com Ressalva' ||
+                                        slotProps.data.status.status == 'Retorno do Pedido de Compra Aprovado com Ressalva'
+                                    "
+                                    class="col-4 md:col-4 mr-3"
+                                >
                                     <Button @click.prevent="buscaInformacoesPedido(slotProps.data.id)" icon="pi pi-print" class="p-button-secondary" />
                                 </div>
                             </div>
