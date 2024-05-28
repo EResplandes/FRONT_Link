@@ -155,16 +155,11 @@ export default {
                 previewConfig
             );
 
-<<<<<<< HEAD
-            this.zoomIn();
-            this.zoomIn();
-=======
 		this.zoomIn();
 		this.zoomIn();
 		this.zoomIn();
 		this.zoomIn();
 
->>>>>>> d2ad42ac77cb7c841f3685d28909730c6ab489fb
         },
 
         nextPage() {
@@ -213,7 +208,7 @@ export default {
 
 <template>
     <!-- Chat -->
-    <Dialog header="Chat" v-model:visible="displayChat" :style="{ width: '40%' }" :modal="true">
+    <Dialog header="Chat" v-model:visible="displayChat" :style="{ width: '80%' }" :modal="true">
         <div class="grid">
             <div class="col-12">
                 <div class="card timeline-container">
