@@ -202,6 +202,8 @@ export default {
                 previewConfig
             );
 
+            this.zoomOut();
+            this.zoomOut();
         },
 
         // Metódo responsável por aprovar
