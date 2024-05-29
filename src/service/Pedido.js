@@ -492,11 +492,9 @@ export default class PedidoService {
         formData.append('id_usuario', idCriador);
         formData.append('anexo', novoAnexo ?? null);
 
-        return fetch(`${API_URL}/pedidos/responde-reprovado-fluxo/` + id_pedido, {
+        return fetch(`${API_URL}/pedidos/responde-reprovado-fluxo/` + id_pedido + '/' + localStorage.getItem('usuario_id') + '/' + novaMensagem, {
             method: 'POST',
             headers: {
-                Accept: 'multipart/form-data',
-                'Content-Type': 'multipart/form-data',
                 Authorization: 'Bearer ' + token
             },
             body: formData

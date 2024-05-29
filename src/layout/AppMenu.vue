@@ -31,7 +31,7 @@ const model = ref([
             { label: 'Para Aprovação de Fluxo', icon: 'pi pi-fw pi-check-circle', to: '/aprovacao-gerentes', requiredRole: ['Diretor', 'Gerente', 'Administrador'] },
             { label: 'Pedidos Reprovados', icon: 'pi pi-fw pi-book', to: '/pedidos-reprovados', requiredRole: ['Gestor de Fluxo', 'Administrador', 'Gerente', 'Comprador Externo', 'Diretor'] },
             { label: 'Pedidos Reprovados por Gestor | Diretor', icon: 'pi pi-fw pi-book', to: '/reprovados-gestor', requiredRole: ['Comprador', 'Administrador'] },
-            { label: 'Pedidos Reprovados por Soleni', icon: 'pi pi-fw pi-book', to: '/reprovados-soleni', requiredRole: ['Comprador', 'Administrador'] }
+            { label: 'Pedidos Reprovados por Soleni', icon: 'pi pi-fw pi-book', to: '/reprovados-soleni', requiredRole: ['Comprador', 'Administrador', 'Gerente'] }
         ]
     },
     {
@@ -44,7 +44,10 @@ const model = ref([
     },
     {
         label: 'Relatórios',
-        items: [{ label: 'Pedidos Aprovados', icon: 'pi pi-fw pi-users', to: '/relatorio-aprovados', requiredRole: ['Administrador', 'Gestor de Fluxo'] }]
+        items: [
+            { label: 'Pedidos Aprovados', icon: 'pi pi-fw pi-users', to: '/relatorio-aprovados', requiredRole: ['Administrador', 'Gestor de Fluxo'] },
+            { label: 'Pedidos Reprovados', icon: 'pi pi-fw pi-users', to: '/relatorio-reprovados', requiredRole: ['Administrador', 'Gestor de Fluxo'] }
+        ]
     },
     {
         label: 'Presidência',
@@ -62,7 +65,7 @@ const model = ref([
                 label: 'Landing',
                 icon: 'pi pi-fw pi-globe',
                 to: '/landing/:id_pedido',
-		requiredRole: ['Administrador']
+                requiredRole: ['Administrador']
             }
         ]
     }

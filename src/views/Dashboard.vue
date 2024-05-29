@@ -72,7 +72,6 @@ export default {
         <ProgressSpinner />
     </div>
 
-    Alterar senha primeiro login
     <Dialog header="ALTERAÇÃO DE SENHA" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
         <Card class="m-1" style="width: 100%; overflow: hidden; background-color: #f8f8ff">
             <template #header> </template>

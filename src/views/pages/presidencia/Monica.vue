@@ -2,16 +2,16 @@
 import { ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
+import PedidoService from '../../../service/Pedido';
 import ChatService from '../../../service/ChatService';
-import MonicaService from '../../../service/MonicaService';
 
 export default {
     data() {
         return {
             toast: new useToast(),
             displayConfirmation: ref(false),
+            pedidoService: new PedidoService(),
             chatService: new ChatService(),
-            monicaService: new MonicaService(),
             displayConfirmationActivation: ref(false),
             visibleRight: ref(false),
             displayChat: ref(false),
@@ -19,7 +19,7 @@ export default {
             currentIndex: 0,
             loading1: ref(null),
             sleep: ref(null),
-            mensagemMonica: ref(null),
+            mensagemEmival: ref(null),
             pedidos: ref(null),
             pedidosAprovados: [],
             pedidosReprovados: [],
@@ -53,24 +53,11 @@ export default {
         }
 
         // Metódo responsável por buscar quantidades de pedidos para aprovação
-        this.monicaService.buscaQuantidades().then((data) => {
+        this.pedidoService.pedidosMonica().then((data) => {
             console.log(data);
-            this.quantidadesPedidos = data.quantidades;
+            this.pedidos = data.pedidos;
             this.preloading = false;
         });
-    },
-    created() {
-        // Método responsável por buscar quantidades de pedidos para aprovação
-        this.monicaService
-            .buscaQuantidades()
-            .then((data) => {
-                this.quantidadesPedidos = data.quantidades;
-                this.preloading = false;
-            })
-            .catch((error) => {
-                console.error('Error fetching quantities:', error);
-                this.preloading = false;
-            });
     },
 
     watch: {
@@ -89,7 +76,7 @@ export default {
         displayAcima(newVal) {
             if (newVal === false) {
                 this.currentIndex = 0;
-                this.listarMonicaMaiorMil();
+                this.listarEmivalMaiorMil();
             }
         }
     },
@@ -172,7 +159,7 @@ export default {
                         id: fileName
                     }
                 },
-                previewConfig
+                { embedMode: 'SIZED_CONTAINER' }
             );
         },
         renderPdfAcima(url, fileName) {
@@ -203,11 +190,11 @@ export default {
                         id: fileName
                     }
                 },
-                previewConfig
+                { embedMode: 'SIZED_CONTAINER' }
             );
         },
         buscaQuantidades() {
-            this.monicaService.buscaQuantidades().then((data) => {
+            this.pedidoService.buscaQuantidades().then((data) => {
                 console.log(data);
                 this.quantidadesPedidos = data.quantidades;
                 this.preloading = false;
@@ -215,10 +202,10 @@ export default {
         },
 
         // Metódo responsável por listagem de pedidos
-        listarMonicaMenorQuinhentos() {
+        listarEmivalMenorQuinhentos() {
             this.preloading = true;
             this.acimaMil = false;
-            this.monicaService.listarMonicaMenorQuinhentos().then((data) => {
+            this.pedidoService.listarEmivalMenorQuinhentos().then((data) => {
                 this.pedidos = data.pedidos;
                 this.ocultaFiltros = true;
                 this.preloading = false;
@@ -227,17 +214,17 @@ export default {
 
         // Metódo responsável por aprovar
         aprovar() {
-            this.monicaService.aprovarMonica(this.pedidosAprovados).then((data) => {
+            this.pedidoService.aprovarEmival(this.pedidosAprovados).then((data) => {
                 this.display = false;
                 this.showSuccess('Pedidos aprovados com sucesso!');
                 this.pedidosAprovados = [];
 
                 if (this.pedidos[0].valor <= 500) {
-                    this.listarMonicaMenorQuinhentos();
+                    this.listarEmivalMenorQuinhentos();
                 } else if (this.pedidos[0].valor > 500 && this.pedidos[0].valor < 1000) {
-                    this.listarMonicaMenorMil();
+                    this.listarEmivalMenorMil();
                 } else {
-                    this.listarMonicaMaiorMil();
+                    this.listarEmivalMaiorMil();
                 }
 
                 console.log(data);
@@ -245,10 +232,10 @@ export default {
         },
 
         // Metódo responsável por listagem de pedidos
-        listarMonicaMenorMil() {
+        listarEmivalMenorMil() {
             this.preloading = true;
             this.acimaMil = false;
-            this.monicaService.listarMonicaMenorMil().then((data) => {
+            this.pedidoService.listarEmivalMenorMil().then((data) => {
                 this.pedidos = data.pedidos;
                 this.preloading = false;
                 this.ocultaFiltros = true;
@@ -256,10 +243,10 @@ export default {
         },
 
         // Metódo responsável por listagem de pedidos
-        listarMonicaMaiorMil() {
+        listarEmivalMaiorMil() {
             this.acimaMil = true;
             this.preloading = true;
-            this.monicaService.listarMonicaMaiorMil().then((data) => {
+            this.pedidoService.listarEmivalMaiorMil().then((data) => {
                 this.pedidos = data.pedidos;
                 this.preloading = false;
                 this.ocultaFiltros = true;
@@ -307,7 +294,7 @@ export default {
             // Incrementa currentIndex e verifica se está dentro dos limites do array
             if (this.currentIndex < this.pedidos.length) {
                 // Enviando id do pedido
-                this.monicaService.aprovarPedidoUnico(this.pedidoAcima.id).then((data) => {
+                this.pedidoService.aprovarPedidoUnico(this.pedidoAcima.id).then((data) => {
                     if (data.resposta == 'Pedido aprovado com sucesso!') {
                         this.showSuccess('Pedido aprovado com sucesso!');
                     }
@@ -318,7 +305,7 @@ export default {
                         this.visualizarAcima(this.pedidos[this.currentIndex].id, this.pedidos[this.currentIndex]);
                         localStorage.setItem('ultimoPedidoAprovado', this.currentIndex);
                     } else {
-                        this.listarMonicaMaiorMil();
+                        this.listarEmivalMaiorMil();
                         this.displayAcima = false;
                     }
                 });
@@ -374,7 +361,7 @@ export default {
 
             switch (status) {
                 case 0: // REPROVAR PEDIDO ABAIXO DE MIL
-                    this.monicaService.aprovarMonica([{ id: this.pedidos[this.currentIndex].id, status: 3, mensagem: this.mensagemMonica }]).then((data) => {
+                    this.pedidoService.aprovarEmival([{ id: this.pedidos[this.currentIndex].id, status: 3, mensagem: this.mensagemEmival }]).then((data) => {
                         this.showSuccess('Pedidos Reprovado com Sucesso!');
                         this.pedidosReprovados = [];
 
@@ -389,21 +376,21 @@ export default {
                             this.displayChat = false;
 
                             if (this.pedidos[0].valor <= 500) {
-                                this.listarMonicaMenorQuinhentos();
+                                this.listarEmivalMenorQuinhentos();
                             } else if (this.pedidos[0].valor > 500 && this.pedidos[0].valor < 1000) {
-                                this.listarMonicaMenorMil();
+                                this.listarEmivalMenorMil();
                             } else {
-                                this.listarMonicaMaiorMil();
+                                this.listarEmivalMaiorMil();
                             }
                         }
 
                         this.displayChat = false;
-                        this.mensagemMonica = null;
+                        this.mensagemEmival = null;
                     });
 
                     break;
                 case 1: // REPROVAR PEDIDO ACIMA DE MIL
-                    this.monicaService.aprovafMonica([{ id: this.pedidos[this.currentIndex].id, status: 3, mensagem: this.mensagemMonica }]).then((data) => {
+                    this.pedidoService.aprovarEmival([{ id: this.pedidos[this.currentIndex].id, status: 3, mensagem: this.mensagemEmival }]).then((data) => {
                         this.showSuccess('Pedidos Reprovado com Sucesso!');
                         this.pedidosReprovados = [];
                         this.pedidos.splice(this.currentIndex, 1);
@@ -416,16 +403,16 @@ export default {
                             this.displayAcima = false;
                             this.displayChat = false;
 
-                            this.listarMonicaMaiorMil();
+                            this.listarEmivalMaiorMil();
                         }
 
                         this.displayChat = false;
-                        this.mensagemMonica = null;
+                        this.mensagemEmival = null;
                     });
 
                     break;
                 case 2:
-                    this.monicaService.aprovafMonica([{ id: this.pedidos[this.currentIndex].id, status: 5, mensagem: this.mensagemMonica }]).then((data) => {
+                    this.pedidoService.aprovarEmival([{ id: this.pedidos[this.currentIndex].id, status: 5, mensagem: this.mensagemEmival }]).then((data) => {
                         this.showSuccess('Pedidos Aprovado com Ressalva com Sucesso!');
                         this.pedidosReprovados = [];
 
@@ -440,20 +427,20 @@ export default {
                             this.displayChat = false;
 
                             if (this.pedidos[0].valor <= 500) {
-                                this.listarMonicaMenorQuinhentos();
+                                this.listarEmivalMenorQuinhentos();
                             } else if (this.pedidos[0].valor > 500 && this.pedidos[0].valor < 1000) {
-                                this.listarMonicaMenorMil();
+                                this.listarEmivalMenorMil();
                             } else {
-                                this.listarMonicaMaiorMil();
+                                this.listarEmivalMaiorMil();
                             }
                         }
 
                         this.displayChat = false;
-                        this.mensagemMonica = null;
+                        this.mensagemEmival = null;
                     });
                     break;
                 case 3:
-                    this.monicaService.aprovarMonica([{ id: this.pedidos[this.currentIndex].id, status: 5, mensagem: this.mensagemMonica }]).then((data) => {
+                    this.pedidoService.aprovarEmival([{ id: this.pedidos[this.currentIndex].id, status: 5, mensagem: this.mensagemEmival }]).then((data) => {
                         this.showSuccess('Pedidos Aprovado com Ressalva com Sucesso!');
                         this.pedidosReprovados = [];
                         this.pedidos.splice(this.currentIndex, 1);
@@ -466,11 +453,11 @@ export default {
                             this.displayAcima = false;
                             this.displayChat = false;
 
-                            this.listarMonicaMaiorMil();
+                            this.listarEmivalMaiorMil();
                         }
 
                         this.displayChat = false;
-                        this.mensagemMonica = null;
+                        this.mensagemEmival = null;
                     });
                     break;
                 default:
@@ -483,8 +470,8 @@ export default {
             // this.chat(this.proximoPedido);
 
             this.proximoPedido = this.pedidos[this.currentIndex];
-            // this.pedidosReprovados.push({ id: this.proximoPedido.id, status: 3, mensagem: this.mensagemMonica });
-            this.monicaService.aprovarMonica([{ id: this.proximoPedido.id, status: 3, mensagem: this.mensagemMonica }]).then((data) => {
+            // this.pedidosReprovados.push({ id: this.proximoPedido.id, status: 3, mensagem: this.mensagemEmival });
+            this.pedidoService.aprovarEmival([{ id: this.proximoPedido.id, status: 3, mensagem: this.mensagemEmival }]).then((data) => {
                 this.showSuccess('Pedidos Reprovado com Sucesso!');
                 this.pedidosReprovados = [];
             });
@@ -500,16 +487,16 @@ export default {
                 this.displayChat = false;
 
                 if (this.pedidos[0].valor <= 500) {
-                    this.listarMonicaMenorQuinhentos();
+                    this.listarEmivalMenorQuinhentos();
                 } else if (this.pedidos[0].valor > 500 && this.pedidos[0].valor < 1000) {
-                    this.listarMonicaMenorMil();
+                    this.listarEmivalMenorMil();
                 } else {
-                    this.listarMonicaMaiorMil();
+                    this.listarEmivalMaiorMil();
                 }
             }
             // Agora você pode chamar a função visualizar para exibir o próximo PDF
             this.displayChat = false;
-            this.mensagemMonica = null;
+            this.mensagemEmival = null;
         },
 
         salvaMensagemAcima() {
@@ -584,13 +571,13 @@ export default {
         },
 
         visualizarAcima(id, data) {
+            this.pedidoSelecionado = data;
             this.titleDocumento = `Visualizando Pedido ${this.currentIndex + 1} de ${this.pedidos.length} Pedidos`;
             console.log(data.anexo);
             this.pedidoAcima = data;
             this.displayAcima = true;
             const dataAgora = new Date();
             // this.pdfsrc = ;
-            this.pedidoSelecionado = data;
             this.$nextTick(() => {
                 this.renderPdfAcima(`${this.urlBase}/${data.anexo}?t=${dataAgora.getSeconds()}`, `${dataAgora.getSeconds()}.pdf`);
             });
@@ -635,146 +622,154 @@ export default {
             this.buscaPedidos();
             this.showInfo('Filtro removidos com sucesso!');
             this.form = {};
+        },
+
+        formattedMessage(message) {
+            const nomeUsuario = message.nome_usuario;
+            const funcao = message.funcao;
+            const dataAssinatura = message.data_assinatura
+                ? new Date(message.data_assinatura).toLocaleString('pt-BR', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit'
+                  })
+                : 'Data não disponível';
+
+            const res = `${nomeUsuario} ${funcao} - ${dataAssinatura}`;
+            console.log('Formatted Message:', res);
+            return res;
         }
     }
 };
 </script>
 
 <template>
-    <div style="z-index: 99" v-if="preloading" class="full-screen-spinner">
+    <div style="z-index: 9999" v-if="preloading" class="full-screen-spinner">
         <ProgressSpinner />
     </div>
-
-    <Button v-if="this.pedidos != null" label="Voltar" class="p-button-secondary" style="width: 20%" @click="(this.ocultaFiltros = false), (this.pedidos = null), buscaQuantidades()" />
-
-    <div v-if="this.ocultaFiltros == false" class="grid text-center">
-        <div class="col-12">
-            <Splitter style="height: 300px">
-                <SplitterPanel @click.prevent="listarMonicaMenorQuinhentos()" class="flex align-items-center justify-content-center splitter-panel">
-                    <div>
-                        Total de pedidos com valor até R$ 500,00
-                        <br />
-                        <h3>{{ this.quantidadesPedidos.qtd_abaixoQuinhentos }} pedidos</h3>
-                    </div>
-                </SplitterPanel>
-                <SplitterPanel @click.prevent="listarMonicaMenorMil()" class="flex align-items-center justify-content-center splitter-panel">
-                    <div>
-                        Total de pedidos com valor de R$ 500,01 à R$ 1000,00
-                        <br />
-                        <h3>{{ this.quantidadesPedidos.qtd_abaixoMil }} pedidos</h3>
-                    </div>
-                </SplitterPanel>
-                <SplitterPanel @click.prevent="listarMonicaMaiorMil()" class="flex align-items-center justify-content-center splitter-panel">
-                    <div>
-                        Total de pedidos com o valor acima de R$ 1000,00
-                        <br />
-                        <h3>{{ this.quantidadesPedidos.qtd_acimaMil }} pedidos</h3>
-                    </div>
-                </SplitterPanel>
-            </Splitter>
-        </div>
-    </div>
-
-    <!-- Chat -->
-    <Dialog :header="this.titleChat" v-model:visible="displayChat" :style="{ width: '80%' }" :modal="true">
-        <div class="grid">
-            <div class="col-12">
-                <div class="card timeline-container">
-                    <Timeline :value="conversa" align="alternate" class="customized-timeline">
-                        <template #marker="slotProps">
-                            <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
-                                <i :class="slotProps.item.icon"></i>
-                            </span>
-                        </template>
-                        <template #content="slotProps">
-                            <Card>
-                                <template #title>
-                                    {{ slotProps.item.id_usuario.name }}
-                                </template>
-                                <template #subtitle>
-                                    {{ this.formatarData(slotProps.item.data_mensagem) }}
-                                </template>
-                                <template #content>
-                                    <h6>
-                                        {{ slotProps.item.mensagem }}
-                                    </h6>
-                                </template>
-                            </Card>
-                        </template>
-                    </Timeline>
-                </div>
-                <hr />
-                <InputText class="col-12" type="text" v-model="mensagemMonica" placeholder="Digite a mensagem..." />
-                <Button @click="salvaMensagemPedido(this.salvarMensagemPedidoStatus)" label="Enviar Mensagem" class="mr-2 mt-3 p-button-success col-12" />
-            </div>
-        </div>
-    </Dialog>
-
-    <!-- Visualizar - Abaixo de 1000 reais -->
-    <Dialog :header="this.titleDocumento" v-model:visible="display" :style="{ width: '98%' }" :modal="true">
-        <div class="grid flex justify-content-center">
-            <div class="col-12 md:col-12">
-                <!-- <pdf :src="this.urlBase"></pdf> -->
-                <div ref="pdfContainer" style="width: 100%; height: 700px; border: none"></div>
-                <!-- <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe> -->
-            </div>
-            <div class="col-4 md:col-3">
-                <Button icon="pi pi-times" label="Pedido Anterior" class="p-button-secondary" style="width: 100%; height: 50px" @click.prevent="voltar()" :disabled="this.currentIndex == 0" />
-            </div>
-            <div class="col-4 md:col-3">
-                <Button icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%; height: 50px" @click.prevent="reprovarItem()" />
-            </div>
-            <div class="col-4 md:col-3">
-                <Button icon="pi pi-times" label="Aprovar c/ Ressalva " class="p-button-warning" style="width: 100%; height: 50px" @click.prevent="ressalvaItem()" />
-            </div>
-            <div class="col-4 md:col-3">
-                <Button
-                    icon="pi pi-check"
-                    :label="this.currentIndex >= this.pedidos.length - 1 ? 'Aprovar Último Pedido' : 'Próximos Pedidos'"
-                    class="p-button-info"
-                    style="width: 100%; height: 50px"
-                    @click.prevent="proximoItem()"
-                    :disabled="this.currentIndex == this.pedidos.length"
-                />
-            </div>
-
-            <div v-if="this.pedidosAprovados.length > 0" class="col-12 md:col-12">
-                <Button icon="pi pi-check" label="Finalizar Aprovações" class="p-button-success" style="width: 100%; height: 50px" @click.prevent="aprovar()" />
-            </div>
-        </div>
-    </Dialog>
-
-    <!-- Visualizar - Acima de 1000 reais -->
-    <Dialog :header="this.titleDocumento" v-model:visible="displayAcima" :style="{ width: '95%' }" :modal="true">
-        <div class="grid">
-            <div class="col-12 md:col-12">
-                <!-- <pdf :src="this.urlBase"></pdf> -->
-                <div ref="pdfContainerAcima" style="width: 100%; height: 750px; border: none"></div>
-                <!-- <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe> -->
-            </div>
-            <div class="col-4 md:col-3">
-                <Button icon="pi pi-times" label="Pedido Anterior" class="p-button-secondary" style="width: 100%; height: 50px" @click.prevent="voltarAcima()" :disabled="this.currentIndex == 0" />
-            </div>
-            <div class="col-4 md:col-3">
-                <Button icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%; height: 50px" @click.prevent="reprovarItemAcima()" />
-            </div>
-            <div class="col-4 md:col-3">
-                <Button icon="pi pi-times" label="Aprovar c/ Ressalva " class="p-button-warning" style="width: 100%; height: 50px" @click.prevent="ressalvaItemAcima()" />
-            </div>
-            <div class="col-4 md:col-3"><Button icon="pi pi-check" label="Aprovar" class="p-button-info" style="width: 100%; height: 50px" @click.prevent="proximoItemAcima()" :disabled="this.currentIndex == this.pedidos.length" /></div>
-        </div>
-    </Dialog>
-
     <div class="grid">
         <Toast />
-        <ConfirmDialog></ConfirmDialog>
 
-        <!-- Tabela com todos pedidos com Dr Monica aprovação em conjunto - Pedidos abaixo de 1000 reais -->
+        <!-- Visualizar - Abaixo de 1000 reais -->
+        <Dialog :header="this.titleDocumento" v-model:visible="display" :style="{ width: '98%' }" :modal="true">
+            <div class="grid flex justify-content-center">
+                <div class="col-12 md:col-12">
+                    <!-- <pdf :src="this.urlBase"></pdf> -->
+                    <div ref="pdfContainer" style="width: 100%; height: 700px; border: none"></div>
+                    <!-- <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe> -->
+                </div>
+                <div class="col-4 md:col-3">
+                    <Button icon="pi pi-times" label="Pedido Anterior" class="p-button-secondary" style="width: 100%; height: 50px" @click.prevent="voltar()" :disabled="this.currentIndex == 0" />
+                </div>
+                <div class="col-4 md:col-3">
+                    <Button icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%; height: 50px" @click.prevent="reprovarItem()" />
+                </div>
+                <div class="col-4 md:col-3">
+                    <Button icon="pi pi-times" label="Aprovar c/ Ressalva " class="p-button-warning" style="width: 100%; height: 50px" @click.prevent="ressalvaItem()" />
+                </div>
+                <div class="col-4 md:col-3">
+                    <Button
+                        icon="pi pi-check"
+                        :label="this.currentIndex >= this.pedidos.length - 1 ? 'Aprovar Último Pedido' : 'Próximos Pedidos'"
+                        class="p-button-info"
+                        style="width: 100%; height: 50px"
+                        @click.prevent="proximoItem()"
+                        :disabled="this.currentIndex == this.pedidos.length"
+                    />
+                </div>
+
+                <div v-if="this.pedidosAprovados.length > 0" class="col-12 md:col-12">
+                    <Button icon="pi pi-check" label="Finalizar Aprovações" class="p-button-success" style="width: 100%; height: 50px" @click.prevent="aprovar()" />
+                </div>
+            </div>
+        </Dialog>
+
+        <!-- Chat -->
+        <Dialog :header="this.titleChat" v-model:visible="displayChat" :style="{ width: '80%' }" :modal="true">
+            <div class="grid">
+                <div class="col-12">
+                    <div class="card timeline-container">
+                        <Timeline :value="conversa" align="alternate" class="customized-timeline">
+                            <template #marker="slotProps">
+                                <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
+                                    <i :class="slotProps.item.icon"></i>
+                                </span>
+                            </template>
+                            <template #content="slotProps">
+                                <Card>
+                                    <template #title>
+                                        {{ slotProps.item.id_usuario.name }}
+                                    </template>
+                                    <template #subtitle>
+                                        {{ this.formatarData(slotProps.item.data_mensagem) }}
+                                    </template>
+                                    <template #content>
+                                        <h6>
+                                            {{ slotProps.item.mensagem }}
+                                        </h6>
+                                    </template>
+                                </Card>
+                            </template>
+                        </Timeline>
+                    </div>
+                    <hr />
+                    <InputText class="col-12" type="text" v-model="mensagemEmival" placeholder="Digite a mensagem..." />
+                    <Button @click="salvaMensagemPedido(this.salvarMensagemPedidoStatus)" label="Enviar Mensagem" class="mr-2 mt-3 p-button-success col-12" />
+                </div>
+            </div>
+        </Dialog>
+        <!-- Anexo -->
+        <Dialog header="Insira novo Anexo" v-model:visible="displayAnexo" :style="{ width: '30%' }" :modal="true">
+            <div class="grid mt-5 text-center flex justify-content-center align-items-center">
+                <FileUpload uploadLabel="Salvar" cancelLabel="Limpar PDF" chooseLabel="Selecione" @change="uploadPdf" type="file" ref="pdf" name="demo[]" accept=".pdf,.docx" :maxFileSize="1000000"></FileUpload>
+            </div>
+            <div>
+                <Button @click.prevent="this.displayAnexo = false" label="Salvar" class="mr-2 mt-3 p-button-success col-12" />
+            </div>
+        </Dialog>
+
+        <!-- Modal Filtros -->
+        <Sidebar style="width: 500px" v-model:visible="visibleRight" :baseZIndex="1000" position="right">
+            <h3 v-if="this.editar == false" class="titleForm">Filtros</h3>
+
+            <div class="card p-fluid">
+                <div class="field">
+                    <label for="empresa">Empresa:</label>
+                    <Dropdown v-model="form.empresa" :options="empresas" showClear optionLabel="nome_empresa" placeholder="Selecione..." class="w-full" />
+                </div>
+                <div class="field">
+                    <label for="empresa">Status:</label>
+                    <Dropdown v-model="form.status" :options="status" showClear optionLabel="status" placeholder="Selecione..." class="w-full" />
+                </div>
+                <div class="field">
+                    <label for="cpf">Descrição: </label>
+                    <InputText v-tooltip.left="'Digite a descrição do pedido'" v-model="form.descricao" id="cnpj" placeholder="Digite..." />
+                </div>
+                <div class="field">
+                    <label for="cpf">Valor: </label>
+                    <InputNumber v-tooltip.left="'Digite o valor do pedido'" v-model="form.valor" inputId="minmaxfraction" :minFractionDigits="2" :maxFractionDigits="2" placeholder="Digite..." />
+                </div>
+                <div class="field">
+                    <label for="cpf">Dt. In clusão:</label>
+                    <Calendar dateFormat="dd/mm/yy" v-tooltip.left="'Selecione a data de inclusão'" v-model="form.dt_inclusao" showIcon :showOnFocus="false" class="" />
+                </div>
+                <hr />
+                <div class="field">
+                    <Button @click.prevent="buscaFiltros()" label="Filtrar" class="mr-2 mb-2 p-button-secondary" />
+                    <Button @click.prevent="limparFiltro()" label="Limpar Filtros" class="mr-2 mb-2 p-button-danger" />
+                </div>
+            </div>
+        </Sidebar>
+
+        <!-- Tabela com todos pedidos -->
         <div class="col-12">
             <div class="col-12 lg:col-6">
                 <Toast />
             </div>
-            <div v-if="this.pedidos && this.acimaMil == false" class="card">
+            <div class="card">
                 <DataTable
                     dataKey="id"
                     :value="pedidos"
@@ -788,7 +783,9 @@ export default {
                     stripedRows
                 >
                     <template #header>
-                        <div class="flex justify-content-between"></div>
+                        <div class="flex justify-content-between">
+                            <h5 for="empresa">Pedidos para Aprovação | Dr. Mônica</h5>
+                        </div>
                     </template>
                     <template #empty> Nenhum pedido encontrado! </template>
                     <template #loading> Carregando informações... Por favor, aguarde! </template>
@@ -808,12 +805,13 @@ export default {
                         </template>
                     </Column>
 
-                    <Column field="Valor" header="Valor" :sortable="true" class="w-3">
+                    <Column field="Empresa" header="Empresa" :sortable="true" class="w-2">
                         <template #body="slotProps">
-                            <span class="p-column-title">Valor</span>
-                            {{ slotProps.data.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
+                            <span class="p-column-title">Empresa</span>
+                            {{ slotProps.data.empresa.nome_empresa }}
                         </template>
                     </Column>
+
                     <Column field="Descrição" header="Descrição" :sortable="true" class="w-5">
                         <template #body="slotProps">
                             <span class="p-column-title">Descrição</span>
@@ -821,73 +819,26 @@ export default {
                         </template>
                     </Column>
 
-                    <Column field="..." header="..." :sortable="true" class="w-2">
+                    <Column field="Presidente" header="Presidente" :sortable="true" class="w-5">
                         <template #body="slotProps">
-                            <span class="p-column-title"></span>
-                            <div class="grid">
-                                <div class="col-4 md:col-4 mr-3">
-                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-secondary" />
-                                </div>
-                            </div>
-                        </template>
-                    </Column>
-                </DataTable>
-            </div>
-
-            <!-- Tabela com todos pedidos com Dr Monica aprovação separada acima de 1000 reais -->
-            <div v-if="this.pedidos && this.acimaMil" class="card">
-                <DataTable
-                    dataKey="id"
-                    :value="pedidos"
-                    :paginator="true"
-                    :rows="10"
-                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                    :rowsPerPageOptions="[5, 10, 25, 50, 100]"
-                    currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
-                    responsiveLayout="scroll"
-                    filterDisplay="menu"
-                    stripedRows
-                >
-                    <template #header>
-                        <div class="flex justify-content-between"></div>
-                    </template>
-                    <template #empty> Nenhum pedido encontrado! </template>
-                    <template #loading> Carregando informações... Por favor, aguarde! </template>
-
-                    <Column field="" header="" class="w-1">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Dt. Inclusão</span>
-                            <Tag v-if="slotProps.data.urgente == 1" class="mr-2" severity="danger" value="Urgente"></Tag>
-                            <Tag v-else class="mr-2" severity="info" value="Normal"></Tag>
+                            <span class="p-column-title">Presidente</span>
+                            Dr. {{ slotProps.data.link.link }}
                         </template>
                     </Column>
 
-                    <Column field="Dt. Inclusão" header="Dt. Inclusão" :sortable="true" class="w-2">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Dt. Inclusão</span>
-                            {{ formatarData(slotProps.data.dt_inclusao) }}
-                        </template>
-                    </Column>
-
-                    <Column field="Valor" header="Valor" :sortable="true" class="w-3">
+                    <Column field="Valor" header="Valor" :sortable="true" class="w-1">
                         <template #body="slotProps">
                             <span class="p-column-title">CNPJ</span>
                             {{ slotProps.data.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
                         </template>
                     </Column>
-                    <Column field="Descrição" header="Descrição" :sortable="true" class="w-5">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Descrição</span>
-                            {{ slotProps.data.descricao }}
-                        </template>
-                    </Column>
 
                     <Column field="..." header="..." :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
                             <div class="grid">
-                                <div class="col-4 md:col-4 mr-3">
-                                    <Button @click.prevent="visualizarAcima(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-secondary" />
+                                <div class="col-4 md:col-4 mr-4">
+                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
                                 </div>
                             </div>
                         </template>

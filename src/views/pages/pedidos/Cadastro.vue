@@ -147,18 +147,29 @@ export default {
                                 <label for="firstname2">Urgente</label>
                                 <InputSwitch :trueValue="1" :falseValue="0" :modelValue="form.urgente" v-model="form.urgente" />
                             </div>
+
+                            
+
+
                             <div class="field col-12 md:col-4">
                                 <label for="firstname2">Valor <span class="obrigatorio">*</span></label>
                                 <InputNumber v-tooltip.top="'Digite o valor do pedido'" v-model="form.valor" inputId="minmaxfraction" :minFractionDigits="2" :maxFractionDigits="2" placeholder="R$..." />
                             </div>
-                            <div class="field col-12 md:col-3">
+                            <div class="field col-12 md:col-2">
                                 <label for="firstname2">Nº Pedido no Protheus <span class="obrigatorio">*</span></label>
                                 <InputText type="number" v-tooltip.top="'Digite o numero do pedido'" v-model="form.protheus" />
                             </div>
-                            <div class="field col-12 md:col-4">
+
+                            <div class="field col-12 md:col-2">
                                 <label for="firstname2">Dt de Vencimento <span class="obrigatorio">*</span></label>
                                 <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de vencimento'" v-model="form.dt_vencimento" showIcon iconDisplay="input" />
                             </div>
+
+                            <div class="field col-1 md:col-3">
+                                <label for="firstname2">PDF<span class="obrigatorio">*</span></label>
+                                <FileUpload chooseLabel="Selecionar Arquivo" @change="uploadPdf" mode="basic" type="file" ref="pdf" name="demo[]" accept=".pdf,.docx" :maxFileSize="999999999"></FileUpload>
+                            </div>
+                            
                             <div class="field col-12 md:col-4">
                                 <label for="Link">Link <span class="obrigatorio">*</span></label>
                                 <Dropdown id="Link" v-model="form.link" :options="links" optionLabel="link" placeholder="Selecione..."></Dropdown>
@@ -176,7 +187,6 @@ export default {
                                 <Textarea v-tooltip.top="'Digite a descrição do pedido'" id="descricao" rows="4" v-model="form.descricao" placeholder="Digite a descrição..." />
                             </div>
                         </div>
-                        <FileUpload chooseLabel="Selecionar Arquivo" @change="uploadPdf" mode="basic" type="file" ref="pdf" name="demo[]" accept=".pdf,.docx" :maxFileSize="999999999"></FileUpload>
                     </TabPanel>
                     <TabPanel header="Fluxo" class="p-tabview-selected-secondary">
                         <div class="p-fluid formgrid grid">

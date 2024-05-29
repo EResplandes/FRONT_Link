@@ -44,6 +44,14 @@ export default {
     },
 
     mounted: function () {
+        if (window.AdobeDC) {
+            this.adobeApiReady = true;
+        } else {
+            document.addEventListener('adobe_dc_view_sdk.ready', () => {
+                this.adobeApiReady = true;
+            });
+        }
+
         // Metódo responsável por buscar todas os pedidos reprovados
         this.pedidoService.buscaReprovados(localStorage.getItem('local_id')).then((data) => {
             this.pedidos = data.pedidos;
@@ -121,6 +129,10 @@ export default {
             this.display = true;
             this.pdf = data.anexo;
             this.pdfsrc = `${this.urlBase}/${this.pdf}`;
+            const dataAgora = new Date();
+            this.$nextTick(() => {
+                this.renderPdf(`${this.urlBase}/${this.pdf}`, `${dataAgora.getSeconds()}.pdf`);
+            });
         },
 
         filtrar() {
@@ -149,7 +161,79 @@ export default {
 
         uploadPdf() {
             this.pdf = this.$refs.pdf.files[0];
-        }
+        },
+
+        nextPage() {
+            this.previewFilePromise.then((adobeViewer) => {
+                adobeViewer.getAPIs().then((apis) => {
+                    apis.getCurrentPage()
+                        .then((currentPage) => apis.gotoLocation(currentPage + 1))
+                        .catch((error) => console.error(error));
+                });
+            });
+        },
+        previousPage() {
+            this.previewFilePromise.then((adobeViewer) => {
+                adobeViewer.getAPIs().then((apis) => {
+                    apis.getCurrentPage()
+                        .then((currentPage) => {
+                            if (currentPage > 1) {
+                                return apis.gotoLocation(currentPage - 1);
+                            }
+                        })
+                        .catch((error) => console.error(error));
+                });
+            });
+        },
+        zoomIn() {
+            this.previewFilePromise.then((adobeViewer) => {
+                adobeViewer.getAPIs().then((apis) => {
+                    apis.getZoomAPIs()
+                        .zoomIn()
+                        .catch((error) => console.error(error));
+                });
+            });
+        },
+        zoomOut() {
+            this.previewFilePromise.then((adobeViewer) => {
+                adobeViewer.getAPIs().then((apis) => {
+                    apis.getZoomAPIs()
+                        .zoomOut()
+                        .catch((error) => console.error(error));
+                });
+            });
+        },
+        renderPdf(url, fileName) {
+            if (!this.adobeApiReady) {
+                return;
+            }
+            const previewConfig = {
+                defaultViewMode: 'FIT_WIDTH',
+                showAnnotationTools: false
+            };
+            this.$refs.pdfContainer.innerHTML = '';
+            let viewer = document.createElement('div');
+            viewer.id = 'viewer';
+            this.$refs.pdfContainer.appendChild(viewer);
+            let adobeDCView = new AdobeDC.View({
+                clientId: 'e8c98881c48049bbb03b3c5d5db05129',
+                divId: 'viewer'
+            });
+            this.previewFilePromise = adobeDCView.previewFile(
+                {
+                    content: {
+                        location: {
+                            url: url
+                        }
+                    },
+                    metaData: {
+                        fileName: fileName,
+                        id: fileName
+                    }
+                },
+                { embedMode: 'SIZED_CONTAINER' }
+            );
+        },
     }
 };
 </script>
@@ -163,7 +247,7 @@ export default {
 
         <!-- Visualizar -->
         <Dialog header="Documento" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
-            <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
+            <div ref="pdfContainer" style="width: 100%; height: 500px; border: none"></div>
         </Dialog>
 
         <!-- Chat -->

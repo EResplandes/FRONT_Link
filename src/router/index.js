@@ -119,6 +119,11 @@ const router = createRouter({
                     component: () => import('@/views/pages/relatorios/Aprovados.vue')
                 },
                 {
+                    path: '/relatorio-reprovados',
+                    name: 'relatorio-reprovados',
+                    component: () => import('@/views/pages/relatorios/Reprovados.vue')
+                },
+                {
                     path: '/uikit/formlayout',
                     name: 'formlayout',
                     component: () => import('@/views/uikit/FormLayout.vue')

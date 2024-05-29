@@ -60,8 +60,27 @@ export default class GerenteService {
             });
     }
 
-    async aprovarExterno(id_pedido) {
-        return await fetch(`${API_URL}/pedidos/aprovar-fluxo-externo/` + id_pedido + '/' + localStorage.getItem('usuario_id'), {
+    async aprovarExterno(id_pedido, idLink, idUsuario) {
+        return await fetch(`${API_URL}/pedidos/aprovar-fluxo-externo/` + id_pedido + '/' + idLink + '/' + idUsuario, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    async reprovarExterno(id_pedido, idUsuario, mensagem) {
+        return await fetch(`${API_URL}/pedidos/reprovar-fluxo-externo/` + id_pedido + '/' + idUsuario + '/' + mensagem, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

@@ -41,6 +41,14 @@ export default {
     },
 
     mounted: function () {
+        if (window.AdobeDC) {
+            this.adobeApiReady = true;
+        } else {
+            document.addEventListener('adobe_dc_view_sdk.ready', () => {
+                this.adobeApiReady = true;
+            });
+        }
+
         // Metódo responsável por buscar todas os pedidos reprovados
         this.pedidoService.buscaPedidosRessalva(localStorage.getItem('local_id')).then((data) => {
             this.pedidos = data.pedidos;
@@ -119,6 +127,10 @@ export default {
             this.display = true;
             this.pdf = data.anexo;
             this.pdfsrc = `${this.urlBase}/${this.pdf}`;
+            const dataAgora = new Date();
+            this.$nextTick(() => {
+                this.renderPdf(`${this.urlBase}/${this.pdf}`, `${dataAgora.getSeconds()}.pdf`);
+            });
         },
 
         filtrar() {
@@ -143,7 +155,80 @@ export default {
             this.buscaPedidos();
             this.showInfo('Filtro removidos com sucesso!');
             this.form = {};
-        }
+        },
+
+        renderPdf(url, fileName) {
+            if (!this.adobeApiReady) {
+                return;
+            }
+            const previewConfig = {
+                defaultViewMode: 'FIT_WIDTH',
+                showAnnotationTools: false
+            };
+            this.$refs.pdfContainer.innerHTML = '';
+            let viewer = document.createElement('div');
+            viewer.id = 'viewer';
+            this.$refs.pdfContainer.appendChild(viewer);
+            let adobeDCView = new AdobeDC.View({
+                clientId: 'e8c98881c48049bbb03b3c5d5db05129',
+                divId: 'viewer'
+            });
+            this.previewFilePromise = adobeDCView.previewFile(
+                {
+                    content: {
+                        location: {
+                            url: url
+                        }
+                    },
+                    metaData: {
+                        fileName: fileName,
+                        id: fileName
+                    }
+                },
+                { embedMode: 'SIZED_CONTAINER' }
+            );
+        },
+
+        nextPage() {
+            this.previewFilePromise.then((adobeViewer) => {
+                adobeViewer.getAPIs().then((apis) => {
+                    apis.getCurrentPage()
+                        .then((currentPage) => apis.gotoLocation(currentPage + 1))
+                        .catch((error) => console.error(error));
+                });
+            });
+        },
+        previousPage() {
+            this.previewFilePromise.then((adobeViewer) => {
+                adobeViewer.getAPIs().then((apis) => {
+                    apis.getCurrentPage()
+                        .then((currentPage) => {
+                            if (currentPage > 1) {
+                                return apis.gotoLocation(currentPage - 1);
+                            }
+                        })
+                        .catch((error) => console.error(error));
+                });
+            });
+        },
+        zoomIn() {
+            this.previewFilePromise.then((adobeViewer) => {
+                adobeViewer.getAPIs().then((apis) => {
+                    apis.getZoomAPIs()
+                        .zoomIn()
+                        .catch((error) => console.error(error));
+                });
+            });
+        },
+        zoomOut() {
+            this.previewFilePromise.then((adobeViewer) => {
+                adobeViewer.getAPIs().then((apis) => {
+                    apis.getZoomAPIs()
+                        .zoomOut()
+                        .catch((error) => console.error(error));
+                });
+            });
+        },
     }
 };
 </script>
@@ -157,7 +242,7 @@ export default {
 
         <!-- Visualizar -->
         <Dialog header="Documento" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
-            <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
+            <div ref="pdfContainer" style="width: 100%; height: 500px; border: none"></div>
         </Dialog>
 
         <!-- Chat -->
@@ -167,7 +252,9 @@ export default {
                     <div class="card timeline-container">
                         <Timeline :value="conversa" align="alternate" class="customized-timeline">
                             <template #marker="slotProps">
-                                <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
+                                <span
+                                    class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2"
+                                    :style="{ backgroundColor: slotProps.item.color }">
                                     <i :class="slotProps.item.icon"></i>
                                 </span>
                             </template>
@@ -202,23 +289,28 @@ export default {
             <div class="card p-fluid">
                 <div class="field">
                     <label for="empresa">Empresa:</label>
-                    <Dropdown v-model="form.empresa" :options="empresas" showClear optionLabel="nome_empresa" placeholder="Selecione..." class="w-full" />
+                    <Dropdown v-model="form.empresa" :options="empresas" showClear optionLabel="nome_empresa"
+                        placeholder="Selecione..." class="w-full" />
                 </div>
                 <div class="field">
                     <label for="empresa">Status:</label>
-                    <Dropdown v-model="form.status" :options="status" showClear optionLabel="status" placeholder="Selecione..." class="w-full" />
+                    <Dropdown v-model="form.status" :options="status" showClear optionLabel="status"
+                        placeholder="Selecione..." class="w-full" />
                 </div>
                 <div class="field">
                     <label for="cpf">Descrição: </label>
-                    <InputText v-tooltip.left="'Digite a descrição do pedido'" v-model="form.descricao" id="cnpj" placeholder="Digite..." />
+                    <InputText v-tooltip.left="'Digite a descrição do pedido'" v-model="form.descricao" id="cnpj"
+                        placeholder="Digite..." />
                 </div>
                 <div class="field">
                     <label for="cpf">Valor: </label>
-                    <InputNumber v-tooltip.left="'Digite o valor do pedido'" v-model="form.valor" inputId="minmaxfraction" :minFractionDigits="2" :maxFractionDigits="2" placeholder="Digite..." />
+                    <InputNumber v-tooltip.left="'Digite o valor do pedido'" v-model="form.valor" inputId="minmaxfraction"
+                        :minFractionDigits="2" :maxFractionDigits="2" placeholder="Digite..." />
                 </div>
                 <div class="field">
                     <label for="cpf">Dt. In clusão:</label>
-                    <Calendar dateFormat="dd/mm/yy" v-tooltip.left="'Selecione a data de inclusão'" v-model="form.dt_inclusao" showIcon :showOnFocus="false" class="" />
+                    <Calendar dateFormat="dd/mm/yy" v-tooltip.left="'Selecione a data de inclusão'"
+                        v-model="form.dt_inclusao" showIcon :showOnFocus="false" class="" />
                 </div>
                 <hr />
                 <div class="field">
@@ -234,27 +326,22 @@ export default {
                 <Toast />
             </div>
             <div class="card">
-                <DataTable
-                    dataKey="id"
-                    :value="pedidos"
-                    :paginator="true"
-                    :rows="10"
+                <DataTable dataKey="id" :value="pedidos" :paginator="true" :rows="10"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25, 50, 100]"
                     currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
-                    responsiveLayout="scroll"
-                    filterDisplay="menu"
-                    stripedRows
-                >
+                    responsiveLayout="scroll" filterDisplay="menu" stripedRows>
                     <template #header>
                         <div class="flex justify-content-between">
                             <h5 for="empresa">Pedidos Aprovados com Ressalva:</h5>
                             <div class="grid">
                                 <div class="col-4 md:col-4 mr-2">
-                                    <Button @click.prevent="filtrar()" icon="pi pi-search" label="Filtrar" class="p-button-secondary" style="margin-right: 0.25em" />
+                                    <Button @click.prevent="filtrar()" icon="pi pi-search" label="Filtrar"
+                                        class="p-button-secondary" style="margin-right: 0.25em" />
                                 </div>
                                 <div class="col-6 md:col-4">
-                                    <Button @click.prevent="limparFiltro()" icon="pi pi-trash" label="Limpar" class="mr-2 mb-2 p-button-danger" />
+                                    <Button @click.prevent="limparFiltro()" icon="pi pi-trash" label="Limpar"
+                                        class="mr-2 mb-2 p-button-danger" />
                                 </div>
                             </div>
                         </div>
@@ -310,10 +397,12 @@ export default {
                             <span class="p-column-title"></span>
                             <div class="grid">
                                 <div class="col-4 md:col-4 mr-4">
-                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
+                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye"
+                                        class="p-button-info" />
                                 </div>
                                 <div class="col-4 md:col-4">
-                                    <Button @click="chat(slotProps.data.id)" icon="pi pi-comments" class="p-button-secondary" />
+                                    <Button @click="chat(slotProps.data.id)" icon="pi pi-comments"
+                                        class="p-button-secondary" />
                                 </div>
                             </div>
                         </template>
@@ -363,7 +452,8 @@ export default {
 }
 
 .timeline-container {
-    max-height: 300px; /* Defina a altura máxima desejada */
-    overflow-y: auto; /* Adiciona uma barra de rolagem vertical quando o conteúdo excede a altura máxima */
-}
-</style>
+    max-height: 300px;
+    /* Defina a altura máxima desejada */
+    overflow-y: auto;
+    /* Adiciona uma barra de rolagem vertical quando o conteúdo excede a altura máxima */
+}</style>

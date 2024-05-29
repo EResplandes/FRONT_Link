@@ -84,20 +84,6 @@ export default {
 
                     <div class="col-6 md:col-6 lg:col-4 p-0 lg:pb-5 mt-4 lg:mt-0 p-2">
                         <div
-                            style="height: 160px; padding: 10px; border-radius: 1px; background: linear-gradient(90deg, rgba(251, 199, 145, 0.2), rgba(246, 158, 188, 0.2)), linear-gradient(180deg, rgba(172, 180, 223, 0.2), rgba(212, 162, 221, 0.2))"
-                        >
-                            <div class="p-3 surface-card h-full" style="border-radius: 8px">
-                                <div class="icon-wrapper flex align-items-center justify-content-center bg-pink-200 mb-3">
-                                    <i class="pi pi-fw pi-user text-2xl text-pink-700 p-1"></i>
-                                </div>
-                                <h5 class="mb-2 text-900">Criador</h5>
-                                <span class="text-600">Convallis tellus id interdum velit laoreet.</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-12 md:col-12 lg:col-4 p-0 lg:pr-5 lg:pb-5 mt-4 lg:mt-0 p-2">
-                        <div
                             style="height: 160px; padding: 10px; border-radius: 1px; background: linear-gradient(90deg, rgba(253, 228, 165, 0.2), rgba(187, 199, 205, 0.2)), linear-gradient(180deg, rgba(253, 228, 165, 0.2), rgba(187, 199, 205, 0.2))"
                         >
                             <div class="p-3 surface-card h-full" style="border-radius: 8px">
