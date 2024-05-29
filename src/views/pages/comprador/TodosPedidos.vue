@@ -22,9 +22,12 @@ export default {
             visibleRight: ref(false),
             confirm: new useConfirm(),
             loading1: ref(null),
+            idPedido: ref(null),
             empresas: ref([]),
+            empresa: ref([]),
             pedidos: ref(null),
             status: ref(null),
+            displayAlteracao: ref(false),
             form: ref({}),
             editar: ref(false),
             preloading: ref(true),
@@ -63,14 +66,14 @@ export default {
         // Metódo responsável por buscar todas empresas
         this.empresaService.buscaEmpresas().then((data) => {
             if (data.resposta == 'Empresas listados com sucesso!') {
-                this.empresas = data.empresas.map((empresa) => empresa.nome_empresa);
+                this.empresa = data.empresas;
             }
         });
 
-        // Metódo responsável por buscar todos status
-        this.statusService.buscaStatus().then((data) => {
-            if (data.resposta == 'Status listados com sucesso!') {
-                this.status = data.itens;
+        // Metódo responsável por buscar todas empresas
+        this.empresaService.buscaEmpresas().then((data) => {
+            if (data.resposta == 'Empresas listados com sucesso!') {
+                this.empresas = data.empresas.map((empresa) => empresa.nome_empresa);
             }
         });
     },
@@ -87,18 +90,55 @@ export default {
             }
         },
 
+        alterar(id) {
+            // 1º Passo - Buscar informações do pedido
+            this.idPedido = id;
+            this.pedidoService.buscaInformacoesPedidoAlterar(id).then((data) => {
+                // 2º Passo -> Abrir Modal
+                this.displayAlteracao = true;
+
+                // 3º Passo -> Montar Valores no form
+                this.form = {
+                    descricao: data.pedido[0].descricao,
+                    valor: data.pedido[0].valor,
+                    empresa: data.pedido[0].empresa,
+                    protheus: data.pedido[0]?.protheus,
+                    dt_vencimento: data.pedido[0]?.dt_vencimento,
+                    urgente: data.pedido[0].urgente
+                };
+            });
+        },
+
+        // Metódo responsável por buscar informações do pedido
         buscaInformacoesPedido(id) {
             this.preloading = true;
             this.pedidoService.buscaInformacoesPedido(id).then((data) => {
                 this.imprimirAutorizacao(data);
             });
         },
+
+        // Metódo responsável por atualizar informaçóes do pedido
+        salvarAlteracoes() {
+            this.preloading = true;
+            this.pedidoService.atualizarInformacoesPedido(this.form, this.idPedido).then((data) => {
+                if (data.resposta == 'Pedido atualizado com sucesso!') {
+                    this.showSuccess('Pedido atualizado com sucesso!');
+                    this.displayAlteracao = false;
+                    this.buscaPedidos();
+                }
+            });
+        },
+
         // Metódo responsável por buscar todos pedidos
         buscaPedidos() {
-            this.preloading = true;
             this.pedidoService.buscaPedidosPorComprador(localStorage.getItem('usuario_id')).then((data) => {
-                this.pedidos = data.pedidos;
+                this.pedidos = data.pedidos.map((pedido) => ({
+                    ...pedido,
+                    dt_inclusao_formatada: this.formatarData(pedido.dt_inclusao),
+                    valor_formatado: pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                }));
                 this.preloading = false;
+                this.loading = false;
             });
         },
 
@@ -137,11 +177,6 @@ export default {
             });
         },
 
-        filtrar() {
-            this.visibleRight = true;
-            this.editar = false;
-        },
-
         showSuccess(mensagem) {
             this.toast.add({ severity: 'success', summary: 'Sucesso!', detail: mensagem, life: 3000 });
         },
@@ -167,13 +202,6 @@ export default {
                     this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
                 }
             });
-        },
-
-        // Metódo responsável por limpagem de filtros
-        limparFiltro() {
-            this.buscaPedidos();
-            this.showInfo('Filtro removidos com sucesso!');
-            this.form = {};
         },
 
         getStatus(dados) {
@@ -230,6 +258,10 @@ export default {
                 case 'renewal':
                     return null;
             }
+        },
+
+        uploadPdf() {
+            this.form.pdf = this.$refs.pdf.files[0];
         }
     }
 };
@@ -275,41 +307,48 @@ export default {
                         </Timeline>
                     </div>
                     <hr />
-                    <!-- <InputText class="col-12" type="text" v-model="newMessage" placeholder="Digite a mensagem..." disabled/>
-                    <Button @click.prevent="enviarMensagem()" label="Enviar" class="mr-2 mt-3 p-button-success col-12" disabled /> -->
                 </div>
             </div>
         </Dialog>
 
-        <!-- Modal Filtros -->
-        <Sidebar style="width: 500px" v-model:visible="visibleRight" :baseZIndex="1000" position="right">
-            <h3 v-if="this.editar == false" class="titleForm">Filtros</h3>
-
+        <!-- Alterar informações pedido -->
+        <Sidebar style="width: 500px" v-model:visible="displayAlteracao" :baseZIndex="1000" position="right">
             <div class="card p-fluid">
+                <h6 class="titleForm">Formulário de Edição</h6>
+
+                <div class="field">
+                    <label for="descricao">Urgente: </label><br />
+                    <InputSwitch :trueValue="1" :falseValue="0" :modelValue="form.urgente" v-model="form.urgente" />
+                </div>
                 <div class="field">
                     <label for="empresa">Empresa:</label>
-                    <Dropdown v-model="form.empresa" :options="empresas" showClear optionLabel="nome_empresa" placeholder="Selecione..." class="w-full" />
+                    <Dropdown v-model="form.empresa" :options="empresa" showClear optionLabel="nome_empresa" placeholder="Selecione..." class="w-full" />
                 </div>
                 <div class="field">
-                    <label for="empresa">Status:</label>
-                    <Dropdown v-model="form.status" :options="status" showClear optionLabel="status" placeholder="Selecione..." class="w-full" />
+                    <label for="valor">Nº Protheus: </label>
+                    <InputNumber v-tooltip.left="'Digite o número do pedido no Protheus'" v-model="form.protheus" placeholder="Digite..." />
                 </div>
                 <div class="field">
-                    <label for="cpf">Descrição: </label>
-                    <InputText v-tooltip.left="'Digite a descrição do pedido'" v-model="form.descricao" id="cnpj" placeholder="Digite..." />
-                </div>
-                <div class="field">
-                    <label for="cpf">Valor: </label>
+                    <label for="valor">Valor: </label>
                     <InputNumber v-tooltip.left="'Digite o valor do pedido'" v-model="form.valor" inputId="minmaxfraction" :minFractionDigits="2" :maxFractionDigits="2" placeholder="Digite..." />
                 </div>
                 <div class="field">
-                    <label for="cpf">Dt. In clusão:</label>
-                    <Calendar dateFormat="dd/mm/yy" v-tooltip.left="'Selecione a data de inclusão'" v-model="form.dt_inclusao" showIcon :showOnFocus="false" class="" />
+                    <label for="dt_vencimento">Dt. Vencimento:</label>
+                    <Calendar dateFormat="dd/mm/yy" v-tooltip.left="'Selecione a data vencimento do pedido'" v-model="form.dt_vencimento" showIcon :showOnFocus="false" class="" />
+                    {{ this.form.dt_vencimento }}
+                </div>
+                <div class="field">
+                    <label for="descricao">Descrição: </label>
+                    <Textarea rows="3" cols="30" v-tooltip.left="'Digite a descrição do pedido'" v-model="form.descricao" id="descricao" placeholder="Digite..." />
+                </div>
+                <div class="field">
+                    <label for="firstname2">Somente se existir alguma alteração no PDF</label>
+                    <FileUpload chooseLabel="Selecionar Arquivo" @change="uploadPdf" mode="basic" type="file" ref="pdf" name="demo[]" accept=".pdf,.docx" :maxFileSize="999999999"></FileUpload>
                 </div>
                 <hr />
                 <div class="field">
-                    <Button @click.prevent="buscaFiltros()" label="Filtrar" class="mr-2 mb-2 p-button-secondary" />
-                    <Button @click.prevent="limparFiltro()" label="Limpar Filtros" class="mr-2 mb-2 p-button-danger" />
+                    <Button @click.prevent="salvarAlteracoes()" label="Alterar Pedido" class="mr-2 mb-2 p-button-secondary" />
+                    <Button @click.prevent="this.displayAlteracao = false" label="Fechar" class="mr-2 mb-2 p-button-danger" />
                 </div>
             </div>
         </Sidebar>
@@ -400,7 +439,10 @@ export default {
                                 <div class="col-3 md:col-3 mr-1">
                                     <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
                                 </div>
-                                <div v-if="slotProps.data.status.status == 'Reprovado' || slotProps.data.status.status == 'Aprovado com Ressalva'" class="col-3 md:col-3">
+                                <div v-if="slotProps.data.status.status != 'Aprovado' && slotProps.data.status.status != 'Aprovado com Ressalva'" class="col-3 md:col-3 ml-3">
+                                    <Button @click.prevent="alterar(slotProps.data.id)" icon="pi pi-pencil" class="p-button-warning" />
+                                </div>
+                                <div v-if="slotProps.data.status.status == 'Reprovado' || slotProps.data.status.status == 'Aprovado com Ressalva'" class="col-3 md:col-3 ml-3">
                                     <Button @click.prevent="chat(slotProps.data.id, slotProps.data)" icon="pi pi-comments" class="p-button-secon" />
                                 </div>
                                 <div
@@ -410,7 +452,7 @@ export default {
                                         slotProps.data.status.status == 'Resposta do Pedido de Compra Aprovado com Ressalva' ||
                                         slotProps.data.status.status == 'Retorno do Pedido de Compra Aprovado com Ressalva'
                                     "
-                                    class="col-4 md:col-4 mr-3"
+                                    class="col-4 md:col-4 mr-1 ml-3"
                                 >
                                     <Button @click.prevent="buscaInformacoesPedido(slotProps.data.id)" icon="pi pi-print" class="p-button-secondary" />
                                 </div>

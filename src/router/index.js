@@ -35,7 +35,7 @@ const router = createRouter({
                 },
                 {
                     path: '/pedidos-todos-comprador',
-                    name: 'pedidos-todos',
+                    name: 'pedidos-todos-comprador',
                     component: () => import('@/views/pages/comprador/TodosPedidos.vue')
                 },
                 {

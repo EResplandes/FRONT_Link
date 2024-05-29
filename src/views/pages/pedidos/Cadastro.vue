@@ -147,10 +147,6 @@ export default {
                                 <label for="firstname2">Urgente</label>
                                 <InputSwitch :trueValue="1" :falseValue="0" :modelValue="form.urgente" v-model="form.urgente" />
                             </div>
-
-                            
-
-
                             <div class="field col-12 md:col-4">
                                 <label for="firstname2">Valor <span class="obrigatorio">*</span></label>
                                 <InputNumber v-tooltip.top="'Digite o valor do pedido'" v-model="form.valor" inputId="minmaxfraction" :minFractionDigits="2" :maxFractionDigits="2" placeholder="R$..." />

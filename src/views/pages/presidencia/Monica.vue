@@ -61,7 +61,7 @@ export default {
         adobeApiReady: {
             handler() {
                 this.$nextTick(() => {
-                    this.renderPdf(`https://documentcloud.adobe.com/view-sdk-demo/PDFs/Bodea Brochure.pdf`, `teste.pdf`);
+                    this.renderPdfAcima(`https://documentcloud.adobe.com/view-sdk-demo/PDFs/Bodea Brochure.pdf`, `teste.pdf`);
                 });
             }
         },
