@@ -202,7 +202,6 @@ export default {
                 previewConfig
             );
 
-            this.zoomIn();
         },
 
         // Metódo responsável por aprovar
