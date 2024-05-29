@@ -748,7 +748,14 @@ export default {
 
     <!-- Visualizar - Abaixo de 1000 reais -->
     <Dialog :header="this.titleDocumento" v-model:visible="display" :style="{ width: '98%' }" :modal="true">
-
+        <div class="flex align-items-center justify-content-start" v-if="this.pedidoSelecionado.assinados.length > 0">
+            <label for="buttondisplay" class="font-bold block mb-2">Autorizações: </label>
+            <div v-for="(message, index) in this.pedidoSelecionado.assinados" :key="index">
+                <InlineMessage class="m-2" severity="success">
+                    {{ formattedMessage(message) }}
+                </InlineMessage>
+            </div>
+        </div>
         <div class="grid flex justify-content-center">
             <div class="col-12 md:col-12">
                 <!-- <pdf :src="this.urlBase"></pdf> -->
