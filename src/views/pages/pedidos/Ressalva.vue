@@ -36,8 +36,19 @@ export default {
             displayAnexo: ref(false),
             urlBase: 'https://link.gruporialma.com.br/storage',
             pdf: ref(null),
-            pdfsrc: ref(null)
+            pdfsrc: ref(null),
+            heightVH: (window.innerHeight * 0.8)
         };
+    },
+
+    computed: {
+        pdfContainerStyle() {
+            return {
+                width: '100%',
+                height: `${this.heightVH}px`,
+                border: 'none'
+            };
+        }
     },
 
     mounted: function () {
@@ -242,7 +253,7 @@ export default {
 
         <!-- Visualizar -->
         <Dialog header="Documento" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
-            <div ref="pdfContainer" style="width: 100%; height: 500px; border: none"></div>
+            <div ref="pdfContainer" :style="pdfContainerStyle"></div>
         </Dialog>
 
         <!-- Chat -->

@@ -39,8 +39,19 @@ export default {
             displayAnexo: ref(false),
             urlBase: 'https://link.gruporialma.com.br/storage',
             pdf: ref(null),
-            pdfsrc: ref(null)
+            pdfsrc: ref(null),
+            heightVH: (window.innerHeight * 0.8)
         };
+    },
+
+    computed: {
+        pdfContainerStyle() {
+            return {
+                width: '100%',
+                height: `${this.heightVH}px`,
+                border: 'none'
+            };
+        }
     },
 
     mounted: function () {
@@ -247,7 +258,7 @@ export default {
 
         <!-- Visualizar -->
         <Dialog header="Documento" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
-            <div ref="pdfContainer" style="width: 100%; height: 500px; border: none"></div>
+            <div ref="pdfContainer" :style="pdfContainerStyle"></div>
         </Dialog>
 
         <!-- Chat -->
@@ -257,7 +268,9 @@ export default {
                     <div class="card timeline-container">
                         <Timeline :value="conversa" align="alternate" class="customized-timeline">
                             <template #marker="slotProps">
-                                <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
+                                <span
+                                    class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2"
+                                    :style="{ backgroundColor: slotProps.item.color }">
                                     <i :class="slotProps.item.icon"></i>
                                 </span>
                             </template>
@@ -281,7 +294,8 @@ export default {
                     <hr />
                     <InputText class="col-12" type="text" v-model="novaMensagem" placeholder="Digite a mensagem..." />
                     <Button @click.prevent="enviarMensagem()" label="Enviar" class="mr-2 mt-3 p-button-success col-12" />
-                    <Button @click.prevent="this.displayAnexo = true" label="Alterar Pedido" class="mr-2 mt-3 p-button-secondary col-12" />
+                    <Button @click.prevent="this.displayAnexo = true" label="Alterar Pedido"
+                        class="mr-2 mt-3 p-button-secondary col-12" />
                 </div>
             </div>
         </Dialog>
@@ -289,10 +303,12 @@ export default {
         <!-- Anexo -->
         <Dialog header="Insira novo Anexo" v-model:visible="displayAnexo" :style="{ width: '30%' }" :modal="true">
             <div class="grid mt-5 text-center flex justify-content-center align-items-center">
-                <FileUpload uploadLabel="Salvar" cancelLabel="Limpar PDF" chooseLabel="Selecione" @change="uploadPdf" type="file" ref="pdf" name="demo[]" accept=".pdf,.docx" :maxFileSize="1000000"></FileUpload>
+                <FileUpload uploadLabel="Salvar" cancelLabel="Limpar PDF" chooseLabel="Selecione" @change="uploadPdf"
+                    type="file" ref="pdf" name="demo[]" accept=".pdf,.docx" :maxFileSize="1000000"></FileUpload>
             </div>
             <div>
-                <Button @click.prevent="this.displayAnexo = false" label="Salvar" class="mr-2 mt-3 p-button-success col-12" />
+                <Button @click.prevent="this.displayAnexo = false" label="Salvar"
+                    class="mr-2 mt-3 p-button-success col-12" />
             </div>
         </Dialog>
 
@@ -303,23 +319,28 @@ export default {
             <div class="card p-fluid">
                 <div class="field">
                     <label for="empresa">Empresa:</label>
-                    <Dropdown v-model="form.empresa" :options="empresas" showClear optionLabel="nome_empresa" placeholder="Selecione..." class="w-full" />
+                    <Dropdown v-model="form.empresa" :options="empresas" showClear optionLabel="nome_empresa"
+                        placeholder="Selecione..." class="w-full" />
                 </div>
                 <div class="field">
                     <label for="empresa">Status:</label>
-                    <Dropdown v-model="form.status" :options="status" showClear optionLabel="status" placeholder="Selecione..." class="w-full" />
+                    <Dropdown v-model="form.status" :options="status" showClear optionLabel="status"
+                        placeholder="Selecione..." class="w-full" />
                 </div>
                 <div class="field">
                     <label for="cpf">Descrição: </label>
-                    <InputText v-tooltip.left="'Digite a descrição do pedido'" v-model="form.descricao" id="cnpj" placeholder="Digite..." />
+                    <InputText v-tooltip.left="'Digite a descrição do pedido'" v-model="form.descricao" id="cnpj"
+                        placeholder="Digite..." />
                 </div>
                 <div class="field">
                     <label for="cpf">Valor: </label>
-                    <InputNumber v-tooltip.left="'Digite o valor do pedido'" v-model="form.valor" inputId="minmaxfraction" :minFractionDigits="2" :maxFractionDigits="2" placeholder="Digite..." />
+                    <InputNumber v-tooltip.left="'Digite o valor do pedido'" v-model="form.valor" inputId="minmaxfraction"
+                        :minFractionDigits="2" :maxFractionDigits="2" placeholder="Digite..." />
                 </div>
                 <div class="field">
                     <label for="cpf">Dt. In clusão:</label>
-                    <Calendar dateFormat="dd/mm/yy" v-tooltip.left="'Selecione a data de inclusão'" v-model="form.dt_inclusao" showIcon :showOnFocus="false" class="" />
+                    <Calendar dateFormat="dd/mm/yy" v-tooltip.left="'Selecione a data de inclusão'"
+                        v-model="form.dt_inclusao" showIcon :showOnFocus="false" class="" />
                 </div>
                 <hr />
                 <div class="field">
@@ -335,27 +356,22 @@ export default {
                 <Toast />
             </div>
             <div class="card">
-                <DataTable
-                    dataKey="id"
-                    :value="pedidos"
-                    :paginator="true"
-                    :rows="10"
+                <DataTable dataKey="id" :value="pedidos" :paginator="true" :rows="10"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25, 50, 100]"
                     currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
-                    responsiveLayout="scroll"
-                    filterDisplay="menu"
-                    stripedRows
-                >
+                    responsiveLayout="scroll" filterDisplay="menu" stripedRows>
                     <template #header>
                         <div class="flex justify-content-between">
                             <h5 for="empresa">Pedidos Reprovados:</h5>
                             <div class="grid">
                                 <div class="col-4 md:col-4 mr-2">
-                                    <Button @click.prevent="filtrar()" icon="pi pi-search" label="Filtrar" class="p-button-secondary" style="margin-right: 0.25em" />
+                                    <Button @click.prevent="filtrar()" icon="pi pi-search" label="Filtrar"
+                                        class="p-button-secondary" style="margin-right: 0.25em" />
                                 </div>
                                 <div class="col-6 md:col-4">
-                                    <Button @click.prevent="limparFiltro()" icon="pi pi-trash" label="Limpar" class="mr-2 mb-2 p-button-danger" />
+                                    <Button @click.prevent="limparFiltro()" icon="pi pi-trash" label="Limpar"
+                                        class="mr-2 mb-2 p-button-danger" />
                                 </div>
                             </div>
                         </div>
@@ -411,10 +427,12 @@ export default {
                             <span class="p-column-title"></span>
                             <div class="grid">
                                 <div class="col-4 md:col-4 mr-4">
-                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
+                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye"
+                                        class="p-button-info" />
                                 </div>
                                 <div class="col-4 md:col-4">
-                                    <Button @click="chat(slotProps.data.id)" icon="pi pi-comments" class="p-button-secondary" />
+                                    <Button @click="chat(slotProps.data.id)" icon="pi pi-comments"
+                                        class="p-button-secondary" />
                                 </div>
                             </div>
                         </template>
@@ -464,7 +482,9 @@ export default {
 }
 
 .timeline-container {
-    max-height: 300px; /* Defina a altura máxima desejada */
-    overflow-y: auto; /* Adiciona uma barra de rolagem vertical quando o conteúdo excede a altura máxima */
+    max-height: 300px;
+    /* Defina a altura máxima desejada */
+    overflow-y: auto;
+    /* Adiciona uma barra de rolagem vertical quando o conteúdo excede a altura máxima */
 }
 </style>
