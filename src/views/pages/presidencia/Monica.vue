@@ -61,7 +61,7 @@ export default {
         adobeApiReady: {
             handler() {
                 this.$nextTick(() => {
-                    this.renderPdf(`https://documentcloud.adobe.com/view-sdk-demo/PDFs/Bodea Brochure.pdf`, `teste.pdf`);
+                    this.renderPdfAcima(`https://documentcloud.adobe.com/view-sdk-demo/PDFs/Bodea Brochure.pdf`, `teste.pdf`);
                 });
             }
         },
@@ -479,7 +479,7 @@ export default {
         <Dialog :header="this.titleDocumento" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
             <div class="grid flex justify-content-center">
                 <div class="col-12 md:col-12">
-                    <div ref="pdfContainer" style="width: 100%; height: 500px; border: none"></div>
+                    <div ref="pdfContainerAcima" style="width: 100%; height: 500px; border: none"></div>
                 </div>
                 <div class="col-4 md:col-3">
                     <Button icon="pi pi-times" label="Pedido Anterior" class="p-button-secondary" style="width: 100%; height: 50px" @click.prevent="voltarAcima()" :disabled="this.currentIndex == 0" />
