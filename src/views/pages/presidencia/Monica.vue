@@ -36,9 +36,21 @@ export default {
             titleDocumento: '',
             titleChat: '',
             salvarMensagemPedidoStatus: ref(null),
-            pedidoSelecionado: {}
+            pedidoSelecionado: {},
+            heightVH: (window.innerHeight * 0.71)
         };
     },
+
+    computed: {
+        pdfContainerStyle() {
+            return {
+                width: '100%',
+                height: `${this.heightVH}px`,
+                border: 'none'
+            };
+        }
+    },
+
 
     mounted: function () {
         if (window.AdobeDC) {
@@ -187,8 +199,11 @@ export default {
                         id: fileName
                     }
                 },
-                { embedMode: 'SIZED_CONTAINER' }
+                previewConfig
             );
+
+            this.zoomOut();
+            this.zoomOut();
         },
 
         // Metódo responsável por aprovar
@@ -476,10 +491,10 @@ export default {
         <Toast />
 
         <!-- Visualizar - Abaixo de 1000 reais -->
-        <Dialog :header="this.titleDocumento" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
+        <Dialog :header="this.titleDocumento" v-model:visible="display" :style="{ width: '90%' }" :modal="true">
             <div class="grid flex justify-content-center">
                 <div class="col-12 md:col-12">
-                    <div ref="pdfContainer" style="width: 100%; height: 500px; border: none"></div>
+                    <div ref="pdfContainerAcima" :style="pdfContainerStyle"></div>
                 </div>
                 <div class="col-4 md:col-3">
                     <Button icon="pi pi-times" label="Pedido Anterior" class="p-button-secondary" style="width: 100%; height: 50px" @click.prevent="voltarAcima()" :disabled="this.currentIndex == 0" />
