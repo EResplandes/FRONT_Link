@@ -32,6 +32,29 @@ export default class PedidoService {
             });
     }
 
+    async aprovarMonica(pedidos) {
+        const pedidosJSON = JSON.stringify(pedidos); // Convertendo pedidos para JSON
+        return fetch(`${API_URL}/app/aprovar-monica`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                pedidos: pedidos
+            })
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
     // Requisição responsável por listar todos pedidos com emival para o Gestor de Fluxo
     async pedidosEmival() {
         return await fetch(`${API_URL}/pedidos/listar-emival`, {
@@ -146,6 +169,25 @@ export default class PedidoService {
     // Requisição responsável por buscar todos pedidos de acordo com local
     async buscaPedidos(id_local) {
         return await fetch(`${API_URL}/pedidos/listar-pedidos/` + id_local, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    // Requisição responsável por buscar todos pedidos de acordo com local
+    async buscaPedidosPorComprador(id_usuario) {
+        return await fetch(`${API_URL}/pedidos/listar-pedidos-por-comprador/` + id_usuario, {
             method: 'GET',
             headers: {
                 Accept: 'application/json',

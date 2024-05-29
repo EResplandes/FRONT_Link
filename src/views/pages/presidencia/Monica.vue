@@ -25,15 +25,12 @@ export default {
             pedidosReprovados: [],
             proximoPedido: ref(null),
             preloading: ref(true),
-            ocultaFiltros: ref(false),
-            acimaMil: ref(false),
             display: ref(false),
             displayAcima: ref(false),
             pedidoAcima: ref({}),
             quantidadesPedidos: ref({}),
             pdfsrc: ref(null),
             urlBase: 'https://link.gruporialma.com.br/storage', // Ambiente de Produção
-            // urlBase: 'https://www.gruporialma.com.br/wp-content/uploads', // Ambiente de Desenvolvimento
             adobeApiReady: false,
             previewFilePromise: null,
             titleDocumento: '',
@@ -193,28 +190,10 @@ export default {
                 { embedMode: 'SIZED_CONTAINER' }
             );
         },
-        buscaQuantidades() {
-            this.pedidoService.buscaQuantidades().then((data) => {
-                console.log(data);
-                this.quantidadesPedidos = data.quantidades;
-                this.preloading = false;
-            });
-        },
-
-        // Metódo responsável por listagem de pedidos
-        listarEmivalMenorQuinhentos() {
-            this.preloading = true;
-            this.acimaMil = false;
-            this.pedidoService.listarEmivalMenorQuinhentos().then((data) => {
-                this.pedidos = data.pedidos;
-                this.ocultaFiltros = true;
-                this.preloading = false;
-            });
-        },
 
         // Metódo responsável por aprovar
         aprovar() {
-            this.pedidoService.aprovarEmival(this.pedidosAprovados).then((data) => {
+            this.pedidoService.aprovarMonica(this.pedidosAprovados).then((data) => {
                 this.display = false;
                 this.showSuccess('Pedidos aprovados com sucesso!');
                 this.pedidosAprovados = [];
@@ -229,58 +208,6 @@ export default {
 
                 console.log(data);
             });
-        },
-
-        // Metódo responsável por listagem de pedidos
-        listarEmivalMenorMil() {
-            this.preloading = true;
-            this.acimaMil = false;
-            this.pedidoService.listarEmivalMenorMil().then((data) => {
-                this.pedidos = data.pedidos;
-                this.preloading = false;
-                this.ocultaFiltros = true;
-            });
-        },
-
-        // Metódo responsável por listagem de pedidos
-        listarEmivalMaiorMil() {
-            this.acimaMil = true;
-            this.preloading = true;
-            this.pedidoService.listarEmivalMaiorMil().then((data) => {
-                this.pedidos = data.pedidos;
-                this.preloading = false;
-                this.ocultaFiltros = true;
-            });
-        },
-
-        // Metódo responsávle por buscar proximo pedido
-        proximoItem() {
-            // Verifica se currentIndex é igual ao comprimento dos pedidos
-            if (this.currentIndex === this.pedidos.length) {
-                this.showInfo('Você chegou ao último para aprovação!');
-                return;
-            }
-
-            // Incrementa currentIndex e verifica se está dentro dos limites do array
-            if (this.currentIndex < this.pedidos.length) {
-                this.pedidosAprovados.push({ id: this.pedidos[this.currentIndex].id, status: 4 });
-                console.log(this.pedidosAprovados);
-
-                this.currentIndex++;
-
-                if (this.currentIndex < this.pedidos.length) {
-                    this.visualizar(this.pedidos[this.currentIndex].id, this.pedidos[this.currentIndex]);
-                    localStorage.setItem('ultimoPedidoAprovado', this.currentIndex);
-                }
-
-                if (this.currentIndex == this.pedidos.length) {
-                    this.visualizar(1, this.pedidos[this.currentIndex - 1]);
-                    localStorage.setItem('ultimoPedidoAprovado', this.currentIndex);
-                }
-            } else {
-                // Se currentIndex for igual ao comprimento dos pedidos, não há próximo pedido
-                this.showInfo('Você chegou ao último para aprovação!');
-            }
         },
 
         // Metódo responsávle por buscar proximo pedidoAcima
@@ -315,30 +242,10 @@ export default {
             }
         },
 
-        async reprovarItem() {
-            this.chat(this.pedidoSelecionado.id);
-            this.titleChat = 'Reprovar Pedido';
-            this.salvarMensagemPedidoStatus = 0;
-            localStorage.setItem('ultimoPedidoAprovado', this.currentIndex); // Alterado para 'ultimoPedidoAprovado'
-            if (this.currentIndex == this.pedidos.length) {
-                this.showInfo('Você chegou ao último para aprovação!');
-            }
-        },
-
         async reprovarItemAcima() {
             this.chat(this.pedidoSelecionado.id);
             this.titleChat = 'Reprovar Pedido';
             this.salvarMensagemPedidoStatus = 1;
-            localStorage.setItem('ultimoPedidoAprovado', this.currentIndex); // Alterado para 'ultimoPedidoAprovado'
-            if (this.currentIndex == this.pedidos.length) {
-                this.showInfo('Você chegou ao último para aprovação!');
-            }
-        },
-
-        async ressalvaItem() {
-            this.chat(this.pedidoSelecionado.id);
-            this.salvarMensagemPedidoStatus = 2;
-            this.titleChat = 'Aprovar com Ressalva';
             localStorage.setItem('ultimoPedidoAprovado', this.currentIndex); // Alterado para 'ultimoPedidoAprovado'
             if (this.currentIndex == this.pedidos.length) {
                 this.showInfo('Você chegou ao último para aprovação!');
@@ -361,7 +268,7 @@ export default {
 
             switch (status) {
                 case 0: // REPROVAR PEDIDO ABAIXO DE MIL
-                    this.pedidoService.aprovarEmival([{ id: this.pedidos[this.currentIndex].id, status: 3, mensagem: this.mensagemEmival }]).then((data) => {
+                    this.pedidoService.aprovarMonica([{ id: this.pedidos[this.currentIndex].id, status: 3, mensagem: this.mensagemEmival }]).then((data) => {
                         this.showSuccess('Pedidos Reprovado com Sucesso!');
                         this.pedidosReprovados = [];
 
@@ -390,7 +297,7 @@ export default {
 
                     break;
                 case 1: // REPROVAR PEDIDO ACIMA DE MIL
-                    this.pedidoService.aprovarEmival([{ id: this.pedidos[this.currentIndex].id, status: 3, mensagem: this.mensagemEmival }]).then((data) => {
+                    this.pedidoService.aprovarMonica([{ id: this.pedidos[this.currentIndex].id, status: 3, mensagem: this.mensagemEmival }]).then((data) => {
                         this.showSuccess('Pedidos Reprovado com Sucesso!');
                         this.pedidosReprovados = [];
                         this.pedidos.splice(this.currentIndex, 1);
@@ -412,7 +319,7 @@ export default {
 
                     break;
                 case 2:
-                    this.pedidoService.aprovarEmival([{ id: this.pedidos[this.currentIndex].id, status: 5, mensagem: this.mensagemEmival }]).then((data) => {
+                    this.pedidoService.aprovarMonica([{ id: this.pedidos[this.currentIndex].id, status: 5, mensagem: this.mensagemEmival }]).then((data) => {
                         this.showSuccess('Pedidos Aprovado com Ressalva com Sucesso!');
                         this.pedidosReprovados = [];
 
@@ -440,7 +347,7 @@ export default {
                     });
                     break;
                 case 3:
-                    this.pedidoService.aprovarEmival([{ id: this.pedidos[this.currentIndex].id, status: 5, mensagem: this.mensagemEmival }]).then((data) => {
+                    this.pedidoService.aprovarMonica([{ id: this.pedidos[this.currentIndex].id, status: 5, mensagem: this.mensagemEmival }]).then((data) => {
                         this.showSuccess('Pedidos Aprovado com Ressalva com Sucesso!');
                         this.pedidosReprovados = [];
                         this.pedidos.splice(this.currentIndex, 1);
@@ -465,75 +372,8 @@ export default {
             }
         },
 
-        // Abaixo de 1000
-        salvaMensagem() {
-            // this.chat(this.proximoPedido);
-
-            this.proximoPedido = this.pedidos[this.currentIndex];
-            // this.pedidosReprovados.push({ id: this.proximoPedido.id, status: 3, mensagem: this.mensagemEmival });
-            this.pedidoService.aprovarEmival([{ id: this.proximoPedido.id, status: 3, mensagem: this.mensagemEmival }]).then((data) => {
-                this.showSuccess('Pedidos Reprovado com Sucesso!');
-                this.pedidosReprovados = [];
-            });
-
-            this.pedidos.splice(this.currentIndex, 1);
-
-            if (this.currentIndex < this.pedidos.length) {
-                this.visualizar(1, this.pedidos[this.currentIndex]);
-            } else if (this.pedidos.length > 0) {
-                this.visualizar(1, this.pedidos[this.currentIndex - 1]);
-            } else {
-                this.display = false;
-                this.displayChat = false;
-
-                if (this.pedidos[0].valor <= 500) {
-                    this.listarEmivalMenorQuinhentos();
-                } else if (this.pedidos[0].valor > 500 && this.pedidos[0].valor < 1000) {
-                    this.listarEmivalMenorMil();
-                } else {
-                    this.listarEmivalMaiorMil();
-                }
-            }
-            // Agora você pode chamar a função visualizar para exibir o próximo PDF
-            this.displayChat = false;
-            this.mensagemEmival = null;
-        },
-
         salvaMensagemAcima() {
             // this.chat(this.proximoPedido);
-        },
-
-        // async chat(id) {
-        //     return new Promise((resolve, reject) => {
-        //         this.chatService.buscaConversa(id).then((data) => {
-        //             if (data.resposta == 'Chat listado com sucesso!') {
-        //                 this.conversa = data.conversa;
-        //                 resolve();
-        //             } else {
-        //                 this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
-        //                 reject(new Error('Erro ao buscar conversa'));
-        //             }
-        //         });
-        //     });
-        // },
-
-        // Metódo responsável por voltar com pedidos abaixo de 1000
-        voltar() {
-            if (this.currentIndex == 0) {
-                return;
-            }
-
-            // Remover o último item do array pedidosAprovados
-            this.pedidosAprovados.pop();
-
-            // Recuperar o pedido anterior
-            const pedidoAnterior = this.pedidos[--this.currentIndex];
-
-            // Realizar as operações necessárias com o pedido anterior, como visualização, etc.
-            this.visualizar(pedidoAnterior.id, this.pedidos[this.currentIndex]);
-
-            // Atualizar o localStorage com o novo índice
-            localStorage.setItem('currentIndex', this.currentIndex);
         },
 
         // Metódo responsável por voltar com pedidos acima de 1000
@@ -552,30 +392,12 @@ export default {
             localStorage.setItem('currentIndex', this.currentIndex);
         },
 
-        // Metódo responsável por visualizar pdf
-        visualizar(id, data) {
-            if (!this.display) {
-                this.pedidosAprovados = [];
-            }
-            this.titleDocumento = `Pedidos Aprovados ${this.pedidosAprovados.length} de ${this.pedidos.length} Pedidos`;
-
-            this.display = true;
-            const dataAgora = new Date();
-            // this.pdfsrc = `${this.urlBase}/${data.anexo}?t=${dataAgora.getSeconds()}`;
-
-            this.pedidoSelecionado = data;
-
-            this.$nextTick(() => {
-                this.renderPdf(`${this.urlBase}/${data.anexo}?t=${dataAgora.getSeconds()}`, `${dataAgora.getSeconds()}.pdf`);
-            });
-        },
-
         visualizarAcima(id, data) {
             this.pedidoSelecionado = data;
             this.titleDocumento = `Visualizando Pedido ${this.currentIndex + 1} de ${this.pedidos.length} Pedidos`;
             console.log(data.anexo);
             this.pedidoAcima = data;
-            this.displayAcima = true;
+            this.display = true;
             const dataAgora = new Date();
             // this.pdfsrc = ;
             this.$nextTick(() => {
@@ -654,21 +476,19 @@ export default {
         <Toast />
 
         <!-- Visualizar - Abaixo de 1000 reais -->
-        <Dialog :header="this.titleDocumento" v-model:visible="display" :style="{ width: '98%' }" :modal="true">
+        <Dialog :header="this.titleDocumento" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
             <div class="grid flex justify-content-center">
                 <div class="col-12 md:col-12">
-                    <!-- <pdf :src="this.urlBase"></pdf> -->
-                    <div ref="pdfContainer" style="width: 100%; height: 700px; border: none"></div>
-                    <!-- <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe> -->
+                    <div ref="pdfContainer" style="width: 100%; height: 500px; border: none"></div>
                 </div>
                 <div class="col-4 md:col-3">
-                    <Button icon="pi pi-times" label="Pedido Anterior" class="p-button-secondary" style="width: 100%; height: 50px" @click.prevent="voltar()" :disabled="this.currentIndex == 0" />
+                    <Button icon="pi pi-times" label="Pedido Anterior" class="p-button-secondary" style="width: 100%; height: 50px" @click.prevent="voltarAcima()" :disabled="this.currentIndex == 0" />
                 </div>
                 <div class="col-4 md:col-3">
-                    <Button icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%; height: 50px" @click.prevent="reprovarItem()" />
+                    <Button icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%; height: 50px" @click.prevent="reprovarItemAcima()" />
                 </div>
                 <div class="col-4 md:col-3">
-                    <Button icon="pi pi-times" label="Aprovar c/ Ressalva " class="p-button-warning" style="width: 100%; height: 50px" @click.prevent="ressalvaItem()" />
+                    <Button icon="pi pi-times" label="Aprovar c/ Ressalva " class="p-button-warning" style="width: 100%; height: 50px" @click.prevent="ressalvaItemAcima()" />
                 </div>
                 <div class="col-4 md:col-3">
                     <Button
@@ -676,7 +496,7 @@ export default {
                         :label="this.currentIndex >= this.pedidos.length - 1 ? 'Aprovar Último Pedido' : 'Próximos Pedidos'"
                         class="p-button-info"
                         style="width: 100%; height: 50px"
-                        @click.prevent="proximoItem()"
+                        @click.prevent="proximoItemAcima()"
                         :disabled="this.currentIndex == this.pedidos.length"
                     />
                 </div>
@@ -838,7 +658,7 @@ export default {
                             <span class="p-column-title"></span>
                             <div class="grid">
                                 <div class="col-4 md:col-4 mr-4">
-                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
+                                    <Button @click.prevent="visualizarAcima(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
                                 </div>
                             </div>
                         </template>
