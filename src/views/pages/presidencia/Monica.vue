@@ -203,8 +203,6 @@ export default {
             );
 
             this.zoomIn();
-            this.zoomIn();
-            this.zoomIn();
         },
 
         // Metódo responsável por aprovar
