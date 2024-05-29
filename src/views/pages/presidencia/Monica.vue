@@ -199,8 +199,12 @@ export default {
                         id: fileName
                     }
                 },
-                { embedMode: 'SIZED_CONTAINER' }
+                previewConfig
             );
+
+            this.zoomIn();
+            this.zoomIn();
+            this.zoomIn();
         },
 
         // Metódo responsável por aprovar
@@ -488,7 +492,7 @@ export default {
         <Toast />
 
         <!-- Visualizar - Abaixo de 1000 reais -->
-        <Dialog :header="this.titleDocumento" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
+        <Dialog :header="this.titleDocumento" v-model:visible="display" :style="{ width: '90%' }" :modal="true">
             <div class="grid flex justify-content-center">
                 <div class="col-12 md:col-12">
                     <div ref="pdfContainerAcima" :style="pdfContainerStyle"></div>
