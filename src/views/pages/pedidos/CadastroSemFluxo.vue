@@ -67,7 +67,7 @@ export default {
         // Metódo responsável por cadastrar pedido
         cadastrarPedido() {
             // Array com os nomes dos campos obrigatórios
-            const camposObrigatorios = ['valor', 'dt_vencimento', 'link', 'empresa', 'descricao', 'local', 'protheus'];
+            const camposObrigatorios = ['valor', 'dt_vencimento', 'link', 'empresa', 'descricao', 'local'];
 
             // Variável para verificar se todos os campos obrigatórios estão preenchidos
             let todosCamposPreenchidos = true;
