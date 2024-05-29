@@ -44,7 +44,6 @@ export default {
         this.pedidoService.buscaAnalisando().then((data) => {
             this.pedidos = data.pedidos;
             this.preloading = false;
-            console.log(data);
         });
 
         // Metódo responsável por buscar todas empresas
@@ -158,28 +157,6 @@ export default {
 
         showError(mensagem) {
             this.toast.add({ severity: 'error', summary: 'Ocorreu um erro!', detail: mensagem, life: 3000 });
-        },
-
-        // Metódo responsável por buscar pedidos com filtros
-        buscaFiltros() {
-            this.preloading = true;
-            this.pedidoService.filtroPedidos(this.form).then((data) => {
-                if (data.resposta == 'Pedidos para o Dr. Emival Caiado!') {
-                    this.pedidos = data.pedidos;
-                    this.form = {};
-                    this.showInfo('Filtros aplicados com sucesso!');
-                    this.preloading = false;
-                } else {
-                    this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
-                }
-            });
-        },
-
-        // Metódo responsável por limpagem de filtros
-        limparFiltro() {
-            this.buscaPedidos();
-            this.showInfo('Filtro removidos com sucesso!');
-            this.form = {};
         }
     }
 };
@@ -214,7 +191,7 @@ export default {
                                         {{ slotProps.item.id_usuario.name }}
                                     </template>
                                     <template #subtitle>
-                                        {{ this.formatarData(slotProps.item.data_mensagem) }}
+                                        {{ slotProps.item.data_mensagem }}
                                     </template>
                                     <template #content>
                                         <h6>
@@ -290,7 +267,7 @@ export default {
 
                     <Column field="" header="" class="w-1">
                         <template #body="slotProps">
-                            <span class="p-column-title">Dt. Inclusão</span>
+                            <span class="p-column-title">Categoria</span>
                             <Tag v-if="slotProps.data.urgente == 1" class="mr-2" severity="danger" value="Urgente"></Tag>
                             <Tag v-else class="mr-2" severity="info" value="Normal"></Tag>
                         </template>
@@ -299,18 +276,18 @@ export default {
                     <Column field="Dt. Inclusão" header="Dt. Inclusão" :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">Dt. Inclusão</span>
-                            {{ formatarData(slotProps.data.dt_inclusao) }}
+                            {{ this.formatarData(slotProps.data.dt_inclusao) }}
                         </template>
                     </Column>
 
                     <Column field="Empresa" header="Empresa" :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">Empresa</span>
-                            {{ slotProps.data.empresa.nome_empresa }}
+                            {{ slotProps.data.empresa }}
                         </template>
                     </Column>
 
-                    <Column field="Descrição" header="Descrição" :sortable="true" class="w-4">
+                    <Column field="Descrição" header="Descrição" :sortable="true" class="w-3">
                         <template #body="slotProps">
                             <span class="p-column-title">Descrição</span>
                             {{ slotProps.data.descricao }}
@@ -319,12 +296,26 @@ export default {
 
                     <Column field="Valor" header="Valor" :sortable="true" class="w-1">
                         <template #body="slotProps">
-                            <span class="p-column-title">CNPJ</span>
+                            <span class="p-column-title">Valor</span>
                             {{ slotProps.data.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
                         </template>
                     </Column>
 
-                    <Column field="Tipo Pedido" header="Tipo Pedido" :sortable="true" class="w-2">
+                    <Column field="Local" header="Local" :sortable="true" class="w-1">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Local</span>
+                            {{ slotProps.data.local }}
+                        </template>
+                    </Column>
+
+                    <Column field="Link" header="Link" :sortable="true" class="w-1">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Link</span>
+                            {{ slotProps.data.link }}
+                        </template>
+                    </Column>
+
+                    <Column field="Tipo Pedido" header="Tipo Pedido" :sortable="true" class="w-1">
                         <template #body="slotProps">
                             <span class="p-column-title">Tipo Pedido</span>
                             {{ slotProps.data.tipo_pedido }}

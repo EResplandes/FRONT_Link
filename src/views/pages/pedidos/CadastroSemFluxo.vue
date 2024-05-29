@@ -94,6 +94,7 @@ export default {
                         this.preloading = false;
                         this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
                     }
+                    window.location.reload();
                 });
             }
         },

@@ -105,6 +105,8 @@ export default {
                         this.showSuccess('Pedido cadastrado com sucesso!');
                         this.form = {};
                     }
+
+                    window.location.reload();
                 });
             }
         },
@@ -165,7 +167,7 @@ export default {
                                 <label for="firstname2">PDF<span class="obrigatorio">*</span></label>
                                 <FileUpload chooseLabel="Selecionar Arquivo" @change="uploadPdf" mode="basic" type="file" ref="pdf" name="demo[]" accept=".pdf,.docx" :maxFileSize="999999999"></FileUpload>
                             </div>
-                            
+
                             <div class="field col-12 md:col-4">
                                 <label for="Link">Link <span class="obrigatorio">*</span></label>
                                 <Dropdown id="Link" v-model="form.link" :options="links" optionLabel="link" placeholder="Selecione..."></Dropdown>
