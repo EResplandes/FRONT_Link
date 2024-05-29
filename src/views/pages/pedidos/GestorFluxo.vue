@@ -43,6 +43,8 @@ export default {
         // Metódo responsável por buscar todas os pedidos com status 6
         this.pedidoService.buscaAnalisando().then((data) => {
             this.pedidos = data.pedidos;
+            console.log(data);
+
             this.preloading = false;
         });
 
@@ -126,9 +128,9 @@ export default {
         },
 
         // Metódo responsável por visualizar pdf
-        visualizar(id, data) {
+        visualizar(id, anexo) {
             this.display = true;
-            this.pdf = data.anexo;
+            this.pdf = anexo;
             this.pdfsrc = `${this.urlBase}/${this.pdf}`;
         },
 
@@ -327,7 +329,7 @@ export default {
                             <span class="p-column-title"></span>
                             <div class="grid">
                                 <div class="col-4 md:col-4 mr-3">
-                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
+                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data.anexo)" icon="pi pi-eye" class="p-button-info" />
                                 </div>
                                 <div class="col-4 md:col-4 ml-1">
                                     <Button @click.prevent="fluxo(slotProps.data.id, slotProps.data)" icon="pi pi-sitemap" class="p-button-secon" />
