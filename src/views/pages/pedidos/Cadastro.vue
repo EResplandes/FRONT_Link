@@ -156,7 +156,7 @@ export default {
                                 <InputNumber v-tooltip.top="'Digite o valor do pedido'" v-model="form.valor" inputId="minmaxfraction" :minFractionDigits="2" :maxFractionDigits="2" placeholder="R$..." />
                             </div>
                             <div class="field col-12 md:col-2">
-                                <label for="firstname2">Nº Pedido no Protheus <span class="obrigatorio">*</span></label>
+                                <label for="firstname2">Nº Pedido no Protheus</label>
                                 <InputText type="number" v-tooltip.top="'Digite o numero do pedido'" v-model="form.protheus" />
                             </div>
 
