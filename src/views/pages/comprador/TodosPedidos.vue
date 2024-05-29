@@ -76,6 +76,13 @@ export default {
                 this.empresas = data.empresas.map((empresa) => empresa.nome_empresa);
             }
         });
+
+        // Metódo responsável por buscar todos status
+        this.statusService.buscaStatus().then((data) => {
+            if (data.resposta == 'Status listados com sucesso!') {
+                this.status = data.itens;
+            }
+        });
     },
 
     methods: {
