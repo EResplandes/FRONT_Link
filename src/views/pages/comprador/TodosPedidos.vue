@@ -342,7 +342,6 @@ export default {
                 <div class="field">
                     <label for="dt_vencimento">Dt. Vencimento:</label>
                     <Calendar dateFormat="dd/mm/yy" v-tooltip.left="'Selecione a data vencimento do pedido'" v-model="form.dt_vencimento" showIcon :showOnFocus="false" class="" />
-                    {{ this.form.dt_vencimento }}
                 </div>
                 <div class="field">
                     <label for="descricao">Descrição: </label>
