@@ -39,12 +39,8 @@ const model = ref([
             { label: 'Para Aprovação de Fluxo', icon: 'pi pi-fw pi-check-circle', to: '/aprovacao-gerentes', requiredRole: ['Diretor', 'Gerente', 'Administrador'] },
             { label: 'Pedidos Reprovados', icon: 'pi pi-fw pi-book', to: '/pedidos-reprovados', requiredRole: ['Gestor de Fluxo', 'Administrador', 'Gerente', 'Comprador Externo', 'Diretor'] },
             { label: 'Pedidos Reprovados por Gestor | Diretor', icon: 'pi pi-fw pi-book', to: '/reprovados-gestor', requiredRole: ['Comprador', 'Administrador'] },
-<<<<<<< HEAD
             { label: 'Notas Reprovados pelo Fiscal', icon: 'pi pi-fw pi-book', to: '/pedidos-reprovados-fiscal', requiredRole: ['Comprador', 'Administrador', 'Gestor de Fluxo'] },
             { label: 'Pedidos Reprovados por Soleni', icon: 'pi pi-fw pi-book', to: '/reprovados-soleni', requiredRole: ['Comprador', 'Administrador', 'Gerente'] }
-=======
-            { label: 'Pedidos Reprovados por Soleni', icon: 'pi pi-fw pi-book', to: '/reprovados-soleni', requiredRole: ['Comprador', 'Administrador', 'Gerente', 'Comprador Externo'] }
->>>>>>> 8a49d85b86e2add11121bd06a58100dbf96d4be0
         ]
     },
     {
