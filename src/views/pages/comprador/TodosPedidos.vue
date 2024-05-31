@@ -292,7 +292,7 @@ export default {
                 case 'Enviado para Emival':
                     return 'info';
 
-                case 'negotiation':
+                case 'Enviado para Fiscal':
                     return 'warning';
 
                 case 'renewal':
@@ -480,7 +480,10 @@ export default {
                                 <div class="col-3 md:col-3 mr-1">
                                     <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
                                 </div>
-                                <div v-if="slotProps.data.status.status != 'Aprovado' && slotProps.data.status.status != 'Aprovado com Ressalva' && slotProps.data.status.status != 'Excluído'" class="col-3 md:col-3 ml-3">
+                                <div
+                                    v-if="slotProps.data.status.status != 'Aprovado' && slotProps.data.status.status != 'Aprovado com Ressalva' && slotProps.data.status.status != 'Excluído' && slotProps.data.status.status != 'Enviado para Fiscal'"
+                                    class="col-3 md:col-3 ml-3"
+                                >
                                     <Button @click.prevent="alterar(slotProps.data.id)" icon="pi pi-pencil" class="p-button-warning" />
                                 </div>
                                 <div v-if="slotProps.data.status.status == 'Reprovado' || slotProps.data.status.status == 'Aprovado com Ressalva'" class="col-3 md:col-3 ml-3">
@@ -491,13 +494,17 @@ export default {
                                         slotProps.data.status.status == 'Aprovado' ||
                                         slotProps.data.status.status == 'Aprovado com Ressalva' ||
                                         slotProps.data.status.status == 'Resposta do Pedido de Compra Aprovado com Ressalva' ||
-                                        slotProps.data.status.status == 'Retorno do Pedido de Compra Aprovado com Ressalva'
+                                        slotProps.data.status.status == 'Retorno do Pedido de Compra Aprovado com Ressalva' ||
+                                        slotProps.data.status.status == 'Enviado para Fiscal'
                                     "
                                     class="col-4 md:col-4 mr-1 ml-3"
                                 >
                                     <Button @click.prevent="buscaInformacoesPedido(slotProps.data.id)" icon="pi pi-print" class="p-button-secondary" />
                                 </div>
-                                <div v-if="slotProps.data.status.status != 'Aprovado' && slotProps.data.status.status != 'Aprovado com Ressalva' && slotProps.data.status.status != 'Excluído'" class="col-3 md:col-3">
+                                <div
+                                    v-if="slotProps.data.status.status != 'Aprovado' && slotProps.data.status.status != 'Aprovado com Ressalva' && slotProps.data.status.status != 'Excluído' && slotProps.data.status.status != 'Enviado para Fiscal'"
+                                    class="col-3 md:col-3"
+                                >
                                     <Button @click.prevent="confirmExcluir(slotProps.data.id)" icon="pi pi-trash" class="p-button-danger" />
                                 </div>
                             </div>

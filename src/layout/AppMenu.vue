@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import AppMenuItem from './AppMenuItem.vue';
 
 const userRole = localStorage.getItem('funcao');
+const nome = localStorage.getItem('nome');
 
 // Adicionando a propriedade `requiredRole` aos itens do menu
 const model = ref([
@@ -10,7 +11,7 @@ const model = ref([
         label: 'Home',
         items: [
             { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/', requiredRole: ['Administrador', 'Gestor de Fluxo', 'Diretor', 'Gerente', 'Comprador'] },
-            { label: 'Todos meus pedidos', icon: 'pi pi-fw pi-book', to: '/pedidos-todos-comprador', requiredRole: ['Administrador', 'Comprador'] }
+            { label: 'Todos meus pedidos', icon: 'pi pi-fw pi-book', to: '/pedidos-todos-comprador', requiredRole: ['Administrador', 'Comprador', 'Gerente'] }
         ]
     },
     {
@@ -24,6 +25,10 @@ const model = ref([
         ]
     },
     {
+        label: 'Módulo Fiscal',
+        items: [{ label: 'Pedidos para Escriturar', icon: 'pi pi-fw pi-book', to: '/pedidos-escriturar', requiredRole: ['Fiscal', 'Administrador'] }]
+    },
+    {
         label: 'Meus pedidos',
         items: [
             { label: 'Todos', icon: 'pi pi-fw pi-book', to: '/pedidos-todos', requiredRole: ['Administrador', 'Comprador', 'Gerente'] },
@@ -34,6 +39,7 @@ const model = ref([
             { label: 'Para Aprovação de Fluxo', icon: 'pi pi-fw pi-check-circle', to: '/aprovacao-gerentes', requiredRole: ['Diretor', 'Gerente', 'Administrador'] },
             { label: 'Pedidos Reprovados', icon: 'pi pi-fw pi-book', to: '/pedidos-reprovados', requiredRole: ['Gestor de Fluxo', 'Administrador', 'Gerente', 'Comprador Externo', 'Diretor'] },
             { label: 'Pedidos Reprovados por Gestor | Diretor', icon: 'pi pi-fw pi-book', to: '/reprovados-gestor', requiredRole: ['Comprador', 'Administrador'] },
+            { label: 'Notas Reprovados pelo Fiscal', icon: 'pi pi-fw pi-book', to: '/pedidos-reprovados-fiscal', requiredRole: ['Comprador', 'Administrador', 'Gestor de Fluxo'] },
             { label: 'Pedidos Reprovados por Soleni', icon: 'pi pi-fw pi-book', to: '/reprovados-soleni', requiredRole: ['Comprador', 'Administrador', 'Gerente'] }
         ]
     },
@@ -56,7 +62,7 @@ const model = ref([
         label: 'Presidência',
         items: [
             { label: 'Emival', icon: 'pi pi-fw pi-users', to: '/emival', requiredRole: ['Presidente', 'Administrador'] },
-            { label: 'Mônica', icon: 'pi pi-fw pi-building', to: '/monica', requiredRole: ['Presidente', 'Administrador'] }
+            { label: 'Mônica', icon: 'pi pi-fw pi-building', to: '/monica', requiredRole: ['Presidente', 'Administrador'], requiredNome: ['Mônica Caiado', 'Eduardo C. Resplandes'] }
         ]
     },
     {
@@ -79,7 +85,9 @@ const filteredMenu = computed(() => {
     return model.value
         .map((section) => {
             const filteredItems = section.items.filter((item) => {
-                return !item.requiredRole || item.requiredRole.includes(userRole);
+                const roleCheck = !item.requiredRole || item.requiredRole.includes(userRole);
+                const nomeCheck = !item.requiredNome || item.requiredNome.includes(nome);
+                return roleCheck && nomeCheck;
             });
             return { ...section, items: filteredItems };
         })

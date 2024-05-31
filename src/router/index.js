@@ -39,6 +39,16 @@ const router = createRouter({
                     component: () => import('@/views/pages/comprador/TodosPedidos.vue')
                 },
                 {
+                    path: '/pedidos-escriturar',
+                    name: 'pedidos-escriturar',
+                    component: () => import('@/views/pages/fiscal/Escriturar.vue')
+                },
+                {
+                    path: '/pedidos-reprovados-fiscal',
+                    name: 'pedidos-reprovados-fiscal',
+                    component: () => import('@/views/pages/comprador/PedidosReprovadosFiscal.vue')
+                },
+                {
                     path: '/pedidos-todos-externo',
                     name: 'pedidos-todos-externo',
                     component: () => import('@/views/pages/comprador/TodosPedidosCompradorExterno.vue')

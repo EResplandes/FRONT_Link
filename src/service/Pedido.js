@@ -628,6 +628,31 @@ export default class PedidoService {
             });
     }
 
+    // Requisição responsável por responder pedido reprovado pela Soleni
+    respondePedidoReprovadoFiscal(novoAnexo, novaMensagem, idNota) {
+        let idCriador = localStorage.getItem('usuario_id');
+        const formData = new FormData();
+        formData.append('mensagem', novaMensagem);
+        formData.append('id_usuario', idCriador);
+        formData.append('nota', novoAnexo ?? null);
+
+        return fetch(`${API_URL}/pedidos/responde-reprovado-fiscal/` + idNota, {
+            method: 'POST',
+            headers: {
+                Authorization: 'Bearer ' + token
+            },
+            body: formData
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
     formatarDataParaYMD(data) {
         if (data) {
             const dia = String(data.getDate()).padStart(2, '0');
