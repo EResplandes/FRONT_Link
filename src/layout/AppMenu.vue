@@ -11,7 +11,7 @@ const model = ref([
         label: 'Home',
         items: [
             { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/', requiredRole: ['Administrador', 'Gestor de Fluxo', 'Diretor', 'Gerente', 'Comprador'] },
-            { label: 'Todos meus pedidos', icon: 'pi pi-fw pi-book', to: '/pedidos-todos-comprador', requiredRole: ['Administrador', 'Comprador', 'Gerente'] }
+            { label: 'Todos meus pedidos', icon: 'pi pi-fw pi-book', to: '/pedidos-todos-comprador', requiredRole: ['Administrador', 'Comprador', 'Gestor de Fluxo', 'Comprador Externo', 'Gerente'] }
         ]
     },
     {
@@ -33,14 +33,18 @@ const model = ref([
         items: [
             { label: 'Todos', icon: 'pi pi-fw pi-book', to: '/pedidos-todos', requiredRole: ['Administrador', 'Comprador', 'Gerente'] },
             { label: 'Todos - Comprador Externo', icon: 'pi pi-fw pi-book', to: '/pedidos-todos-externo', requiredRole: ['Administrador', 'Comprador Externo'] },
-            { label: 'Cadastro de Pedido', icon: 'pi pi-fw pi-book', to: '/cadastro-pedido', requiredRole: ['Gerente', 'Administrador', 'Comprador'] },
+            { label: 'Cadastro de Pedido', icon: 'pi pi-fw pi-book', to: '/cadastro-pedido', requiredRole: ['Gerente', 'Administrador', 'Comprador', 'Gestor de Fluxo'] },
             { label: 'Pedidos Aprovados', icon: 'pi pi-fw pi-check-circle', to: '/pedidos-aprovados', requiredRole: ['Gerente', 'Administrador', 'Comprador', 'Comprador Externo'] },
             { label: 'Pedidos Aprovados com Ressalva', icon: 'pi pi-fw pi-check-circle', to: '/pedidos-ressalva', requiredRole: ['Gerente', 'Administrador', 'Comprador Externo', 'Diretor'] },
             { label: 'Para Aprovação de Fluxo', icon: 'pi pi-fw pi-check-circle', to: '/aprovacao-gerentes', requiredRole: ['Diretor', 'Gerente', 'Administrador'] },
             { label: 'Pedidos Reprovados', icon: 'pi pi-fw pi-book', to: '/pedidos-reprovados', requiredRole: ['Gestor de Fluxo', 'Administrador', 'Gerente', 'Comprador Externo', 'Diretor'] },
             { label: 'Pedidos Reprovados por Gestor | Diretor', icon: 'pi pi-fw pi-book', to: '/reprovados-gestor', requiredRole: ['Comprador', 'Administrador'] },
+<<<<<<< HEAD
             { label: 'Notas Reprovados pelo Fiscal', icon: 'pi pi-fw pi-book', to: '/pedidos-reprovados-fiscal', requiredRole: ['Comprador', 'Administrador', 'Gestor de Fluxo'] },
             { label: 'Pedidos Reprovados por Soleni', icon: 'pi pi-fw pi-book', to: '/reprovados-soleni', requiredRole: ['Comprador', 'Administrador', 'Gerente'] }
+=======
+            { label: 'Pedidos Reprovados por Soleni', icon: 'pi pi-fw pi-book', to: '/reprovados-soleni', requiredRole: ['Comprador', 'Administrador', 'Gerente', 'Comprador Externo'] }
+>>>>>>> 8a49d85b86e2add11121bd06a58100dbf96d4be0
         ]
     },
     {
