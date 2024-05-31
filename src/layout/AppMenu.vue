@@ -10,7 +10,7 @@ const model = ref([
         label: 'Home',
         items: [
             { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/', requiredRole: ['Administrador', 'Gestor de Fluxo', 'Diretor', 'Gerente', 'Comprador'] },
-            { label: 'Todos meus pedidos', icon: 'pi pi-fw pi-book', to: '/pedidos-todos-comprador', requiredRole: ['Administrador', 'Comprador', 'Gestor de Fluxo'] }
+            { label: 'Todos meus pedidos', icon: 'pi pi-fw pi-book', to: '/pedidos-todos-comprador', requiredRole: ['Administrador', 'Comprador', 'Gestor de Fluxo', 'Comprador Externo', 'Gerente'] }
         ]
     },
     {
@@ -34,7 +34,7 @@ const model = ref([
             { label: 'Para Aprovação de Fluxo', icon: 'pi pi-fw pi-check-circle', to: '/aprovacao-gerentes', requiredRole: ['Diretor', 'Gerente', 'Administrador'] },
             { label: 'Pedidos Reprovados', icon: 'pi pi-fw pi-book', to: '/pedidos-reprovados', requiredRole: ['Gestor de Fluxo', 'Administrador', 'Gerente', 'Comprador Externo', 'Diretor'] },
             { label: 'Pedidos Reprovados por Gestor | Diretor', icon: 'pi pi-fw pi-book', to: '/reprovados-gestor', requiredRole: ['Comprador', 'Administrador'] },
-            { label: 'Pedidos Reprovados por Soleni', icon: 'pi pi-fw pi-book', to: '/reprovados-soleni', requiredRole: ['Comprador', 'Administrador', 'Gerente'] }
+            { label: 'Pedidos Reprovados por Soleni', icon: 'pi pi-fw pi-book', to: '/reprovados-soleni', requiredRole: ['Comprador', 'Administrador', 'Gerente', 'Comprador Externo'] }
         ]
     },
     {
