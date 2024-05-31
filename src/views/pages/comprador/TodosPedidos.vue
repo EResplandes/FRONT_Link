@@ -97,6 +97,24 @@ export default {
             }
         },
 
+        // Metódo responsável por abrir confiramção de excluir pedido
+        confirmExcluir(id_pedido) {
+            this.confirm.require({
+                message: 'Tem certeza que deseja excluir esse pedido?',
+                header: 'Excluir pedido?',
+                icon: 'pi pi-info-circle',
+                rejectLabel: 'Cancelar',
+                acceptLabel: 'Desativar',
+                rejectClass: 'p-button-secondary p-button-outlined',
+                acceptClass: 'p-button-danger',
+                accept: () => {
+                    this.excluir(id_pedido);
+                },
+                reject: () => {}
+            });
+        },
+
+        // Metóido responsável por buscar dados do pedido para inserir no formulário
         alterar(id) {
             // 1º Passo - Buscar informações do pedido
             this.idPedido = id;
@@ -113,6 +131,21 @@ export default {
                     dt_vencimento: data.pedido[0]?.dt_vencimento,
                     urgente: data.pedido[0].urgente
                 };
+            });
+        },
+
+        // Metódo responsável por excluir pedido - Colocar com status 8
+        excluir(id) {
+            this.preloading = true;
+            this.pedidoService.excluirPedido(id).then((data) => {
+                if (data.resposta == 'Pedido excluído com sucesso!') {
+                    this.showSuccess('Pedido excluído com sucesso!');
+                    this.buscaPedidos();
+                    this.preloading = false;
+                } else {
+                    this.showError('Ocorreu um erro, entre em contato com o Administrador!');
+                    this.preloading = false;
+                }
             });
         },
 
@@ -285,6 +318,8 @@ export default {
             <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
         </Dialog>
 
+        <ConfirmDialog></ConfirmDialog>
+
         <!-- Chat -->
         <Dialog header="Chat" v-model:visible="displayChat" :style="{ width: '40%' }" :modal="true">
             <div class="grid">
@@ -341,8 +376,7 @@ export default {
                 </div>
                 <div class="field">
                     <label for="dt_vencimento">Dt. Vencimento:</label>
-                    <Calendar dateFormat="dd/mm/yy" v-tooltip.left="'Selecione a data vencimento do pedido'" v-model="form.dt_vencimento" showIcon :showOnFocus="false" class="" />
-                    {{ this.form.dt_vencimento }}
+                    <Calendar dateFormat="yy-mm-dd" v-tooltip.left="'Selecione a data vencimento do pedido'" v-model="form.dt_vencimento" showIcon :showOnFocus="false" class="" />
                 </div>
                 <div class="field">
                     <label for="descricao">Descrição: </label>
@@ -446,7 +480,7 @@ export default {
                                 <div class="col-3 md:col-3 mr-1">
                                     <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
                                 </div>
-                                <div v-if="slotProps.data.status.status != 'Aprovado' && slotProps.data.status.status != 'Aprovado com Ressalva'" class="col-3 md:col-3 ml-3">
+                                <div v-if="slotProps.data.status.status != 'Aprovado' && slotProps.data.status.status != 'Aprovado com Ressalva' && slotProps.data.status.status != 'Excluído'" class="col-3 md:col-3 ml-3">
                                     <Button @click.prevent="alterar(slotProps.data.id)" icon="pi pi-pencil" class="p-button-warning" />
                                 </div>
                                 <div v-if="slotProps.data.status.status == 'Reprovado' || slotProps.data.status.status == 'Aprovado com Ressalva'" class="col-3 md:col-3 ml-3">
@@ -462,6 +496,9 @@ export default {
                                     class="col-4 md:col-4 mr-1 ml-3"
                                 >
                                     <Button @click.prevent="buscaInformacoesPedido(slotProps.data.id)" icon="pi pi-print" class="p-button-secondary" />
+                                </div>
+                                <div v-if="slotProps.data.status.status != 'Aprovado' && slotProps.data.status.status != 'Aprovado com Ressalva' && slotProps.data.status.status != 'Excluído'" class="col-3 md:col-3">
+                                    <Button @click.prevent="confirmExcluir(slotProps.data.id)" icon="pi pi-trash" class="p-button-danger" />
                                 </div>
                             </div>
                         </template>
