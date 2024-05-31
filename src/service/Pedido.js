@@ -601,7 +601,14 @@ export default class PedidoService {
         formData.append('descricao', form?.descricao ?? null);
         formData.append('valor', form?.valor ?? null);
         formData.append('urgente', form?.urgente) ?? 0;
-        formData.append('dt_vencimento', form?.dt_vencimento);
+
+        console.log(form.dt_vencimento);
+        if (this.isValidDateFormat(form.dt_vencimento)) {
+            formData.append('dt_vencimento', form?.dt_vencimento);
+        } else {
+            formData.append('dt_vencimento', this.formatarDataParaYMD(form?.dt_vencimento));
+        }
+
         formData.append('anexo', form?.pdf ?? null);
         formData.append('id_empresa', form?.empresa?.id ?? null);
         formData.append('protheus', form?.protheus);
@@ -629,7 +636,14 @@ export default class PedidoService {
 
             return `${ano}-${mes}-${dia}`;
         } else {
-            return `0000-00-00`;
+            return false;
         }
+    }
+
+    isValidDateFormat(dateStr) {
+        // Define a expressão regular para o formato específico
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        // Testa a data fornecida contra a expressão regular
+        return regex.test(dateStr);
     }
 }
