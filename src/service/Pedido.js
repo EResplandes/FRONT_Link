@@ -545,6 +545,44 @@ export default class PedidoService {
             });
     }
 
+    // Requisição responsável por buscar pedidos com status 15 - Enviado para financeiro
+    async buscaPedidosFinanceiro(id) {
+        return await fetch(`${API_URL}/pedidos/listar-pedidos-financeiro`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    // Requisição responsável por buscar pedidos reprovados com financeiro
+    async buscaPedidosReprovadosFinanceiro() {
+        return await fetch(`${API_URL}/pedidos/listar-pedidos-reprovados-finaceiro`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
     // Requisição responsável por responder pedido reprovado
     respondePedidoReprovadoFluxo(novoAnexo, novaMensagem, id_pedido) {
         let idCriador = localStorage.getItem('usuario_id');
@@ -637,6 +675,102 @@ export default class PedidoService {
         formData.append('nota', novoAnexo ?? null);
 
         return fetch(`${API_URL}/pedidos/responde-reprovado-fiscal/` + idNota, {
+            method: 'POST',
+            headers: {
+                Authorization: 'Bearer ' + token
+            },
+            body: formData
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    // Requisição responsável por reprovar pedido do financeiro para fiscal mudando status para 20
+    reprovarFinanceiroParaFiscal(novaMensagem, id_pedido) {
+        return fetch(`${API_URL}/pedidos/reprovar-pedido-financeiro-fiscal/` + id_pedido, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                id_usuario: parseInt(localStorage.getItem('usuario_id'), 10),
+                mensagem: novaMensagem
+            })
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    // Requisição responsável por reprovar pedido do financeiro para comprador mudando status para 19
+    reprovarFinanceiroParaComprador(novaMensagem, id_pedido) {
+        return fetch(`${API_URL}/pedidos/reprovar-pedido-financeiro-comprador/` + id_pedido, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                id_usuario: parseInt(localStorage.getItem('usuario_id'), 10),
+                mensagem: novaMensagem
+            })
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    // Requisição responsável pagar pedido alterando status para 17 ou 18
+    pagarPedido(comprovante, id_pedido) {
+        return fetch(`${API_URL}/pedidos/pagar-pedido/` + id_pedido, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                comprovante: comprovante
+            })
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    // Requisição responsável por responder pedido reprovado pela Soleni
+    respondePedidoReprovadoFinanceiro(novoAnexo, novaMensagem, id_pedido) {
+        let idCriador = localStorage.getItem('usuario_id');
+        const formData = new FormData();
+        formData.append('mensagem', novaMensagem);
+        formData.append('id_usuario', idCriador);
+        formData.append('anexo', novoAnexo ?? null);
+
+        return fetch(`${API_URL}/pedidos/responde-reprovado-financeiro/` + id_pedido, {
             method: 'POST',
             headers: {
                 Authorization: 'Bearer ' + token

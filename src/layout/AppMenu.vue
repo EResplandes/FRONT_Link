@@ -26,7 +26,17 @@ const model = ref([
     },
     {
         label: 'Módulo Fiscal',
-        items: [{ label: 'Pedidos para Escriturar', icon: 'pi pi-fw pi-book', to: '/pedidos-escriturar', requiredRole: ['Fiscal', 'Administrador'] }]
+        items: [
+            { label: 'Pedidos para Escriturar', icon: 'pi pi-fw pi-book', to: '/pedidos-escriturar', requiredRole: ['Fiscal', 'Administrador'] },
+            { label: 'Pedidos Reprovados pelo Financeiro', icon: 'pi pi-fw pi-book', to: '/pedidos-reprovados-financeiro', requiredRole: ['Fiscal', 'Administrador'] }
+        ]
+    },
+    {
+        label: 'Módulo Financeiro',
+        items: [
+            { label: 'Pedidos', icon: 'pi pi-fw pi-book', to: '/pedidos-financeiro', requiredRole: ['Fiscal', 'Administrador'] },
+            { label: 'Pedidos | Conferência', icon: 'pi pi-fw pi-book', to: '/pedidos-financeiro', requiredRole: ['Fiscal', 'Administrador'] }
+        ]
     },
     {
         label: 'Meus pedidos',

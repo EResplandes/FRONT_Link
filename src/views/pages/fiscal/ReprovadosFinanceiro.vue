@@ -3,19 +3,16 @@ import { ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
 import PedidoService from '../../../service/Pedido';
-import EmpresaService from '../../../service/EmpresaService';
-import StatusService from '../../../service/StatusService';
+import FuncionarioService from '../../../service/FuncionarioService';
 import ChatService from '../../../service/ChatService';
 
 export default {
     data() {
         return {
             toast: new useToast(),
-            displayConfirmation: ref(false),
             pedidoService: new PedidoService(),
-            empresaService: new EmpresaService(),
-            statusService: new StatusService(),
             chatService: new ChatService(),
+            funcionarioService: new FuncionarioService(),
             displayConfirmationActivation: ref(false),
             visibleRight: ref(false),
             confirm: new useConfirm(),
@@ -28,6 +25,7 @@ export default {
             status: ref(null),
             conversa: ref(null),
             novaMensagem: ref(null),
+            novoAnexo: ref(null),
             form: ref({}),
             editar: ref(false),
             preloading: ref(true),
@@ -36,56 +34,37 @@ export default {
             displayAnexo: ref(false),
             urlBase: 'https://link.gruporialma.com.br/storage',
             pdf: ref(null),
-            pdfsrc: ref(null),
-            heightVH: window.innerHeight * 0.8
+            pdfsrc: ref(null)
         };
     },
 
-    computed: {
-        pdfContainerStyle() {
-            return {
-                width: '100%',
-                height: `${this.heightVH}px`,
-                border: 'none'
-            };
-        }
-    },
-
     mounted: function () {
-        if (window.AdobeDC) {
-            this.adobeApiReady = true;
-        } else {
-            document.addEventListener('adobe_dc_view_sdk.ready', () => {
-                this.adobeApiReady = true;
-            });
-        }
-
-        // Metódo responsável por buscar todas os pedidos reprovados
-        this.pedidoService.buscaPedidosRessalva(localStorage.getItem('local_id')).then((data) => {
+        // Metódo responsável por buscar todas os pedidos reprovados por gerente com status 10
+        this.pedidoService.buscaPedidosReprovadosFinanceiro().then((data) => {
             this.pedidos = data.pedidos;
             this.preloading = false;
         });
 
-        // Metódo responsável por buscar todas empresas
-        this.empresaService.buscaEmpresas().then((data) => {
-            if (data.resposta == 'Empresas listados com sucesso!') {
-                this.empresas = data.empresas;
-            }
-        });
+        // // Metódo responsável por buscar todas empresas
+        // this.empresaService.buscaEmpresas().then((data) => {
+        //     if (data.resposta == 'Empresas listados com sucesso!') {
+        //         this.empresas = data.empresas;
+        //     }
+        // });
 
-        // Metódo responsável por buscar todos status
-        this.statusService.buscaStatus().then((data) => {
-            if (data.resposta == 'Status listados com sucesso!') {
-                this.status = data.itens;
-            }
-        });
+        // // Metódo responsável por buscar todos status
+        // this.statusService.buscaStatus().then((data) => {
+        //     if (data.resposta == 'Status listados com sucesso!') {
+        //         this.status = data.itens;
+        //     }
+        // });
     },
 
     methods: {
-        // Metódo responsável por buscar todos pedidos reprovados
+        // Metódo responsável por buscar todas os pedidos reprovados por Soleni com status 11
         buscaPedidos() {
             this.preloading = true;
-            this.pedidoService.buscaPedidosRessalva(localStorage.getItem('local_id')).then((data) => {
+            this.pedidoService.buscaPedidosReprovadosFinanceiro().then((data) => {
                 this.pedidos = data.pedidos;
                 this.preloading = false;
             });
@@ -95,24 +74,23 @@ export default {
         chat(id) {
             this.id_pedido = id;
             this.chatService.buscaConversa(id).then((data) => {
+                console.log(data);
                 this.conversa = data.conversa;
                 this.displayChat = true;
-            });
 
-            this.$nextTick(function () {
-                var container = this.$refs.msgContainer;
-                container.scrollTop = container.scrollHeight + 120;
+                this.$nextTick(function () {
+                    var container = this.$refs.msgContainer;
+                    container.scrollTop = container.scrollHeight + 120;
+                });
             });
         },
 
         // Metódo responsável por enviar mensagem para Dr Emival ou Dr. Monica
         enviarMensagem() {
             this.preloading = true;
-            console.log(this.id_pedido);
-            this.pedidoService.respondePedidoRessalva(this.novaMensagem, this.id_pedido).then((data) => {
-                console.log(data);
-                if (data.resposta == 'Pedido respondido com sucesso!') {
-                    this.showSuccess('Pedido respondido com sucesso!');
+            this.pedidoService.respondePedidoReprovadoFinanceiro(this.pdf, this.novaMensagem, this.id_pedido).then((data) => {
+                if (data.resposta == 'Mensagem enviada com sucesso!') {
+                    this.showSuccess('Mensagem enviada com sucesso!');
                     this.displayChat = false;
                     this.buscaPedidos();
                 } else {
@@ -143,10 +121,6 @@ export default {
             this.display = true;
             this.pdf = data.anexo;
             this.pdfsrc = `${this.urlBase}/${this.pdf}`;
-            const dataAgora = new Date();
-            this.$nextTick(() => {
-                this.renderPdf(`${this.urlBase}/${this.pdf}`, `${dataAgora.getSeconds()}.pdf`);
-            });
         },
 
         filtrar() {
@@ -173,77 +147,8 @@ export default {
             this.form = {};
         },
 
-        renderPdf(url, fileName) {
-            if (!this.adobeApiReady) {
-                return;
-            }
-            const previewConfig = {
-                defaultViewMode: 'FIT_WIDTH',
-                showAnnotationTools: false
-            };
-            this.$refs.pdfContainer.innerHTML = '';
-            let viewer = document.createElement('div');
-            viewer.id = 'viewer';
-            this.$refs.pdfContainer.appendChild(viewer);
-            let adobeDCView = new AdobeDC.View({
-                clientId: 'e8c98881c48049bbb03b3c5d5db05129',
-                divId: 'viewer'
-            });
-            this.previewFilePromise = adobeDCView.previewFile(
-                {
-                    content: {
-                        location: {
-                            url: url
-                        }
-                    },
-                    metaData: {
-                        fileName: fileName,
-                        id: fileName
-                    }
-                },
-                { embedMode: 'SIZED_CONTAINER' }
-            );
-        },
-
-        nextPage() {
-            this.previewFilePromise.then((adobeViewer) => {
-                adobeViewer.getAPIs().then((apis) => {
-                    apis.getCurrentPage()
-                        .then((currentPage) => apis.gotoLocation(currentPage + 1))
-                        .catch((error) => console.error(error));
-                });
-            });
-        },
-        previousPage() {
-            this.previewFilePromise.then((adobeViewer) => {
-                adobeViewer.getAPIs().then((apis) => {
-                    apis.getCurrentPage()
-                        .then((currentPage) => {
-                            if (currentPage > 1) {
-                                return apis.gotoLocation(currentPage - 1);
-                            }
-                        })
-                        .catch((error) => console.error(error));
-                });
-            });
-        },
-        zoomIn() {
-            this.previewFilePromise.then((adobeViewer) => {
-                adobeViewer.getAPIs().then((apis) => {
-                    apis.getZoomAPIs()
-                        .zoomIn()
-                        .catch((error) => console.error(error));
-                });
-            });
-        },
-        zoomOut() {
-            this.previewFilePromise.then((adobeViewer) => {
-                adobeViewer.getAPIs().then((apis) => {
-                    apis.getZoomAPIs()
-                        .zoomOut()
-                        .catch((error) => console.error(error));
-                });
-            });
+        uploadPdf() {
+            this.pdf = this.$refs.pdf.files[0];
         }
     }
 };
@@ -257,8 +162,15 @@ export default {
         <Toast />
 
         <!-- Visualizar -->
-        <Dialog header="Documento" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
-            <div ref="pdfContainer" :style="pdfContainerStyle"></div>
+        <Dialog header="Pedido de Compra" v-model:visible="display" :modal="true" :style="{ width: '90%' }">
+            <Splitter>
+                <SplitterPanel class="flex align-items-center justify-content-center splitter-panel">
+                    <iframe :src="pdfsrc" style="width: 100%; height: 650px; border: none"> Oops! ocorreu um erro. </iframe>
+                </SplitterPanel>
+                <SplitterPanel class="flex align-items-center justify-content-center splitter-panel">
+                    <iframe :src="pdfsrcnota" style="width: 100%; height: 650px; border: none"> Oops! ocorreu um erro. </iframe>
+                </SplitterPanel>
+            </Splitter>
         </Dialog>
 
         <!-- Chat -->
@@ -266,7 +178,7 @@ export default {
             <div class="grid">
                 <div class="col-12">
                     <div class="card timeline-container" ref="msgContainer">
-                        <Timeline :value="conversa" align="alternate" class="customized-timeline">
+                        <Timeline :value="conversa" align="alternate" class="customized-timeline flex-column-reverse">
                             <template #marker="slotProps">
                                 <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
                                     <i :class="slotProps.item.icon"></i>
@@ -291,43 +203,21 @@ export default {
                     </div>
                     <hr />
                     <InputText class="col-12" type="text" v-model="novaMensagem" placeholder="Digite a mensagem..." />
-                    <Button @click.prevent="enviarMensagem()" label="Enviar" class="mr-2 mt-3 p-button-success col-12" />
+                    <Button @click.prevent="enviarMensagem()" label="Enviar Mensagem" class="mr-2 mt-3 p-button-success col-12" />
+                    <Button @click.prevent="this.displayAnexo = true" label="Alterar Nota" class="mr-2 mt-3 p-button-secondary col-12" />
                 </div>
             </div>
         </Dialog>
 
-        <!-- Modal Filtros -->
-        <Sidebar style="width: 500px" v-model:visible="visibleRight" :baseZIndex="1000" position="right">
-            <h3 v-if="this.editar == false" class="titleForm">Filtros</h3>
-
-            <div class="card p-fluid">
-                <div class="field">
-                    <label for="empresa">Empresa:</label>
-                    <Dropdown v-model="form.empresa" :options="empresas" showClear optionLabel="nome_empresa" placeholder="Selecione..." class="w-full" />
-                </div>
-                <div class="field">
-                    <label for="empresa">Status:</label>
-                    <Dropdown v-model="form.status" :options="status" showClear optionLabel="status" placeholder="Selecione..." class="w-full" />
-                </div>
-                <div class="field">
-                    <label for="cpf">Descrição: </label>
-                    <InputText v-tooltip.left="'Digite a descrição do pedido'" v-model="form.descricao" id="cnpj" placeholder="Digite..." />
-                </div>
-                <div class="field">
-                    <label for="cpf">Valor: </label>
-                    <InputNumber v-tooltip.left="'Digite o valor do pedido'" v-model="form.valor" inputId="minmaxfraction" :minFractionDigits="2" :maxFractionDigits="2" placeholder="Digite..." />
-                </div>
-                <div class="field">
-                    <label for="cpf">Dt. In clusão:</label>
-                    <Calendar dateFormat="dd/mm/yy" v-tooltip.left="'Selecione a data de inclusão'" v-model="form.dt_inclusao" showIcon :showOnFocus="false" class="" />
-                </div>
-                <hr />
-                <div class="field">
-                    <Button @click.prevent="buscaFiltros()" label="Filtrar" class="mr-2 mb-2 p-button-secondary" />
-                    <Button @click.prevent="limparFiltro()" label="Limpar Filtros" class="mr-2 mb-2 p-button-danger" />
-                </div>
+        <!-- Anexo -->
+        <Dialog header="Insira nova nota" v-model:visible="displayAnexo" :style="{ width: '30%' }" :modal="true">
+            <div class="grid mt-5 text-center flex justify-content-center align-items-center">
+                <FileUpload uploadLabel="Salvar" cancelLabel="Limpar PDF" chooseLabel="Selecione" @change="uploadPdf" type="file" ref="pdf" name="demo[]" accept=".pdf,.docx" :maxFileSize="1000000"></FileUpload>
             </div>
-        </Sidebar>
+            <div>
+                <Button @click.prevent="this.displayAnexo = false" label="Salvar" class="mr-2 mt-3 p-button-success col-12" />
+            </div>
+        </Dialog>
 
         <!-- Tabela com todos pedidos -->
         <div class="col-12">
@@ -349,15 +239,7 @@ export default {
                 >
                     <template #header>
                         <div class="flex justify-content-between">
-                            <h5 for="empresa">Pedidos Aprovados com Ressalva:</h5>
-                            <div class="grid">
-                                <div class="col-4 md:col-4 mr-2">
-                                    <Button @click.prevent="filtrar()" icon="pi pi-search" label="Filtrar" class="p-button-secondary" style="margin-right: 0.25em" />
-                                </div>
-                                <div class="col-6 md:col-4">
-                                    <Button @click.prevent="limparFiltro()" icon="pi pi-trash" label="Limpar" class="mr-2 mb-2 p-button-danger" />
-                                </div>
-                            </div>
+                            <h5 for="empresa">Pedidos Reprovados por Financeiro:</h5>
                         </div>
                     </template>
                     <template #empty> Nenhum pedido encontrado! </template>
@@ -385,14 +267,14 @@ export default {
                         </template>
                     </Column>
 
-                    <Column field="Descrição" header="Descrição" :sortable="true" class="w-5">
+                    <Column field="Descrição" header="Descrição" :sortable="true" class="w-4">
                         <template #body="slotProps">
                             <span class="p-column-title">Descrição</span>
                             {{ slotProps.data.descricao }}
                         </template>
                     </Column>
 
-                    <Column field="Presidente" header="Presidente" :sortable="true" class="w-5">
+                    <Column field="Presidente" header="Presidente" :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">Presidente</span>
                             Dr. {{ slotProps.data.link.link }}
@@ -406,7 +288,7 @@ export default {
                         </template>
                     </Column>
 
-                    <Column field="..." header="..." :sortable="true" class="w-2">
+                    <Column field="..." header="..." :sortable="true" class="w-3">
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
                             <div class="grid">
@@ -464,9 +346,7 @@ export default {
 }
 
 .timeline-container {
-    max-height: 300px;
-    /* Defina a altura máxima desejada */
-    overflow-y: auto;
-    /* Adiciona uma barra de rolagem vertical quando o conteúdo excede a altura máxima */
+    max-height: 300px; /* Defina a altura máxima desejada */
+    overflow-y: auto; /* Adiciona uma barra de rolagem vertical quando o conteúdo excede a altura máxima */
 }
 </style>

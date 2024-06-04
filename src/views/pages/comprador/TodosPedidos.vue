@@ -104,7 +104,7 @@ export default {
                 header: 'Excluir pedido?',
                 icon: 'pi pi-info-circle',
                 rejectLabel: 'Cancelar',
-                acceptLabel: 'Desativar',
+                acceptLabel: 'Excluir',
                 rejectClass: 'p-button-secondary p-button-outlined',
                 acceptClass: 'p-button-danger',
                 accept: () => {
@@ -214,6 +214,11 @@ export default {
                 } else {
                     this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
                 }
+
+                this.$nextTick(function () {
+                    var container = this.$refs.msgContainer;
+                    container.scrollTop = container.scrollHeight + 120;
+                });
             });
         },
 
@@ -324,7 +329,7 @@ export default {
         <Dialog header="Chat" v-model:visible="displayChat" :style="{ width: '40%' }" :modal="true">
             <div class="grid">
                 <div class="col-12">
-                    <div class="card timeline-container">
+                    <div class="card timeline-container" ref="msgContainer">
                         <Timeline :value="conversa" align="alternate" class="customized-timeline">
                             <template #marker="slotProps">
                                 <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
@@ -406,6 +411,8 @@ export default {
                     paginator
                     :rows="10"
                     dataKey="id"
+                    :rowsPerPageOptions="[5, 10, 25, 50, 100]"
+                    currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
                     filterDisplay="row"
                     :loading="loading"
                     :globalFilterFields="['descricao', 'empresa.nome_empresa', 'country.name', 'representative.name', 'status']"

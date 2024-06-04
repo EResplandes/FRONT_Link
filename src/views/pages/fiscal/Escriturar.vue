@@ -260,14 +260,11 @@ export default {
         <!-- Visualizar Pedido de Compra -->
         <Dialog header="Pedido de Compra" v-model:visible="display" :modal="true" :style="{ width: '90%' }">
             <div class="grid">
-                <div class="col-4">
+                <div class="col-6">
                     <Button @click.prevent="abrirChat()" style="width: 100%" label="Reprovar e Enviar para Comprador" icon="pi pi-times" class="p-button-danger" />
                 </div>
-                <div class="col-4">
-                    <Button style="width: 100%" label="Enviar para Gustavo" icon="pi pi-send" class="p-button-info" />
-                </div>
-                <div class="col-4">
-                    <Button @click.prevent="darBaixa()" style="width: 100%" label="Finalizar e Enviar para Financeiro" icon="pi pi-check" class="p-button-success" />
+                <div class="col-6">
+                    <Button @click.prevent="darBaixa()" style="width: 100%" label="Escriturar e Enviar para Financeiro" icon="pi pi-check" class="p-button-success" />
                 </div>
             </div>
 

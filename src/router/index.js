@@ -49,6 +49,11 @@ const router = createRouter({
                     component: () => import('@/views/pages/comprador/PedidosReprovadosFiscal.vue')
                 },
                 {
+                    path: '/pedidos-reprovados-financeiro',
+                    name: 'pedidos-reprovados-financeiro',
+                    component: () => import('@/views/pages/fiscal/ReprovadosFinanceiro.vue')
+                },
+                {
                     path: '/pedidos-todos-externo',
                     name: 'pedidos-todos-externo',
                     component: () => import('@/views/pages/comprador/TodosPedidosCompradorExterno.vue')
@@ -62,6 +67,11 @@ const router = createRouter({
                     path: '/pedidos-ressalva',
                     name: 'pedidos-ressalva',
                     component: () => import('@/views/pages/pedidos/Ressalva.vue')
+                },
+                {
+                    path: '/pedidos-financeiro',
+                    name: 'pedidos-financeiro',
+                    component: () => import('@/views/pages/financeiro/Pedidos.vue')
                 },
                 {
                     path: '/pedidos-justificar',

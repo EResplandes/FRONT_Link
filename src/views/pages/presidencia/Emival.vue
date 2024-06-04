@@ -102,6 +102,11 @@ export default {
                 console.log(data);
                 this.conversa = data.conversa;
                 this.displayChat = true;
+
+                this.$nextTick(function () {
+                    var container = this.$refs.msgContainer;
+                    container.scrollTop = container.scrollHeight + 120;
+                });
             });
         },
         nextPage() {
@@ -698,7 +703,7 @@ export default {
     <Dialog :header="this.titleChat" v-model:visible="displayChat" :style="{ width: '80%' }" :modal="true">
         <div class="grid">
             <div class="col-12">
-                <div class="card timeline-container">
+                <div class="card timeline-container" ref="msgContainer">
                     <Timeline :value="conversa" align="alternate" class="customized-timeline">
                         <template #marker="slotProps">
                             <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
