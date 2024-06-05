@@ -484,18 +484,40 @@ export default {
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
                             <div class="grid">
-                                <div class="col-3 md:col-3 mr-1">
+                                <!-- View Button -->
+                                <div class="col-3 md:col-3">
                                     <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
                                 </div>
+
+                                <!-- Edit Button -->
                                 <div
                                     v-if="slotProps.data.status.status != 'Aprovado' && slotProps.data.status.status != 'Aprovado com Ressalva' && slotProps.data.status.status != 'Excluído' && slotProps.data.status.status != 'Enviado para Fiscal'"
-                                    class="col-3 md:col-3 ml-3"
+                                    class="col-3 md:col-3"
                                 >
-                                    <Button @click.prevent="alterar(slotProps.data.id)" icon="pi pi-pencil" class="p-button-warning" />
+                                    <Button
+                                        v-if="
+                                            slotProps.data.status.status != 'Aprovado' &&
+                                            slotProps.data.status.status != 'Aprovado com Ressalva' &&
+                                            slotProps.data.status.status != 'Excluído' &&
+                                            slotProps.data.status.status != 'Enviado para Fiscal' &&
+                                            slotProps.data.status.status != 'Sem Nota' &&
+                                            slotProps.data.status.status != 'Enviado para Financeiro' &&
+                                            slotProps.data.status.status != 'Nota Reprovada' &&
+                                            slotProps.data.status.status != 'Pago' &&
+                                            slotProps.data.status.status != 'Reprovado por Financeiro - Fiscal'
+                                        "
+                                        @click.prevent="alterar(slotProps.data.id)"
+                                        icon="pi pi-pencil"
+                                        class="p-button-warning"
+                                    />
                                 </div>
-                                <div v-if="slotProps.data.status.status == 'Reprovado' || slotProps.data.status.status == 'Aprovado com Ressalva'" class="col-3 md:col-3 ml-3">
-                                    <Button @click.prevent="chat(slotProps.data.id, slotProps.data)" icon="pi pi-comments" class="p-button-secon" />
+
+                                <!-- Chat Button -->
+                                <div v-if="slotProps.data.status.status == 'Reprovado' || slotProps.data.status.status == 'Aprovado com Ressalva'" class="col-3">
+                                    <Button @click.prevent="chat(slotProps.data.id, slotProps.data)" icon="pi pi-comments" class="p-button-secondary" />
                                 </div>
+
+                                <!-- Print Button -->
                                 <div
                                     v-if="
                                         slotProps.data.status.status == 'Aprovado' ||
@@ -504,12 +526,24 @@ export default {
                                         slotProps.data.status.status == 'Retorno do Pedido de Compra Aprovado com Ressalva' ||
                                         slotProps.data.status.status == 'Enviado para Fiscal'
                                     "
-                                    class="col-4 md:col-4 mr-1 ml-3"
+                                    class="col-4 md:col-4"
                                 >
                                     <Button @click.prevent="buscaInformacoesPedido(slotProps.data.id)" icon="pi pi-print" class="p-button-secondary" />
                                 </div>
+
+                                <!-- Delete Button -->
                                 <div
-                                    v-if="slotProps.data.status.status != 'Aprovado' && slotProps.data.status.status != 'Aprovado com Ressalva' && slotProps.data.status.status != 'Excluído' && slotProps.data.status.status != 'Enviado para Fiscal'"
+                                    v-if="
+                                        slotProps.data.status.status != 'Aprovado' &&
+                                        slotProps.data.status.status != 'Aprovado com Ressalva' &&
+                                        slotProps.data.status.status != 'Excluído' &&
+                                        slotProps.data.status.status != 'Enviado para Fiscal' &&
+                                        slotProps.data.status.status != 'Sem Nota' &&
+                                        slotProps.data.status.status != 'Enviado para Financeiro' &&
+                                        slotProps.data.status.status != 'Nota Reprovada' &&
+                                        slotProps.data.status.status != 'Pago' &&
+                                        slotProps.data.status.status != 'Reprovado por Financeiro - Fiscal'
+                                    "
                                     class="col-3 md:col-3"
                                 >
                                     <Button @click.prevent="confirmExcluir(slotProps.data.id)" icon="pi pi-trash" class="p-button-danger" />
