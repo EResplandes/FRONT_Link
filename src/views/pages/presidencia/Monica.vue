@@ -1,7 +1,6 @@
 <script>
 import { ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
-import { useConfirm } from 'primevue/useconfirm';
 import PedidoService from '../../../service/Pedido';
 import ChatService from '../../../service/ChatService';
 
@@ -12,13 +11,8 @@ export default {
             displayConfirmation: ref(false),
             pedidoService: new PedidoService(),
             chatService: new ChatService(),
-            displayConfirmationActivation: ref(false),
-            visibleRight: ref(false),
             displayChat: ref(false),
-            confirm: new useConfirm(),
             currentIndex: 0,
-            loading1: ref(null),
-            sleep: ref(null),
             mensagemEmival: ref(null),
             pedidos: ref(null),
             pedidosAprovados: [],
@@ -28,7 +22,6 @@ export default {
             display: ref(false),
             displayAcima: ref(false),
             pedidoAcima: ref({}),
-            quantidadesPedidos: ref({}),
             pdfsrc: ref(null),
             urlBase: 'https://link.gruporialma.com.br/storage', // Ambiente de Produção
             adobeApiReady: false,
@@ -97,6 +90,11 @@ export default {
                 console.log(data);
                 this.conversa = data.conversa;
                 this.displayChat = true;
+
+                this.$nextTick(function () {
+                    var container = this.$refs.msgContainer;
+                    container.scrollTop = container.scrollHeight + 120;
+                });
             });
         },
         nextPage() {
@@ -445,11 +443,6 @@ export default {
             return new Intl.DateTimeFormat('pt-BR', options).format(dataFormatada);
         },
 
-        filtrar() {
-            this.visibleRight = true;
-            this.editar = false;
-        },
-
         showSuccess(mensagem) {
             this.toast.add({ severity: 'success', summary: 'Sucesso!', detail: mensagem, life: 3000 });
         },
@@ -534,7 +527,7 @@ export default {
         <Dialog :header="this.titleChat" v-model:visible="displayChat" :style="{ width: '80%' }" :modal="true">
             <div class="grid">
                 <div class="col-12">
-                    <div class="card timeline-container">
+                    <div class="card timeline-container" ref="msgContainer">
                         <Timeline :value="conversa" align="alternate" class="customized-timeline">
                             <template #marker="slotProps">
                                 <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
