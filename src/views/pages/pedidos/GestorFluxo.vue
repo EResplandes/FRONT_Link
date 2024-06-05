@@ -290,6 +290,13 @@ export default {
                         </template>
                     </Column>
 
+                    <Column field="Protheus" header="Protheus" :sortable="true" class="w-1">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Protheus</span>
+                            {{ slotProps.data.protheus }}
+                        </template>
+                    </Column>
+
                     <Column field="Empresa" header="Empresa" :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">Empresa</span>
