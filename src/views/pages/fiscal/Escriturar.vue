@@ -326,7 +326,7 @@ export default {
                         </template>
                     </Column>
 
-                    <Column field="descricao" header="Descrição" style="min-width: 12rem">
+                    <Column field="descricao" header="Fornecedor" style="min-width: 12rem">
                         <template #body="{ data }">
                             {{ data.pedido.descricao }}
                         </template>

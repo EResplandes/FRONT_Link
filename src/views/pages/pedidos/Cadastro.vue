@@ -181,8 +181,8 @@ export default {
                                 <Dropdown id="Local" v-model="form.local" :options="locais" optionLabel="local" placeholder="Selecione..."></Dropdown>
                             </div>
                             <div class="field col-12">
-                                <label for="descricao">Descrição: <span class="obrigatorio">*</span></label>
-                                <Textarea v-tooltip.top="'Digite a descrição do pedido'" id="descricao" rows="4" v-model="form.descricao" placeholder="Digite a descrição..." />
+                                <label for="descricao">Forncedor: <span class="obrigatorio">*</span></label>
+                                <Textarea v-tooltip.top="'Digite o forncedor'" id="descricao" rows="4" v-model="form.descricao" placeholder="Digite o fornecedor..." />
                             </div>
                         </div>
                     </TabPanel>

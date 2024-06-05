@@ -212,14 +212,6 @@ export default {
                     <template #header>
                         <div class="flex justify-content-between">
                             <h5 for="empresa">Pedidos com Mônica:</h5>
-                            <div class="grid">
-                                <div class="col-4 md:col-4 mr-2">
-                                    <Button @click.prevent="filtrar()" icon="pi pi-search" label="Filtrar" class="p-button-secondary" style="margin-right: 0.25em" />
-                                </div>
-                                <div class="col-6 md:col-4">
-                                    <Button @click.prevent="limparFiltro()" icon="pi pi-trash" label="Limpar" class="mr-2 mb-2 p-button-danger" />
-                                </div>
-                            </div>
                         </div>
                     </template>
                     <template #empty> Nenhum pedido encontrado! </template>
@@ -247,7 +239,7 @@ export default {
                         </template>
                     </Column>
 
-                    <Column field="Descrição" header="Descrição" :sortable="true" class="w-5">
+                    <Column field="Descrição" header="Fornecedor" :sortable="true" class="w-5">
                         <template #body="slotProps">
                             <span class="p-column-title">Descrição</span>
                             {{ slotProps.data.descricao }}

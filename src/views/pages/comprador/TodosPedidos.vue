@@ -443,7 +443,7 @@ export default {
                             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pelo Valor" />
                         </template>
                     </Column>
-                    <Column field="descricao" header="Descrição" style="min-width: 12rem">
+                    <Column field="descricao" header="Fornecedor" style="min-width: 12rem">
                         <template #body="{ data }">
                             {{ data.descricao }}
                         </template>

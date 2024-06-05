@@ -60,7 +60,7 @@ export function generatePDF(data) {
     doc.text('PRESIDENTE', 107, 130, null, null, 'center');
 
     // Define o título da tabela
-    const headers = [['', 'Local', 'Descrição', 'Valor', 'Status', 'Autorização', 'Criação', 'Aprovação']];
+    const headers = [['', 'Local', 'Fornecedor', 'Valor', 'Status', 'Autorização', 'Criação', 'Aprovação']];
 
     const tableData = data.map((pedido, index) => {
         const local = pedido.local.local;

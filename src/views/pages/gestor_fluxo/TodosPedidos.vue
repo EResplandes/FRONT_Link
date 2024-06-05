@@ -130,10 +130,10 @@ export default {
         },
 
         chat(id, data) {
-            this.displayChat = true;
             this.chatService.buscaConversa(id).then((data) => {
                 if (data.resposta == 'Chat listado com sucesso!') {
                     this.conversa = data.conversa;
+                    this.displayChat = true;
                 } else {
                     this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
                 }
@@ -256,74 +256,36 @@ export default {
             <div class="grid">
                 <div class="col-12">
                     <div class="card timeline-container" ref="msgContainer">
-                        <Timeline :value="conversa" align="alternate" class="customized-timeline">
-                            <template #marker="slotProps">
-                                <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
-                                    <i :class="slotProps.item.icon"></i>
-                                </span>
-                            </template>
-                            <template #content="slotProps">
-                                <Card>
-                                    <template #title>
-                                        {{ slotProps.item.id_usuario.name }}
-                                    </template>
-                                    <template #subtitle>
-                                        {{ this.formatarData(slotProps.item.data_mensagem) }}
-                                    </template>
-                                    <template #content>
-                                        <h6>
-                                            {{ slotProps.item.mensagem }}
-                                        </h6>
-                                    </template>
-                                </Card>
-                            </template>
-                        </Timeline>
+                        <div v-if="conversa.length === 0" class="alert alert-warning mt-5"><h5>Não há mensagens disponíveis.</h5></div>
+                        <div v-else>
+                            <Timeline :value="conversa" align="alternate" class="customized-timeline">
+                                <template #marker="slotProps">
+                                    <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
+                                        <i :class="slotProps.item.icon"></i>
+                                    </span>
+                                </template>
+                                <template #content="slotProps">
+                                    <Card>
+                                        <template #title>
+                                            {{ slotProps.item.id_usuario.name }}
+                                        </template>
+                                        <template #subtitle>
+                                            {{ slotProps.item.data_mensagem }}
+                                        </template>
+                                        <template #content>
+                                            <h6>
+                                                {{ slotProps.item.mensagem }}
+                                            </h6>
+                                        </template>
+                                    </Card>
+                                </template>
+                            </Timeline>
+                        </div>
                     </div>
                     <hr />
                 </div>
             </div>
         </Dialog>
-
-        <!-- Alterar informações pedido -->
-        <Sidebar style="width: 500px" v-model:visible="displayAlteracao" :baseZIndex="1000" position="right">
-            <div class="card p-fluid">
-                <h6 class="titleForm">Formulário de Edição</h6>
-
-                <div class="field">
-                    <label for="descricao">Urgente: </label><br />
-                    <InputSwitch :trueValue="1" :falseValue="0" :modelValue="form.urgente" v-model="form.urgente" />
-                </div>
-                <div class="field">
-                    <label for="empresa">Empresa:</label>
-                    <Dropdown v-model="form.empresa" :options="empresa" showClear optionLabel="nome_empresa" placeholder="Selecione..." class="w-full" />
-                </div>
-                <div class="field">
-                    <label for="valor">Nº Protheus: </label>
-                    <InputNumber v-tooltip.left="'Digite o número do pedido no Protheus'" v-model="form.protheus" placeholder="Digite..." />
-                </div>
-                <div class="field">
-                    <label for="valor">Valor: </label>
-                    <InputNumber v-tooltip.left="'Digite o valor do pedido'" v-model="form.valor" inputId="minmaxfraction" :minFractionDigits="2" :maxFractionDigits="2" placeholder="Digite..." />
-                </div>
-                <div class="field">
-                    <label for="dt_vencimento">Dt. Vencimento:</label>
-                    <Calendar dateFormat="yy-mm-dd" v-tooltip.left="'Selecione a data vencimento do pedido'" v-model="form.dt_vencimento" showIcon :showOnFocus="false" class="" />
-                </div>
-                <div class="field">
-                    <label for="descricao">Descrição: </label>
-                    <Textarea rows="3" cols="30" v-tooltip.left="'Digite a descrição do pedido'" v-model="form.descricao" id="descricao" placeholder="Digite..." />
-                </div>
-                <div class="field">
-                    <label for="firstname2">Somente se existir alguma alteração no PDF</label>
-                    <FileUpload chooseLabel="Selecionar Arquivo" @change="uploadPdf" mode="basic" type="file" ref="pdf" name="demo[]" accept=".pdf,.docx" :maxFileSize="999999999"></FileUpload>
-                </div>
-                <hr />
-                <div class="field">
-                    <Button @click.prevent="salvarAlteracoes()" label="Alterar Pedido" class="mr-2 mb-2 p-button-secondary" />
-                    <Button @click.prevent="this.displayAlteracao = false" label="Fechar" class="mr-2 mb-2 p-button-danger" />
-                </div>
-            </div>
-        </Sidebar>
 
         <!-- Tabela com todos pedidos -->
         <div class="col-12">
@@ -369,7 +331,7 @@ export default {
                             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pelo Valor" />
                         </template>
                     </Column>
-                    <Column field="descricao" header="Descrição" style="min-width: 12rem">
+                    <Column field="descricao" header="Fornecedor" style="min-width: 12rem">
                         <template #body="{ data }">
                             {{ data.descricao }}
                         </template>
