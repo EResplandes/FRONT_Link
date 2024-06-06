@@ -3,8 +3,6 @@ import { ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
 import PedidoService from '../../../service/Pedido';
-import EmpresaService from '../../../service/EmpresaService';
-import StatusService from '../../../service/StatusService';
 import FuncionarioService from '../../../service/FuncionarioService';
 import ChatService from '../../../service/ChatService';
 
@@ -12,10 +10,7 @@ export default {
     data() {
         return {
             toast: new useToast(),
-            displayConfirmation: ref(false),
             pedidoService: new PedidoService(),
-            empresaService: new EmpresaService(),
-            statusService: new StatusService(),
             chatService: new ChatService(),
             funcionarioService: new FuncionarioService(),
             displayConfirmationActivation: ref(false),
@@ -45,32 +40,31 @@ export default {
 
     mounted: function () {
         // Metódo responsável por buscar todas os pedidos reprovados por gerente com status 10
-        this.pedidoService.buscaReprovadosSoleni(localStorage.getItem('usuario_id')).then((data) => {
-            console.log(data);
+        this.pedidoService.buscaPedidosReprovadosFinanceiro().then((data) => {
             this.pedidos = data.pedidos;
             this.preloading = false;
         });
 
-        // Metódo responsável por buscar todas empresas
-        this.empresaService.buscaEmpresas().then((data) => {
-            if (data.resposta == 'Empresas listados com sucesso!') {
-                this.empresas = data.empresas;
-            }
-        });
+        // // Metódo responsável por buscar todas empresas
+        // this.empresaService.buscaEmpresas().then((data) => {
+        //     if (data.resposta == 'Empresas listados com sucesso!') {
+        //         this.empresas = data.empresas;
+        //     }
+        // });
 
-        // Metódo responsável por buscar todos status
-        this.statusService.buscaStatus().then((data) => {
-            if (data.resposta == 'Status listados com sucesso!') {
-                this.status = data.itens;
-            }
-        });
+        // // Metódo responsável por buscar todos status
+        // this.statusService.buscaStatus().then((data) => {
+        //     if (data.resposta == 'Status listados com sucesso!') {
+        //         this.status = data.itens;
+        //     }
+        // });
     },
 
     methods: {
         // Metódo responsável por buscar todas os pedidos reprovados por Soleni com status 11
         buscaPedidos() {
             this.preloading = true;
-            this.pedidoService.buscaReprovadosSoleni(localStorage.getItem('usuario_id')).then((data) => {
+            this.pedidoService.buscaPedidosReprovadosFinanceiro().then((data) => {
                 this.pedidos = data.pedidos;
                 this.preloading = false;
             });
@@ -83,13 +77,18 @@ export default {
                 console.log(data);
                 this.conversa = data.conversa;
                 this.displayChat = true;
+
+                this.$nextTick(function () {
+                    var container = this.$refs.msgContainer;
+                    container.scrollTop = container.scrollHeight + 120;
+                });
             });
         },
 
         // Metódo responsável por enviar mensagem para Dr Emival ou Dr. Monica
         enviarMensagem() {
             this.preloading = true;
-            this.pedidoService.respondePedidoReprovadoSoleni(this.pdf, this.novaMensagem, this.id_pedido).then((data) => {
+            this.pedidoService.respondePedidoReprovadoFinanceiro(this.pdf, this.novaMensagem, this.id_pedido).then((data) => {
                 if (data.resposta == 'Mensagem enviada com sucesso!') {
                     this.showSuccess('Mensagem enviada com sucesso!');
                     this.displayChat = false;
@@ -163,16 +162,23 @@ export default {
         <Toast />
 
         <!-- Visualizar -->
-        <Dialog header="Documento" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
-            <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
+        <Dialog header="Pedido de Compra" v-model:visible="display" :modal="true" :style="{ width: '90%' }">
+            <Splitter>
+                <SplitterPanel class="flex align-items-center justify-content-center splitter-panel">
+                    <iframe :src="pdfsrc" style="width: 100%; height: 650px; border: none"> Oops! ocorreu um erro. </iframe>
+                </SplitterPanel>
+                <SplitterPanel class="flex align-items-center justify-content-center splitter-panel">
+                    <iframe :src="pdfsrcnota" style="width: 100%; height: 650px; border: none"> Oops! ocorreu um erro. </iframe>
+                </SplitterPanel>
+            </Splitter>
         </Dialog>
 
         <!-- Chat -->
         <Dialog header="Chat" v-model:visible="displayChat" :style="{ width: '40%' }" :modal="true">
             <div class="grid">
                 <div class="col-12">
-                    <div class="card timeline-container">
-                        <Timeline :value="conversa" align="alternate" class="customized-timeline">
+                    <div class="card timeline-container" ref="msgContainer">
+                        <Timeline :value="conversa" align="alternate" class="customized-timeline flex-column-reverse">
                             <template #marker="slotProps">
                                 <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
                                     <i :class="slotProps.item.icon"></i>
@@ -197,14 +203,14 @@ export default {
                     </div>
                     <hr />
                     <InputText class="col-12" type="text" v-model="novaMensagem" placeholder="Digite a mensagem..." />
-                    <Button @click.prevent="enviarMensagem()" label="Enviar" class="mr-2 mt-3 p-button-success col-12" />
-                    <Button @click.prevent="this.displayAnexo = true" label="Alterar Pedido" class="mr-2 mt-3 p-button-secondary col-12" />
+                    <Button @click.prevent="enviarMensagem()" label="Enviar Mensagem" class="mr-2 mt-3 p-button-success col-12" />
+                    <Button @click.prevent="this.displayAnexo = true" label="Alterar Nota" class="mr-2 mt-3 p-button-secondary col-12" />
                 </div>
             </div>
         </Dialog>
 
         <!-- Anexo -->
-        <Dialog header="Insira novo Anexo" v-model:visible="displayAnexo" :style="{ width: '30%' }" :modal="true">
+        <Dialog header="Insira nova nota" v-model:visible="displayAnexo" :style="{ width: '30%' }" :modal="true">
             <div class="grid mt-5 text-center flex justify-content-center align-items-center">
                 <FileUpload uploadLabel="Salvar" cancelLabel="Limpar PDF" chooseLabel="Selecione" @change="uploadPdf" type="file" ref="pdf" name="demo[]" accept=".pdf,.docx" :maxFileSize="1000000"></FileUpload>
             </div>
@@ -233,7 +239,7 @@ export default {
                 >
                     <template #header>
                         <div class="flex justify-content-between">
-                            <h5 for="empresa">Pedidos Reprovados por Soleni:</h5>
+                            <h5 for="empresa">Pedidos Reprovados por Financeiro:</h5>
                         </div>
                     </template>
                     <template #empty> Nenhum pedido encontrado! </template>

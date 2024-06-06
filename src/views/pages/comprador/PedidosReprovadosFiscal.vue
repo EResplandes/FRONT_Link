@@ -5,8 +5,8 @@ import { useConfirm } from 'primevue/useconfirm';
 import PedidoService from '../../../service/Pedido';
 import EmpresaService from '../../../service/EmpresaService';
 import StatusService from '../../../service/StatusService';
-import FuncionarioService from '../../../service/FuncionarioService';
 import ChatService from '../../../service/ChatService';
+import NotaService from '../../../service/NotaService';
 
 export default {
     data() {
@@ -14,18 +14,19 @@ export default {
             toast: new useToast(),
             displayConfirmation: ref(false),
             pedidoService: new PedidoService(),
+            notaService: new NotaService(),
             empresaService: new EmpresaService(),
             statusService: new StatusService(),
             chatService: new ChatService(),
-            funcionarioService: new FuncionarioService(),
             displayConfirmationActivation: ref(false),
             visibleRight: ref(false),
             confirm: new useConfirm(),
+            idNota: ref(null),
             loading1: ref(null),
             empresas: ref(null),
             pedidos: ref(null),
             funcionarios: ref(null),
-            id_pedido: ref(null),
+            idPedido: ref(null),
             id_usuario: ref(null),
             status: ref(null),
             conversa: ref(null),
@@ -45,10 +46,10 @@ export default {
 
     mounted: function () {
         // Metódo responsável por buscar todas os pedidos reprovados por gerente com status 10
-        this.pedidoService.buscaReprovadosSoleni(localStorage.getItem('usuario_id')).then((data) => {
-            console.log(data);
-            this.pedidos = data.pedidos;
+        this.notaService.pedidosReprovadosFiscalPorComprador(localStorage.getItem('usuario_id')).then((data) => {
             this.preloading = false;
+            this.pedidos = data.pedidos;
+            console.log(data);
         });
 
         // Metódo responsável por buscar todas empresas
@@ -70,7 +71,7 @@ export default {
         // Metódo responsável por buscar todas os pedidos reprovados por Soleni com status 11
         buscaPedidos() {
             this.preloading = true;
-            this.pedidoService.buscaReprovadosSoleni(localStorage.getItem('usuario_id')).then((data) => {
+            this.notaService.pedidosReprovadosFiscalPorComprador(localStorage.getItem('usuario_id')).then((data) => {
                 this.pedidos = data.pedidos;
                 this.preloading = false;
             });
@@ -78,7 +79,6 @@ export default {
 
         // Metódo responsável por buscar chat
         chat(id) {
-            this.id_pedido = id;
             this.chatService.buscaConversa(id).then((data) => {
                 console.log(data);
                 this.conversa = data.conversa;
@@ -86,14 +86,15 @@ export default {
             });
         },
 
-        // Metódo responsável por enviar mensagem para Dr Emival ou Dr. Monica
+        // Metódo responsável por enviar mensagem para Fiscal
         enviarMensagem() {
             this.preloading = true;
-            this.pedidoService.respondePedidoReprovadoSoleni(this.pdf, this.novaMensagem, this.id_pedido).then((data) => {
+            this.pedidoService.respondePedidoReprovadoFiscal(this.novoAnexo, this.novaMensagem, this.idNota).then((data) => {
                 if (data.resposta == 'Mensagem enviada com sucesso!') {
                     this.showSuccess('Mensagem enviada com sucesso!');
                     this.displayChat = false;
                     this.buscaPedidos();
+                    this.display = false;
                 } else {
                     this.showError('Ocorreu algum problema, entre em contato com o Administrador');
                 }
@@ -119,14 +120,12 @@ export default {
 
         // Metódo responsável por visualizar pdf
         visualizar(id, data) {
+            this.idNota = data.id_nota;
+            this.idPedido = id;
             this.display = true;
-            this.pdf = data.anexo;
+            this.pdf = data.pedido.anexo;
             this.pdfsrc = `${this.urlBase}/${this.pdf}`;
-        },
-
-        filtrar() {
-            this.visibleRight = true;
-            this.editar = false;
+            this.pdfsrcnota = `${this.urlBase}/${data.nota}`;
         },
 
         showSuccess(mensagem) {
@@ -141,15 +140,13 @@ export default {
             this.toast.add({ severity: 'error', summary: 'Ocorreu um erro!', detail: mensagem, life: 3000 });
         },
 
-        // Metódo responsável por limpagem de filtros
-        limparFiltro() {
-            this.buscaPedidos();
-            this.showInfo('Filtro removidos com sucesso!');
-            this.form = {};
+        uploadPdf() {
+            this.novoAnexo = this.$refs.pdf.files[0];
         },
 
-        uploadPdf() {
-            this.pdf = this.$refs.pdf.files[0];
+        abrirChat() {
+            this.chat(this.idPedido);
+            this.displayChat = true;
         }
     }
 };
@@ -162,9 +159,25 @@ export default {
     <div class="grid">
         <Toast />
 
-        <!-- Visualizar -->
-        <Dialog header="Documento" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
-            <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
+        <!-- Visualizar Pedido de Compra -->
+        <Dialog header="Pedido de Compra" v-model:visible="display" :modal="true" :style="{ width: '90%' }">
+            <div class="grid">
+                <div class="col-6">
+                    <Button @click.prevent="this.displayAnexo = true" style="width: 100%" label="Alterar Nota" icon="pi pi-times" class="p-button-info" />
+                </div>
+                <div class="col-6">
+                    <Button @click.prevent="abrirChat()" style="width: 100%" label="Responder" icon="pi pi-check" class="p-button-success" />
+                </div>
+            </div>
+
+            <Splitter>
+                <SplitterPanel class="flex align-items-center justify-content-center splitter-panel">
+                    <iframe :src="pdfsrc" style="width: 100%; height: 650px; border: none"> Oops! ocorreu um erro. </iframe>
+                </SplitterPanel>
+                <SplitterPanel class="flex align-items-center justify-content-center splitter-panel">
+                    <iframe :src="pdfsrcnota" style="width: 100%; height: 650px; border: none"> Oops! ocorreu um erro. </iframe>
+                </SplitterPanel>
+            </Splitter>
         </Dialog>
 
         <!-- Chat -->
@@ -233,52 +246,51 @@ export default {
                 >
                     <template #header>
                         <div class="flex justify-content-between">
-                            <h5 for="empresa">Pedidos Reprovados por Soleni:</h5>
+                            <h5 for="empresa">Pedidos Reprovados por Fiscal:</h5>
                         </div>
                     </template>
                     <template #empty> Nenhum pedido encontrado! </template>
                     <template #loading> Carregando informações... Por favor, aguarde! </template>
 
-                    <Column field="" header="" class="w-1">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Dt. Inclusão</span>
-                            <Tag v-if="slotProps.data.urgente == 1" class="mr-2" severity="danger" value="Urgente"></Tag>
-                            <Tag v-else class="mr-2" severity="info" value="Normal"></Tag>
-                        </template>
-                    </Column>
-
                     <Column field="Dt. Inclusão" header="Dt. Inclusão" :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">Dt. Inclusão</span>
-                            {{ formatarData(slotProps.data.dt_inclusao) }}
+                            {{ formatarData(slotProps.data.pedido.dt_inclusao) }}
                         </template>
                     </Column>
 
-                    <Column field="Empresa" header="Empresa" :sortable="true" class="w-2">
+                    <Column field="Nº Protheus" header="Nº Protheus" :sortable="true" class="w-1">
                         <template #body="slotProps">
-                            <span class="p-column-title">Empresa</span>
-                            {{ slotProps.data.empresa.nome_empresa }}
+                            <span class="p-column-title">Nº Protheus</span>
+                            {{ slotProps.data.pedido.protheus }}
                         </template>
                     </Column>
 
                     <Column field="Descrição" header="Fornecedor" :sortable="true" class="w-4">
                         <template #body="slotProps">
                             <span class="p-column-title">Descrição</span>
-                            {{ slotProps.data.descricao }}
-                        </template>
-                    </Column>
-
-                    <Column field="Presidente" header="Presidente" :sortable="true" class="w-2">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Presidente</span>
-                            Dr. {{ slotProps.data.link.link }}
+                            {{ slotProps.data.pedido.descricao }}
                         </template>
                     </Column>
 
                     <Column field="Valor" header="Valor" :sortable="true" class="w-1">
                         <template #body="slotProps">
                             <span class="p-column-title">CNPJ</span>
-                            {{ slotProps.data.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
+                            {{ slotProps.data.pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
+                        </template>
+                    </Column>
+
+                    <Column field="Empresa" header="Empresa" :sortable="true" class="w-2">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Empresa</span>
+                            {{ slotProps.data.pedido.empresa }}
+                        </template>
+                    </Column>
+
+                    <Column field="Local" header="Local" :sortable="true" class="w-1">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Local</span>
+                            {{ slotProps.data.pedido.local }}
                         </template>
                     </Column>
 
@@ -287,10 +299,7 @@ export default {
                             <span class="p-column-title"></span>
                             <div class="grid">
                                 <div class="col-4 md:col-4 mr-4">
-                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
-                                </div>
-                                <div class="col-4 md:col-4">
-                                    <Button @click="chat(slotProps.data.id)" icon="pi pi-comments" class="p-button-secondary" />
+                                    <Button @click.prevent="visualizar(slotProps.data.pedido.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
                                 </div>
                             </div>
                         </template>

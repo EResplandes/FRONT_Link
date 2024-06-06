@@ -38,6 +38,7 @@ export default {
             filters: {
                 global: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 protheus: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                criador: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 descricao: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 'local.local': { value: null, matchMode: FilterMatchMode.CONTAINS },
                 dt_inclusao_formatada: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -129,10 +130,10 @@ export default {
         },
 
         chat(id, data) {
-            this.displayChat = true;
             this.chatService.buscaConversa(id).then((data) => {
                 if (data.resposta == 'Chat listado com sucesso!') {
                     this.conversa = data.conversa;
+                    this.displayChat = true;
                 } else {
                     this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
                 }
@@ -248,73 +249,43 @@ export default {
             <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
         </Dialog>
 
+        <ConfirmDialog></ConfirmDialog>
+
         <!-- Chat -->
         <Dialog header="Chat" v-model:visible="displayChat" :style="{ width: '40%' }" :modal="true">
             <div class="grid">
                 <div class="col-12">
-                    <div class="card timeline-container">
-                        <Timeline :value="conversa" align="alternate" class="customized-timeline">
-                            <template #marker="slotProps">
-                                <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
-                                    <i :class="slotProps.item.icon"></i>
-                                </span>
-                            </template>
-                            <template #content="slotProps">
-                                <Card>
-                                    <template #title>
-                                        {{ slotProps.item.id_usuario.name }}
-                                    </template>
-                                    <template #subtitle>
-                                        {{ this.formatarData(slotProps.item.data_mensagem) }}
-                                    </template>
-                                    <template #content>
-                                        <h6>
-                                            {{ slotProps.item.mensagem }}
-                                        </h6>
-                                    </template>
-                                </Card>
-                            </template>
-                        </Timeline>
+                    <div class="card timeline-container" ref="msgContainer">
+                        <div v-if="conversa.length === 0" class="alert alert-warning mt-5"><h5>Não há mensagens disponíveis.</h5></div>
+                        <div v-else>
+                            <Timeline :value="conversa" align="alternate" class="customized-timeline">
+                                <template #marker="slotProps">
+                                    <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
+                                        <i :class="slotProps.item.icon"></i>
+                                    </span>
+                                </template>
+                                <template #content="slotProps">
+                                    <Card>
+                                        <template #title>
+                                            {{ slotProps.item.id_usuario.name }}
+                                        </template>
+                                        <template #subtitle>
+                                            {{ slotProps.item.data_mensagem }}
+                                        </template>
+                                        <template #content>
+                                            <h6>
+                                                {{ slotProps.item.mensagem }}
+                                            </h6>
+                                        </template>
+                                    </Card>
+                                </template>
+                            </Timeline>
+                        </div>
                     </div>
                     <hr />
-                    <!-- <InputText class="col-12" type="text" v-model="newMessage" placeholder="Digite a mensagem..." disabled/>
-                    <Button @click.prevent="enviarMensagem()" label="Enviar" class="mr-2 mt-3 p-button-success col-12" disabled /> -->
                 </div>
             </div>
         </Dialog>
-
-        <!-- Modal Filtros -->
-        <Sidebar style="width: 500px" v-model:visible="visibleRight" :baseZIndex="1000" position="right">
-            <h3 v-if="this.editar == false" class="titleForm">Filtros</h3>
-
-            <div class="card p-fluid">
-                <div class="field">
-                    <label for="empresa">Empresa:</label>
-                    <Dropdown v-model="form.empresa" :options="empresas" showClear optionLabel="nome_empresa" placeholder="Selecione..." class="w-full" />
-                </div>
-                <div class="field">
-                    <label for="empresa">Status:</label>
-                    <Dropdown v-model="form.status" :options="status" showClear optionLabel="status" placeholder="Selecione..." class="w-full" />
-                </div>
-                <div class="field">
-                    <label for="cpf">Descrição: </label>
-                    <InputText v-tooltip.left="'Digite a descrição do pedido'" v-model="form.descricao" id="cnpj" placeholder="Digite..." />
-                </div>
-                <div class="field">
-                    <label for="cpf">Valor: </label>
-                    <InputNumber v-tooltip.left="'Digite o valor do pedido'" v-model="form.valor" inputId="minmaxfraction" :minFractionDigits="2" :maxFractionDigits="2" placeholder="Digite..." />
-                </div>
-                <div class="field">
-                    <label for="cpf">Dt. In clusão:</label>
-                    <Calendar dateFormat="dd/mm/yy" v-tooltip.left="'Selecione a data de inclusão'" v-model="form.dt_inclusao" showIcon :showOnFocus="false" class="" />
-                </div>
-                <hr />
-                <div class="field">
-                    <Button @click.prevent="buscaFiltros()" label="Filtrar" class="mr-2 mb-2 p-button-secondary" />
-                    <Button @click.prevent="limparFiltro()" label="Limpar Filtros" class="mr-2 mb-2 p-button-danger" />
-                </div>
-            </div>
-        </Sidebar>
 
         <!-- Tabela com todos pedidos -->
         <div class="col-12">
@@ -328,6 +299,8 @@ export default {
                     paginator
                     :rows="10"
                     dataKey="id"
+                    :rowsPerPageOptions="[5, 10, 25, 50, 100]"
+                    currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
                     filterDisplay="row"
                     :loading="loading"
                     :globalFilterFields="['descricao', 'empresa.nome_empresa', 'country.name', 'representative.name', 'status']"
@@ -358,8 +331,7 @@ export default {
                             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pelo Valor" />
                         </template>
                     </Column>
-
-                    <Column field="descricao" header="Descrição" style="min-width: 12rem">
+                    <Column field="descricao" header="Fornecedor" style="min-width: 12rem">
                         <template #body="{ data }">
                             {{ data.descricao }}
                         </template>
@@ -367,22 +339,12 @@ export default {
                             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pela Descrição" />
                         </template>
                     </Column>
-
-                    <Column field="local.local" header="Local" style="min-width: 12rem">
-                        <template #body="{ data }">
-                            {{ data.local.local }}
-                        </template>
-                        <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pela Descrição" />
-                        </template>
-                    </Column>
-
                     <Column field="empresa.nome_empresa" header="Empresa" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
                         <template #body="{ data }">
                             {{ data.empresa.nome_empresa }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="empresas" placeholder="Selecione" class="p-column-filter" style="min-width: 12rem" :showClear="true">
+                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="empresas" placeholder="Selecione uma Empresa" class="p-column-filter" style="min-width: 12rem" :showClear="true">
                                 <template #option="slotProps">
                                     {{ slotProps.option }}
                                 </template>
@@ -406,6 +368,16 @@ export default {
                             </MultiSelect>
                         </template>
                     </Column>
+
+                    <Column field="criador" header="Criador" style="min-width: 10rem">
+                        <template #body="{ data }">
+                            {{ data.criador }}
+                        </template>
+                        <template #filter="{ filterModel, filterCallback }">
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar" />
+                        </template>
+                    </Column>
+
                     <Column field="..." header="..." :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
@@ -413,7 +385,7 @@ export default {
                                 <div class="col-3 md:col-3 mr-1">
                                     <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
                                 </div>
-                                <div v-if="slotProps.data.status.status == 'Reprovado' || slotProps.data.status.status == 'Aprovado com Ressalva'" class="col-3 md:col-3">
+                                <div class="col-3 md:col-3">
                                     <Button @click.prevent="chat(slotProps.data.id, slotProps.data)" icon="pi pi-comments" class="p-button-secon" />
                                 </div>
                                 <div

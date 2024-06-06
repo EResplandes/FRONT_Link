@@ -321,7 +321,7 @@ export default {
                         </template>
                     </Column>
 
-                    <Column field="Descrição" header="Descrição" :sortable="true" class="w-4">
+                    <Column field="Descrição" header="Fornecedor" :sortable="true" class="w-4">
                         <template #body="slotProps">
                             <span class="p-column-title">Descrição</span>
                             {{ slotProps.data.pedido.descricao }}

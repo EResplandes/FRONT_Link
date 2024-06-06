@@ -5,6 +5,8 @@ import { useConfirm } from 'primevue/useconfirm';
 import EmpresaService from '../../../service/EmpresaService';
 import StatusService from '../../../service/StatusService';
 import PedidoService from '../../../service/Pedido';
+import NotaService from '../../../service/NotaService';
+import BoletoService from '../../../service/BoletoService';
 import { generatePDF } from './aprovacao';
 
 export default {
@@ -14,7 +16,9 @@ export default {
             displayConfirmation: ref(false),
             empresaService: new EmpresaService(),
             statusService: new StatusService(),
+            boletoService: new BoletoService(),
             pedidoService: new PedidoService(),
+            notaService: new NotaService(),
             displayConfirmationActivation: ref(false),
             visibleRight: ref(false),
             confirm: new useConfirm(),
@@ -29,6 +33,7 @@ export default {
             preloading: ref(true),
             displayFluxo: ref(false),
             display: ref(false),
+            displayNota: ref(false),
             // urlBase: 'http://localhost:8000/storage',
             urlBase: 'https://link.gruporialma.com.br/storage',
             pdf: ref(null),
@@ -42,6 +47,7 @@ export default {
         // Metódo responsável por buscar todos pedidos relacionas a esse usuário que foram aprovados
         this.pedidoService.buscaAprovadosPedidos(localStorage.getItem('usuario_id')).then((data) => {
             this.pedidos = data.pedidos;
+            console.log(data);
             this.preloading = false;
         });
 
@@ -64,7 +70,7 @@ export default {
         // Metódo responsável por buscar todos pedidos do usuário logado
         buscaPedidos() {
             this.preloading = true;
-            this.gerenteService.buscaPedidos(localStorage.getItem('usuario_id')).then((data) => {
+            this.pedidoService.buscaAprovadosPedidos(localStorage.getItem('usuario_id')).then((data) => {
                 this.pedidos = data.pedidos;
                 this.preloading = false;
             });
@@ -112,9 +118,103 @@ export default {
             });
         },
 
-        filtrar() {
-            this.visibleRight = true;
-            this.editar = false;
+        modalForm(id, status) {
+            this.status = status;
+            this.idPedido = id;
+            this.displayNota = true;
+        },
+
+        // Metódo responsável por cadastrar nota e boleto em conjunto
+        cadastrarNota() {
+            const camposObrigatorios = ['pdf', 'pdfBoleto'];
+
+            // Variável para verificar se todos os campos obrigatórios estão preenchidos
+            let todosCamposPreenchidos = true;
+
+            // Iterar sobre os campos obrigatórios
+            for (const campo of camposObrigatorios) {
+                // Verificar se o campo está vazio
+                if (!this.form[campo]) {
+                    // Se estiver vazio, exibir mensagem de erro e definir a variável como falsa
+                    this.showError(`O campo NOTA e BOLETO é obrigatório!`);
+                    todosCamposPreenchidos = false;
+                }
+            }
+
+            if (todosCamposPreenchidos) {
+                this.preloading = true;
+                this.notaService.cadastrarNota(this.form, this.idPedido).then((data) => {
+                    if (data.resposta == 'Nota cadastrada com suceso!') {
+                        this.displayNota = false;
+                        this.showSuccess('Nota cadastrada com sucesso!');
+                        this.buscaPedidos();
+                        this.preloading = false;
+                        this.form = {};
+                    }
+                });
+            }
+        },
+
+        // Metódo responsável por cadastrar somente nota
+        cadastrarSomenteNota() {
+            const camposObrigatorios = ['pdf'];
+
+            // Variável para verificar se todos os campos obrigatórios estão preenchidos
+            let todosCamposPreenchidos = true;
+
+            // Iterar sobre os campos obrigatórios
+            for (const campo of camposObrigatorios) {
+                // Verificar se o campo está vazio
+                if (!this.form[campo]) {
+                    // Se estiver vazio, exibir mensagem de erro e definir a variável como falsa
+                    this.showError(`O campo NOTA é obrigatório!`);
+                    todosCamposPreenchidos = false;
+                }
+            }
+
+            if (todosCamposPreenchidos) {
+                this.preloading = true;
+                this.notaService.cadastrarSomenteNota(this.form, this.idPedido).then((data) => {
+                    if (data.resposta == 'Nota cadastrada com suceso!') {
+                        this.displayNota = false;
+                        this.showSuccess('Nota cadastrada com sucesso!');
+                        this.buscaPedidos();
+                        this.preloading = false;
+                        this.form = {};
+                    }
+                });
+            }
+        },
+
+        // Metódo responsável por cadastrar somente boleto e enviar para pagamento sem nota
+        cadastrarBoleto() {
+            const camposObrigatorios = ['pdfBoleto'];
+
+            // Variável para verificar se todos os campos obrigatórios estão preenchidos
+            let todosCamposPreenchidos = true;
+
+            // Iterar sobre os campos obrigatórios
+            for (const campo of camposObrigatorios) {
+                // Verificar se o campo está vazio
+                if (!this.form[campo]) {
+                    // Se estiver vazio, exibir mensagem de erro e definir a variável como falsa
+                    this.showError(`O campo BOLETO é obrigatório!`);
+                    todosCamposPreenchidos = false;
+                }
+            }
+
+            if (todosCamposPreenchidos) {
+                this.preloading = true;
+                this.boletoService.cadastrarBoleto(this.form, this.idPedido).then((data) => {
+                    if (data.resposta == 'Boleto cadastrado com suceso!') {
+                        this.displayNota = false;
+                        this.showSuccess('Boleto cadastrado com sucesso, pedido enviado para pagamento!');
+                        this.buscaPedidos();
+                        this.preloading = false;
+                        this.form = {};
+                    }
+                });
+            }
         },
 
         showSuccess(mensagem) {
@@ -127,6 +227,14 @@ export default {
 
         showError(mensagem) {
             this.toast.add({ severity: 'error', summary: 'Ocorreu um erro!', detail: mensagem, life: 3000 });
+        },
+
+        uploadPdf() {
+            this.form.pdf = this.$refs.pdf.files[0];
+        },
+
+        uploadPdfBoleto() {
+            this.form.pdfBoleto = this.$refs.pdfBoleto.files[0];
         }
     }
 };
@@ -148,38 +256,28 @@ export default {
             </div>
         </Dialog>
 
-        <!-- Modal Filtros -->
-        <Sidebar style="width: 500px" v-model:visible="visibleRight" :baseZIndex="1000" position="right">
-            <h3 v-if="this.editar == false" class="titleForm">Filtros</h3>
-
-            <div class="card p-fluid">
-                <div class="field">
-                    <label for="empresa">Empresa:</label>
-                    <Dropdown v-model="form.empresa" :options="empresas" showClear optionLabel="nome_empresa" placeholder="Selecione..." class="w-full" />
+        <!-- Inserir nota -->
+        <Dialog header="Nota" v-model:visible="displayNota" :style="{ width: '40%' }" :modal="true">
+            <div class="grid mt-1">
+                <div class="field col-6 md:col-6">
+                    <label for="firstname2">Selecione a Nota:</label><br />
+                    <FileUpload style="width: 100%" chooseLabel="Selecionar Nota" @change="uploadPdf" mode="basic" type="file" ref="pdf" name="demo[]" accept=".pdf,.docx" :maxFileSize="999999999"></FileUpload>
                 </div>
-                <div class="field">
-                    <label for="empresa">Status:</label>
-                    <Dropdown v-model="form.status" :options="status" showClear optionLabel="status" placeholder="Selecione..." class="w-full" />
+                <div v-if="this.status != 'Sem Nota'" class="field col-6 md:col-6">
+                    <label for="firstname2">Selecione o Boleto: <span style="color: red">*</span></label>
+                    <FileUpload style="width: 100%" chooseLabel="Selecionar Boleto" @change="uploadPdfBoleto" mode="basic" type="file" ref="pdfBoleto" name="demo[]" accept=".pdf,.docx" :maxFileSize="999999999"></FileUpload>
                 </div>
-                <div class="field">
-                    <label for="cpf">Descrição: </label>
-                    <InputText v-tooltip.left="'Digite a descrição do pedido'" v-model="form.descricao" id="cnpj" placeholder="Digite..." />
+                <div v-if="this.status != 'Sem Nota'" class="col-12 md:col-12">
+                    <Button style="width: 100%" @click.prevent="cadastrarBoleto()" label="Cadastrar (SOMENTE BOLETO) - Pagamento Antecipado" class="p-button-success" />
                 </div>
-                <div class="field">
-                    <label for="cpf">Valor: </label>
-                    <InputNumber v-tooltip.left="'Digite o valor do pedido'" v-model="form.valor" inputId="minmaxfraction" :minFractionDigits="2" :maxFractionDigits="2" placeholder="Digite..." />
+                <div v-if="this.status != 'Sem Nota'" class="col-12 md:col-12">
+                    <Button style="width: 100%" @click.prevent="cadastrarNota()" label="Cadastrar" class="p-button-info" />
                 </div>
-                <div class="field">
-                    <label for="cpf">Dt. In clusão:</label>
-                    <Calendar dateFormat="dd/mm/yy"  v-tooltip.left="'Selecione a data de inclusão'" v-model="form.dt_inclusao" showIcon :showOnFocus="false" class="" />
-                </div>
-                <hr />
-                <div class="field">
-                    <Button @click.prevent="buscaFiltros()" label="Filtrar" class="mr-2 mb-2 p-button-secondary" />
-                    <Button @click.prevent="limparFiltro()" label="Limpar Filtros" class="mr-2 mb-2 p-button-danger" />
+                <div v-if="this.status == 'Sem Nota'" class="col-12 md:col-12">
+                    <Button style="width: 100%" @click.prevent="cadastrarSomenteNota()" label="Cadastrar Nota" class="p-button-info" />
                 </div>
             </div>
-        </Sidebar>
+        </Dialog>
 
         <!-- Tabela com todos pedidos -->
         <div class="col-12">
@@ -202,14 +300,6 @@ export default {
                     <template #header>
                         <div class="flex justify-content-between">
                             <h5 for="empresa">Pedidos Aprovados:</h5>
-                            <div class="grid">
-                                <div class="col-4 md:col-4 mr-2">
-                                    <Button @click.prevent="filtrar()" icon="pi pi-search" label="Filtrar" class="p-button-secondary" style="margin-right: 0.25em" />
-                                </div>
-                                <div class="col-6 md:col-4">
-                                    <Button @click.prevent="limparFiltro()" icon="pi pi-trash" label="Limpar" class="mr-2 mb-2 p-button-danger" />
-                                </div>
-                            </div>
                         </div>
                     </template>
                     <template #empty> Nenhum pedido encontrado! </template>
@@ -230,14 +320,14 @@ export default {
                         </template>
                     </Column>
 
-                    <Column field="Empresa" header="Empresa" :sortable="true" class="w-2">
+                    <Column field="Nº do Protheus" header="Nº do Protheus" :sortable="true" class="w-1">
                         <template #body="slotProps">
-                            <span class="p-column-title">Empresa</span>
-                            {{ slotProps.data.empresa.nome_empresa }}
+                            <span class="p-column-title">Nº do Protheus</span>
+                            {{ slotProps.data.protheus }}
                         </template>
                     </Column>
 
-                    <Column field="Descrição" header="Descrição" :sortable="true" class="w-5">
+                    <Column field="Descrição" header="Fornecedor" :sortable="true" class="w-3">
                         <template #body="slotProps">
                             <span class="p-column-title">Descrição</span>
                             {{ slotProps.data.descricao }}
@@ -251,15 +341,32 @@ export default {
                         </template>
                     </Column>
 
-                    <Column field="..." header="..." :sortable="true" class="w-2">
+                    <Column field="Empresa" header="Empresa" :sortable="true" class="w-1">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Empresa</span>
+                            {{ slotProps.data.empresa.nome_empresa }}
+                        </template>
+                    </Column>
+
+                    <Column field="Status" header="Status" :sortable="true" class="w-1">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Status</span>
+                            {{ slotProps.data.status.status }}
+                        </template>
+                    </Column>
+
+                    <Column field="..." header="..." :sortable="true" class="w-3">
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
                             <div class="grid">
-                                <div class="col-4 md:col-4 mr-3">
+                                <div class="col-3 md:col-3">
                                     <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
                                 </div>
-                                <div class="col-4 md:col-4 mr-3">
+                                <div class="col-3 md:col-3 ml-1">
                                     <Button @click.prevent="buscaInformacoesPedido(slotProps.data.id)" icon="pi pi-print" class="p-button-secondary" />
+                                </div>
+                                <div v-if="slotProps.data.status.status == 'Aprovado' || slotProps.data.status.status == 'Aprovado com Ressalva' || slotProps.data.status.status == 'Sem Nota'" class="col-3 md:col-3 ml-1">
+                                    <Button @click.prevent="modalForm(slotProps.data.id, slotProps.data.status.status)" icon="pi pi-folder-open" class="p-button-warning" />
                                 </div>
                             </div>
                         </template>

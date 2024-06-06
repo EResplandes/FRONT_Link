@@ -104,7 +104,7 @@ export default {
                 header: 'Excluir pedido?',
                 icon: 'pi pi-info-circle',
                 rejectLabel: 'Cancelar',
-                acceptLabel: 'Desativar',
+                acceptLabel: 'Excluir',
                 rejectClass: 'p-button-secondary p-button-outlined',
                 acceptClass: 'p-button-danger',
                 accept: () => {
@@ -214,6 +214,11 @@ export default {
                 } else {
                     this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
                 }
+
+                this.$nextTick(function () {
+                    var container = this.$refs.msgContainer;
+                    container.scrollTop = container.scrollHeight + 120;
+                });
             });
         },
 
@@ -292,7 +297,7 @@ export default {
                 case 'Enviado para Emival':
                     return 'info';
 
-                case 'negotiation':
+                case 'Enviado para Fiscal':
                     return 'warning';
 
                 case 'renewal':
@@ -324,7 +329,7 @@ export default {
         <Dialog header="Chat" v-model:visible="displayChat" :style="{ width: '40%' }" :modal="true">
             <div class="grid">
                 <div class="col-12">
-                    <div class="card timeline-container">
+                    <div class="card timeline-container" ref="msgContainer">
                         <Timeline :value="conversa" align="alternate" class="customized-timeline">
                             <template #marker="slotProps">
                                 <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
@@ -406,6 +411,8 @@ export default {
                     paginator
                     :rows="10"
                     dataKey="id"
+                    :rowsPerPageOptions="[5, 10, 25, 50, 100]"
+                    currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
                     filterDisplay="row"
                     :loading="loading"
                     :globalFilterFields="['descricao', 'empresa.nome_empresa', 'country.name', 'representative.name', 'status']"
@@ -436,7 +443,7 @@ export default {
                             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pelo Valor" />
                         </template>
                     </Column>
-                    <Column field="descricao" header="Descrição" style="min-width: 12rem">
+                    <Column field="descricao" header="Fornecedor" style="min-width: 12rem">
                         <template #body="{ data }">
                             {{ data.descricao }}
                         </template>
@@ -477,27 +484,68 @@ export default {
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
                             <div class="grid">
-                                <div class="col-3 md:col-3 mr-1">
+                                <!-- View Button -->
+                                <div class="col-3 md:col-3">
                                     <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
                                 </div>
-                                <div v-if="slotProps.data.status.status != 'Aprovado' && slotProps.data.status.status != 'Aprovado com Ressalva' && slotProps.data.status.status != 'Excluído'" class="col-3 md:col-3 ml-3">
-                                    <Button @click.prevent="alterar(slotProps.data.id)" icon="pi pi-pencil" class="p-button-warning" />
+
+                                <!-- Edit Button -->
+                                <div
+                                    v-if="slotProps.data.status.status != 'Aprovado' && slotProps.data.status.status != 'Aprovado com Ressalva' && slotProps.data.status.status != 'Excluído' && slotProps.data.status.status != 'Enviado para Fiscal'"
+                                    class="col-3 md:col-3"
+                                >
+                                    <Button
+                                        v-if="
+                                            slotProps.data.status.status != 'Aprovado' &&
+                                            slotProps.data.status.status != 'Aprovado com Ressalva' &&
+                                            slotProps.data.status.status != 'Excluído' &&
+                                            slotProps.data.status.status != 'Enviado para Fiscal' &&
+                                            slotProps.data.status.status != 'Sem Nota' &&
+                                            slotProps.data.status.status != 'Enviado para Financeiro' &&
+                                            slotProps.data.status.status != 'Nota Reprovada' &&
+                                            slotProps.data.status.status != 'Pago' &&
+                                            slotProps.data.status.status != 'Reprovado por Financeiro - Fiscal'
+                                        "
+                                        @click.prevent="alterar(slotProps.data.id)"
+                                        icon="pi pi-pencil"
+                                        class="p-button-warning"
+                                    />
                                 </div>
-                                <div v-if="slotProps.data.status.status == 'Reprovado' || slotProps.data.status.status == 'Aprovado com Ressalva'" class="col-3 md:col-3 ml-3">
-                                    <Button @click.prevent="chat(slotProps.data.id, slotProps.data)" icon="pi pi-comments" class="p-button-secon" />
+
+                                <!-- Chat Button -->
+                                <div v-if="slotProps.data.status.status == 'Reprovado' || slotProps.data.status.status == 'Aprovado com Ressalva'" class="col-3">
+                                    <Button @click.prevent="chat(slotProps.data.id, slotProps.data)" icon="pi pi-comments" class="p-button-secondary" />
                                 </div>
+
+                                <!-- Print Button -->
                                 <div
                                     v-if="
                                         slotProps.data.status.status == 'Aprovado' ||
                                         slotProps.data.status.status == 'Aprovado com Ressalva' ||
                                         slotProps.data.status.status == 'Resposta do Pedido de Compra Aprovado com Ressalva' ||
-                                        slotProps.data.status.status == 'Retorno do Pedido de Compra Aprovado com Ressalva'
+                                        slotProps.data.status.status == 'Retorno do Pedido de Compra Aprovado com Ressalva' ||
+                                        slotProps.data.status.status == 'Enviado para Fiscal'
                                     "
-                                    class="col-4 md:col-4 mr-1 ml-3"
+                                    class="col-4 md:col-4"
                                 >
                                     <Button @click.prevent="buscaInformacoesPedido(slotProps.data.id)" icon="pi pi-print" class="p-button-secondary" />
                                 </div>
-                                <div v-if="slotProps.data.status.status != 'Aprovado' && slotProps.data.status.status != 'Aprovado com Ressalva' && slotProps.data.status.status != 'Excluído'" class="col-3 md:col-3">
+
+                                <!-- Delete Button -->
+                                <div
+                                    v-if="
+                                        slotProps.data.status.status != 'Aprovado' &&
+                                        slotProps.data.status.status != 'Aprovado com Ressalva' &&
+                                        slotProps.data.status.status != 'Excluído' &&
+                                        slotProps.data.status.status != 'Enviado para Fiscal' &&
+                                        slotProps.data.status.status != 'Sem Nota' &&
+                                        slotProps.data.status.status != 'Enviado para Financeiro' &&
+                                        slotProps.data.status.status != 'Nota Reprovada' &&
+                                        slotProps.data.status.status != 'Pago' &&
+                                        slotProps.data.status.status != 'Reprovado por Financeiro - Fiscal'
+                                    "
+                                    class="col-3 md:col-3"
+                                >
                                     <Button @click.prevent="confirmExcluir(slotProps.data.id)" icon="pi pi-trash" class="p-button-danger" />
                                 </div>
                             </div>

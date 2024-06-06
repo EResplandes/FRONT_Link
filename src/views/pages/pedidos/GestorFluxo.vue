@@ -79,6 +79,7 @@ export default {
                 if (data.resposta == 'Fluxo aprovado com sucesso!') {
                     this.showSuccess('Fluxo aprovado com sucesso!');
                     this.preloading = true;
+                    this.display = false;
                     this.displayFluxo = false;
                     this.buscaPedidos();
                 } else {
@@ -129,6 +130,7 @@ export default {
 
         // Metódo responsável por visualizar pdf
         visualizar(id, anexo) {
+            this.idPedido = id;
             this.display = true;
             this.pdf = anexo;
             this.pdfsrc = `${this.urlBase}/${this.pdf}`;
@@ -136,10 +138,15 @@ export default {
 
         fluxo(id, data) {
             this.idPedido = id;
-            this.displayFluxo = true;
+
+            this.chatService.buscaConversa(this.idPedido).then((data) => {
+                this.conversa = data.conversa;
+            });
+
             this.fluxoService.buscaFluxo(id).then((data) => {
                 if (data.resposta == 'Fluxo listado com sucesso!') {
                     this.fluxoPedido = data.fluxo;
+                    this.displayFluxo = true;
                 }
             });
         },
@@ -173,49 +180,52 @@ export default {
 
         <!-- Visualizar -->
         <Dialog header="Documento" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
+            <Button @click.prevent="fluxo(this.idPedido)" label="Tomada de Ação" class="mr-2 mb-2 p-button-info col-12" />
+
             <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
         </Dialog>
 
-        <!-- Chat -->
-        <Dialog header="Chat" v-model:visible="displayChat" :style="{ width: '40%' }" :modal="true">
-            <div class="grid">
-                <div class="col-12">
-                    <div class="card timeline-container">
-                        <Timeline :value="conversa" align="alternate" class="customized-timeline">
-                            <template #marker="slotProps">
-                                <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
-                                    <i :class="slotProps.item.icon"></i>
-                                </span>
-                            </template>
-                            <template #content="slotProps">
-                                <Card>
-                                    <template #title>
-                                        {{ slotProps.item.id_usuario.name }}
-                                    </template>
-                                    <template #subtitle>
-                                        {{ slotProps.item.data_mensagem }}
-                                    </template>
-                                    <template #content>
-                                        <h6>
-                                            {{ slotProps.item.mensagem }}
-                                        </h6>
-                                    </template>
-                                </Card>
-                            </template>
-                        </Timeline>
-                    </div>
-                    <hr />
-                    <InputText class="col-12" type="text" v-model="this.form.mensagem" placeholder="Digite a mensagem..." />
-                    <Button @click.prevent="enviarMensagem()" label="Reprovar e enviar mensagem" class="mr-2 mt-3 p-button-success col-12" />
-                </div>
-            </div>
-        </Dialog>
-
         <!-- Fluxo -->
-        <Dialog header="Fluxo" v-model:visible="displayFluxo" :style="{ width: '40%' }" :modal="true">
+        <Dialog header="" v-model:visible="displayFluxo" :style="{ width: '70%' }" :modal="true">
             <div class="grid">
-                <div class="col-12">
+                <div class="col-6">
                     <div class="card timeline-container">
+                        <h3>Chat</h3>
+                        <div v-if="conversa.length === 0" class="alert alert-warning mt-5"><h5>Não há mensagens disponíveis.</h5></div>
+                        <div v-else>
+                            <Timeline :value="conversa" align="alternate" class="customized-timeline">
+                                <template #marker="slotProps">
+                                    <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
+                                        <i :class="slotProps.item.icon"></i>
+                                    </span>
+                                </template>
+                                <template #content="slotProps">
+                                    <Card>
+                                        <template #title>
+                                            {{ slotProps.item.id_usuario.name }}
+                                        </template>
+                                        <template #subtitle>
+                                            {{ slotProps.item.data_mensagem }}
+                                        </template>
+                                        <template #content>
+                                            <h6>
+                                                {{ slotProps.item.mensagem }}
+                                            </h6>
+                                        </template>
+                                    </Card>
+                                </template>
+                            </Timeline>
+                        </div>
+                        <hr />
+                        <InputText class="col-12" type="text" v-model="form.mensagem" placeholder="Digite a mensagem..." />
+                        <Button @click.prevent="enviarMensagem()" label="Reprovar e enviar mensagem" class="mr-2 mt-3 p-button-danger col-12" />
+                    </div>
+                </div>
+
+                <div class="col-6">
+                    <div class="card timeline-container">
+                        <h3>Fluxo</h3>
+                        <div v-if="fluxoPedido.length === 0" class="alert alert-warning mt-5"><h5>Pedido Sem Fluxo.</h5></div>
                         <Timeline :value="fluxoPedido" align="alternate" class="customized-timeline">
                             <template #marker="slotProps">
                                 <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
@@ -234,9 +244,7 @@ export default {
                             </template>
                         </Timeline>
                     </div>
-                    <hr />
-                    <Button @click.prevent="aprovarFluxo()" label="Aprovar" class="mr-2 mt-3 p-button-success col-12" />
-                    <Button @click.prevent="reprovarFluxo()" label="Reprovar" class="mr-2 mt-3 p-button-danger col-12" />
+                    <Button @click.prevent="aprovarFluxo()" label="Aprovar" class="mr-2 p-button-success col-12" />
                 </div>
             </div>
         </Dialog>
@@ -282,6 +290,13 @@ export default {
                         </template>
                     </Column>
 
+                    <Column field="Protheus" header="Protheus" :sortable="true" class="w-1">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Protheus</span>
+                            {{ slotProps.data.protheus }}
+                        </template>
+                    </Column>
+
                     <Column field="Empresa" header="Empresa" :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">Empresa</span>
@@ -289,7 +304,7 @@ export default {
                         </template>
                     </Column>
 
-                    <Column field="Descrição" header="Descrição" :sortable="true" class="w-3">
+                    <Column field="Descrição" header="Fornecedor" :sortable="true" class="w-3">
                         <template #body="slotProps">
                             <span class="p-column-title">Descrição</span>
                             {{ slotProps.data.descricao }}
@@ -307,6 +322,13 @@ export default {
                         <template #body="slotProps">
                             <span class="p-column-title">Local</span>
                             {{ slotProps.data.local }}
+                        </template>
+                    </Column>
+
+                    <Column field="Criador" header="Criador" :sortable="true" class="w-1">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Criador</span>
+                            {{ slotProps.data.criador }}
                         </template>
                     </Column>
 
@@ -330,9 +352,6 @@ export default {
                             <div class="grid">
                                 <div class="col-4 md:col-4 mr-3">
                                     <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data.anexo)" icon="pi pi-eye" class="p-button-info" />
-                                </div>
-                                <div class="col-4 md:col-4 ml-1">
-                                    <Button @click.prevent="fluxo(slotProps.data.id, slotProps.data)" icon="pi pi-sitemap" class="p-button-secon" />
                                 </div>
                             </div>
                         </template>
@@ -382,7 +401,7 @@ export default {
 }
 
 .timeline-container {
-    max-height: 300px; /* Defina a altura máxima desejada */
+    max-height: 700px; /* Defina a altura máxima desejada */
     overflow-y: auto; /* Adiciona uma barra de rolagem vertical quando o conteúdo excede a altura máxima */
 }
 </style>

@@ -6,43 +6,41 @@ import PedidoService from '../../../service/Pedido';
 import EmpresaService from '../../../service/EmpresaService';
 import StatusService from '../../../service/StatusService';
 import ChatService from '../../../service/ChatService';
-import { generatePDF } from '../comprador/aprovacao';
+import NotasService from '../../../service/NotaService';
 import { FilterMatchMode } from 'primevue/api';
 
 export default {
     data() {
         return {
             toast: new useToast(),
-            displayConfirmation: ref(false),
             pedidoService: new PedidoService(),
             empresaService: new EmpresaService(),
             statusService: new StatusService(),
             chatService: new ChatService(),
-            displayConfirmationActivation: ref(false),
-            visibleRight: ref(false),
+            notasService: new NotasService(),
             confirm: new useConfirm(),
-            loading1: ref(null),
+            idPedido: ref(null),
             empresas: ref([]),
+            empresa: ref([]),
             pedidos: ref(null),
             status: ref(null),
             form: ref({}),
-            editar: ref(false),
             preloading: ref(true),
             displayChat: ref(false),
             display: ref(false),
             urlBase: 'https://link.gruporialma.com.br/storage',
             pdf: ref(null),
+            newMessage: ref(null),
             pdfsrc: ref(null),
+            pdfsrcnota: ref(null),
             conversa: ref(null),
             customers: null,
             filters: {
                 global: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 protheus: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 descricao: { value: null, matchMode: FilterMatchMode.CONTAINS },
-                'local.local': { value: null, matchMode: FilterMatchMode.CONTAINS },
                 dt_inclusao_formatada: { value: null, matchMode: FilterMatchMode.CONTAINS },
-                'empresa.nome_empresa': { value: null, matchMode: FilterMatchMode.CONTAINS },
-                status: { value: null, matchMode: FilterMatchMode.IN },
+                empresa: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 valor_formatado: { value: null, matchMode: FilterMatchMode.CONTAINS }
             },
             loading: true
@@ -51,13 +49,8 @@ export default {
 
     mounted: function () {
         // Metódo responsável por buscar todas os pedidos
-        this.pedidoService.buscaTodosPedidosExternos().then((data) => {
-            console.log(data);
-            this.pedidos = data.pedidos.map((pedido) => ({
-                ...pedido,
-                dt_inclusao_formatada: this.formatarData(pedido.dt_inclusao),
-                valor_formatado: pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-            }));
+        this.notasService.pedidosEscriturar().then((data) => {
+            this.pedidos = data.pedidos;
             this.preloading = false;
             this.loading = false;
         });
@@ -68,40 +61,15 @@ export default {
                 this.empresas = data.empresas.map((empresa) => empresa.nome_empresa);
             }
         });
-
-        // Metódo responsável por buscar todos status
-        this.statusService.buscaStatus().then((data) => {
-            if (data.resposta == 'Status listados com sucesso!') {
-                this.status = data.itens;
-            }
-        });
     },
 
     methods: {
-        imprimirAutorizacao(data) {
-            console.log(data);
-            try {
-                generatePDF(data);
-                this.preloading = false;
-            } catch (error) {
-                console.error('Erro ao gerar PDF:', error);
-            } finally {
-                this.loading = false;
-            }
-        },
-
-        buscaInformacoesPedido(id) {
-            this.preloading = true;
-            this.pedidoService.buscaInformacoesPedido(id).then((data) => {
-                this.imprimirAutorizacao(data);
-            });
-        },
-        // Metódo responsável por buscar todos pedidos
+        // Metódo responsável por bucsar todos pedidos
         buscaPedidos() {
-            this.preloading = true;
-            this.pedidoService.buscaTodosPedidosExternos().then((data) => {
+            this.notasService.pedidosEscriturar().then((data) => {
                 this.pedidos = data.pedidos;
                 this.preloading = false;
+                this.loading = false;
             });
         },
 
@@ -122,33 +90,27 @@ export default {
             return new Intl.DateTimeFormat('pt-BR', options).format(dataFormatada);
         },
 
-        // Metódo responsável por visualizar pdf
-        visualizar(id, data) {
-            this.display = true;
-            this.pdf = data.anexo;
-            this.pdfsrc = `${this.urlBase}/${this.pdf}`;
-        },
-
-        chat(id, data) {
-            this.displayChat = true;
-            this.chatService.buscaConversa(id).then((data) => {
-                if (data.resposta == 'Chat listado com sucesso!') {
-                    this.conversa = data.conversa;
+        // Metódo responsável por dar baixa na nota
+        darBaixa() {
+            this.preloading = true;
+            this.notasService.darBaixa(this.idPedido).then((data) => {
+                if (data.resposta == 'Nota escriturada e enviada para o Financeiro com sucesso!') {
+                    this.buscaPedidos();
+                    this.showSuccess('Nota escriturada e enviada para o Financeiro com sucesso!');
                 } else {
-                    this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
+                    this.showError('Ocorreu algum problema, entre em contato com o Administrador');
                 }
-
-                this.$nextTick(function () {
-                    var container = this.$refs.msgContainer;
-                    container.scrollTop = container.scrollHeight + 120;
-                });
-
+                this.display = false;
             });
         },
 
-        filtrar() {
-            this.visibleRight = true;
-            this.editar = false;
+        // Metódo responsável por visualizar pdf
+        visualizar(id, data) {
+            this.idPedido = id;
+            this.display = true;
+            this.pdf = data.pedido.anexo;
+            this.pdfsrc = `${this.urlBase}/${this.pdf}`;
+            this.pdfsrcnota = `${this.urlBase}/${data.nota}`;
         },
 
         showSuccess(mensagem) {
@@ -161,28 +123,6 @@ export default {
 
         showError(mensagem) {
             this.toast.add({ severity: 'error', summary: 'Ocorreu um erro!', detail: mensagem, life: 3000 });
-        },
-
-        // Metódo responsável por buscar pedidos com filtros
-        buscaFiltros() {
-            this.preloading = true;
-            this.pedidoService.filtroPedidos(this.form).then((data) => {
-                if (data.resposta == 'Pedidos para o Dr. Emival Caiado!') {
-                    this.pedidos = data.pedidos;
-                    this.form = {};
-                    this.showInfo('Filtros aplicados com sucesso!');
-                    this.preloading = false;
-                } else {
-                    this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
-                }
-            });
-        },
-
-        // Metódo responsável por limpagem de filtros
-        limparFiltro() {
-            this.buscaPedidos();
-            this.showInfo('Filtro removidos com sucesso!');
-            this.form = {};
         },
 
         getStatus(dados) {
@@ -233,12 +173,43 @@ export default {
                 case 'Enviado para Emival':
                     return 'info';
 
-                case 'negotiation':
+                case 'Enviado para Fiscal':
                     return 'warning';
 
                 case 'renewal':
                     return null;
             }
+        },
+
+        chat(id) {
+            this.displayChat = true;
+            this.chatService.buscaConversa(id).then((data) => {
+                if (data.resposta == 'Chat listado com sucesso!') {
+                    this.conversa = data.conversa;
+                } else {
+                    this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
+                }
+            });
+        },
+
+        abrirChat() {
+            this.chat(this.idPedido);
+            this.displayChat = true;
+        },
+
+        enviarMensagem() {
+            this.preloading = true;
+            this.notasService.reprovarNota(this.idPedido, this.newMessage).then((data) => {
+                if (data.resposta == 'Nota reprovada com sucesso') {
+                    this.displayChat = false;
+                    this.display = false;
+                    this.buscaPedidos();
+                    this.showSuccess('Nota reprovada com sucesso');
+                } else {
+                    this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
+                }
+                console.log(data);
+            });
         }
     }
 };
@@ -250,16 +221,12 @@ export default {
     </div>
     <div class="grid">
         <Toast />
-        <!-- Visualizar -->
-        <Dialog header="Documento" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
-            <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
-        </Dialog>
 
         <!-- Chat -->
         <Dialog header="Chat" v-model:visible="displayChat" :style="{ width: '40%' }" :modal="true">
             <div class="grid">
                 <div class="col-12">
-                    <div class="card timeline-container" ref="msgContainer">
+                    <div class="card timeline-container">
                         <Timeline :value="conversa" align="alternate" class="customized-timeline">
                             <template #marker="slotProps">
                                 <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
@@ -284,11 +251,34 @@ export default {
                         </Timeline>
                     </div>
                     <hr />
-                    <!-- <InputText class="col-12" type="text" v-model="newMessage" placeholder="Digite a mensagem..." disabled/>
-                    <Button @click.prevent="enviarMensagem()" label="Enviar" class="mr-2 mt-3 p-button-success col-12" disabled /> -->
+                    <InputText class="col-12" type="text" v-model="newMessage" placeholder="Digite a mensagem..." />
+                    <Button @click.prevent="enviarMensagem()" label="Enviar" class="mr-2 mt-3 p-button-success col-12" />
                 </div>
             </div>
         </Dialog>
+
+        <!-- Visualizar Pedido de Compra -->
+        <Dialog header="Pedido de Compra" v-model:visible="display" :modal="true" :style="{ width: '90%' }">
+            <div class="grid">
+                <div class="col-6">
+                    <Button @click.prevent="abrirChat()" style="width: 100%" label="Reprovar e Enviar para Comprador" icon="pi pi-times" class="p-button-danger" />
+                </div>
+                <div class="col-6">
+                    <Button @click.prevent="darBaixa()" style="width: 100%" label="Escriturar e Enviar para Financeiro" icon="pi pi-check" class="p-button-success" />
+                </div>
+            </div>
+
+            <Splitter>
+                <SplitterPanel class="flex align-items-center justify-content-center splitter-panel">
+                    <iframe :src="pdfsrc" style="width: 100%; height: 650px; border: none"> Oops! ocorreu um erro. </iframe>
+                </SplitterPanel>
+                <SplitterPanel class="flex align-items-center justify-content-center splitter-panel">
+                    <iframe :src="pdfsrcnota" style="width: 100%; height: 650px; border: none"> Oops! ocorreu um erro. </iframe>
+                </SplitterPanel>
+            </Splitter>
+        </Dialog>
+
+        <ConfirmDialog></ConfirmDialog>
 
         <!-- Tabela com todos pedidos -->
         <div class="col-12">
@@ -308,25 +298,28 @@ export default {
                 >
                     <template #empty> Nenhum Pedido Encontrado. </template>
                     <template #loading> Loading customers data. Please wait. </template>
+
                     <Column field="dt_inclusao_formatada" header="Dt. Inclusão" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
                         <template #body="{ data }">
-                            {{ data.dt_inclusao_formatada }}
+                            {{ this.formatarData(data.dt_inclusao_nota) }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
                             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pela Dt. de Inclusão" />
                         </template>
                     </Column>
+
                     <Column field="protheus" header="Nº Protheus" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
                         <template #body="{ data }">
-                            {{ data.protheus }}
+                            {{ data.pedido.protheus }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
                             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pela Dt. de Inclusão" />
                         </template>
                     </Column>
+
                     <Column field="valor_formatado" header="Valor" style="min-width: 12rem">
                         <template #body="{ data }">
-                            {{ data.valor_formatado }}
+                            {{ data.pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
                             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pelo Valor" />
@@ -335,25 +328,16 @@ export default {
 
                     <Column field="descricao" header="Fornecedor" style="min-width: 12rem">
                         <template #body="{ data }">
-                            {{ data.descricao }}
-                        </template>
-                        <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pelo fornecedor" />
-                        </template>
-                    </Column>
-
-                    <Column field="local.local" header="Local" style="min-width: 12rem">
-                        <template #body="{ data }">
-                            {{ data.local.local }}
+                            {{ data.pedido.descricao }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
                             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pela Descrição" />
                         </template>
                     </Column>
 
-                    <Column field="empresa.nome_empresa" header="Empresa" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
+                    <Column field="empresa" header="Empresa" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
                         <template #body="{ data }">
-                            {{ data.empresa.nome_empresa }}
+                            {{ data.pedido.empresa }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
                             <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="empresas" placeholder="Selecione uma Empresa" class="p-column-filter" style="min-width: 12rem" :showClear="true">
@@ -364,34 +348,12 @@ export default {
                         </template>
                     </Column>
 
-                    <Column header="Status" filterField="status" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 16rem">
-                        <template #body="{ data }">
-                            <div class="flex align-items-center gap-2">
-                                <Tag :value="getStatus(data)" :severity="getSeverity(data.status.status)" />
-                            </div>
-                        </template>
-                        <template #filter="{ filterModel, filterCallback }">
-                            <MultiSelect v-model="filterModel.value" @change="filterCallback()" :options="status" optionLabel="status" placeholder="Todos" class="p-column-filter" style="min-width: 16rem" :maxSelectedLabels="1">
-                                <template #option="slotProps">
-                                    <div class="flex align-items-center gap-2">
-                                        <span>{{ slotProps.option.status }}</span>
-                                    </div>
-                                </template>
-                            </MultiSelect>
-                        </template>
-                    </Column>
                     <Column field="..." header="..." :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
                             <div class="grid">
                                 <div class="col-3 md:col-3 mr-1">
-                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
-                                </div>
-                                <div v-if="slotProps.data.status.status == 'Reprovado' || slotProps.data.status.status == 'Aprovado com Ressalva'" class="col-3 md:col-3">
-                                    <Button @click.prevent="chat(slotProps.data.id, slotProps.data)" icon="pi pi-comments" class="p-button-secon" />
-                                </div>
-                                <div v-if="slotProps.data.status.status == 'Aprovado' || slotProps.data.status.status == 'Aprovado com Ressalva'" class="col-4 md:col-4 mr-3">
-                                    <Button @click.prevent="buscaInformacoesPedido(slotProps.data.id)" icon="pi pi-print" class="p-button-secondary" />
+                                    <Button @click.prevent="visualizar(slotProps.data.pedido.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
                                 </div>
                             </div>
                         </template>
