@@ -220,13 +220,10 @@ export default {
         <!-- Visualizar -->
         <Dialog header="Documento" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
             <div class="flex justify-content-center">
-                <div v-if="this.localGerente != '1'" class="flex-1 m-1">
-                    <Button @click.prevent="aprovarPedido()" icon="pi pi-check" label="Aprovar" class="p-button-success" style="width: 100%" />
-                </div>
-                <div v-if="this.localGerente == '1'" class="flex-1 m-1">
+                <div class="flex-1 m-1">
                     <Button @click.prevent="aprovarPedidoDiretor(2)" icon="pi pi-check" label="Aprovar e Enviar Dr. Emival" class="p-button-success" style="width: 100%" />
                 </div>
-                <div v-if="this.localGerente == '1'" class="flex-1 m-1">
+                <div class="flex-1 m-1">
                     <Button @click.prevent="aprovarPedidoDiretor(1)" icon="pi pi-check" label="Aprovar e Enviar Dr. Mônica" class="p-button-warning" style="width: 100%" />
                 </div>
                 <div class="flex-1 m-1">
