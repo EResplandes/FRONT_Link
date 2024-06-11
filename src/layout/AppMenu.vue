@@ -26,7 +26,7 @@ const model = ref([
     {
         label: 'Cadastro de Pedido',
         items: [
-            { label: 'Cadastro SEM FLUXO', icon: 'pi pi-fw pi-book', to: '/cadastro-sem-fluxo', requiredRole: ['Gestor de Fluxo', 'Administrador', 'Comprador Externo', 'Comprador'] },
+            { label: 'Cadastro SEM FLUXO', icon: 'pi pi-fw pi-book', to: '/cadastro-sem-fluxo', requiredRole: ['Gestor de Fluxo', 'Administrador', 'Comprador Externo', 'Comprador', 'Gerente'] },
             { label: 'Cadastro COM FLUXO', icon: 'pi pi-fw pi-book', to: '/cadastro-pedido', requiredRole: ['Gerente', 'Administrador', 'Comprador', 'Gestor de Fluxo'] }
         ]
     },
@@ -54,9 +54,9 @@ const model = ref([
             { label: 'Para Aprovação de Fluxo', icon: 'pi pi-fw pi-reply', to: '/aprovacao-gerentes', requiredRole: ['Diretor', 'Gerente', 'Administrador'] },
             { label: 'Justificar Pedidos Reprovados por Gestor | Diretor', icon: 'pi pi-fw pi-pencil', to: '/reprovados-gestor', requiredRole: ['Comprador', 'Administrador'] },
             { label: 'Justificar Pedidos Aprovados com Ressalva', icon: 'pi pi-fw pi-pencil', to: '/pedidos-ressalva', requiredRole: ['Gerente', 'Administrador', 'Comprador Externo', 'Diretor'] },
-            { label: 'Justificar Pedidos Reprovados', icon: 'pi pi-fw pi-pencil', to: '/pedidos-reprovados', requiredRole: ['Gestor de Fluxo', 'Administrador', 'Gerente', 'Comprador Externo', 'Diretor'] },
+            { label: 'Justificar Pedidos Reprovados', icon: 'pi pi-fw pi-pencil', to: '/pedidos-reprovados', requiredRole: ['Gestor de Fluxo', 'Administrador', 'Gerente', 'Comprador Externo', 'Diretor', 'Comprador'] },
             { label: 'Justificar Notas Reprovados pelo Fiscal', icon: 'pi pi-fw pi-pencil', to: '/pedidos-reprovados-fiscal', requiredRole: ['Comprador', 'Administrador', 'Gestor de Fluxo'] },
-            { label: 'Justificar Pedidos Reprovados por Soleni', icon: 'pi pi-fw pi-pencil', to: '/reprovados-soleni', requiredRole: ['Comprador', 'Administrador', 'Gerente'] }
+            { label: 'Justificar Pedidos Reprovados por Soleni', icon: 'pi pi-fw pi-pencil', to: '/reprovados-soleni', requiredRole: ['Comprador', 'Administrador', 'Gerente', 'Comprador Externo'] }
         ]
     },
     {

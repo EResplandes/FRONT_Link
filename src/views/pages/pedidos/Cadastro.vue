@@ -81,7 +81,7 @@ export default {
         // Metódo responsável por cadastrar pedido
         cadastrarPedido() {
             // Array com os nomes dos campos obrigatórios
-            const camposObrigatorios = ['valor', 'dt_vencimento', 'link', 'empresa', 'descricao', 'fluxo', 'local'];
+            const camposObrigatorios = ['valor', 'dt_vencimento', 'link', 'empresa', 'descricao', 'fluxo', 'local', 'protheus'];
 
             // Variável para verificar se todos os campos obrigatórios estão preenchidos
             let todosCamposPreenchidos = true;
@@ -154,7 +154,7 @@ export default {
                                 <InputNumber v-tooltip.top="'Digite o valor do pedido'" v-model="form.valor" inputId="minmaxfraction" :minFractionDigits="2" :maxFractionDigits="2" placeholder="R$..." />
                             </div>
                             <div class="field col-12 md:col-2">
-                                <label for="firstname2">Nº Pedido no Protheus</label>
+                                <label for="firstname2">Nº Pedido no Protheus <span class="obrigatorio">* </span>></label>
                                 <InputText type="number" v-tooltip.top="'Digite o numero do pedido'" v-model="form.protheus" />
                             </div>
 

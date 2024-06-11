@@ -191,8 +191,7 @@ export default {
                 <div class="col-6">
                     <div class="card timeline-container">
                         <h3>Chat</h3>
-                        <div v-if="conversa.length === 0" class="alert alert-warning mt-5"><h5>Não há mensagens disponíveis.</h5></div>
-                        <div v-else>
+                        <div>
                             <Timeline :value="conversa" align="alternate" class="customized-timeline">
                                 <template #marker="slotProps">
                                     <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
@@ -225,7 +224,6 @@ export default {
                 <div class="col-6">
                     <div class="card timeline-container">
                         <h3>Fluxo</h3>
-                        <div v-if="fluxoPedido.length === 0" class="alert alert-warning mt-5"><h5>Pedido Sem Fluxo.</h5></div>
                         <Timeline :value="fluxoPedido" align="alternate" class="customized-timeline">
                             <template #marker="slotProps">
                                 <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
