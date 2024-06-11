@@ -3,12 +3,19 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
 import { useRouter } from 'vue-router';
 import API_URL from '../service/config';
+import { useToast } from 'primevue/usetoast';
+import RelatorioService from '../service/RelatorioService';
 
 const { layoutConfig, onMenuToggle, setScale } = useLayout();
 
 const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
 const router = useRouter();
+const relatorioService = new RelatorioService();
+const visible = ref(false);
+const toast = useToast();
+const pedidos = ref(null);
+const nomeUsuario = localStorage.getItem('nome');
 
 onMounted(() => {
     decrementScale(1);
@@ -21,6 +28,12 @@ onMounted(() => {
     if (token == '' || token == null || token == undefined) {
         router.push('/auth/login'); // Mandando para tela login
     }
+
+    relatorioService.buscaStatusPedidosPessoa(localStorage.getItem('usuario_id')).then((data) => {
+        console.log(data);
+        pedidos.value = data.informacoes;
+        console.log(pedidos.value);
+    });
 
     // // Verifica se o usuário está ativo, se não estiver ele deslogado o usuário
     // if (status != 'Ativo') {
@@ -88,6 +101,20 @@ const isOutsideClicked = (event) => {
 
     return !(sidebarEl.isSameNode(event.target) || sidebarEl.contains(event.target) || topbarEl.isSameNode(event.target) || topbarEl.contains(event.target));
 };
+
+const showTemplate = () => {
+    if (!visible.value) {
+        toast.add({ severity: 'success', summary: 'Can you send me the report?', group: 'bc' });
+        visible.value = true;
+    }
+};
+const onClose = () => {
+    visible.value = false;
+};
+
+const applyRowStyle = () => {
+    return '#1ea97c';
+};
 </script>
 
 <template>
@@ -105,10 +132,25 @@ const isOutsideClicked = (event) => {
         </button>
 
         <div class="layout-topbar-menu" :class="topbarMenuClasses">
+            <button @click="showTemplate" class="p-link layout-topbar-button" label="Sair">
+                <i class="pi pi-bell m-1"></i>
+            </button>
             <button @click="logout()" class="p-link layout-topbar-button" label="Sair">
                 <i class="pi pi-sign-out m-1"></i>
             </button>
         </div>
+
+        <Toast position="bottom-right" group="bc" @close="onClose">
+            <template #message="slotProps">
+                <div class="flex flex-column align-items-start" style="flex: 1; max-height: 600px; overflow-y: auto">
+                    <li>
+                        <ul v-for="pedido in pedidos">
+                            <span style="font-weight: 800">{{ pedido.status }} <Badge style="background-color: black" :value="pedido.total"></Badge></span>
+                        </ul>
+                    </li>
+                </div>
+            </template>
+        </Toast>
     </div>
 </template>
 

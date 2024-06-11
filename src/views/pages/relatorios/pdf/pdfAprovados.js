@@ -60,18 +60,19 @@ export function generatePDF(data) {
     doc.text('PRESIDENTE', 107, 130, null, null, 'center');
 
     // Define o título da tabela
-    const headers = [['', 'Local', 'Fornecedor', 'Valor', 'Status', 'Autorização', 'Criação', 'Aprovação']];
+    const headers = [['', 'Local', 'Fornecedor', 'Nº Prot', 'Valor', 'Status', 'Autorização', 'Criação', 'Aprovação']];
 
     const tableData = data.map((pedido, index) => {
         const local = pedido.local.local;
         const descricao = pedido.descricao;
+        const protheus = pedido.protheus;
         const valor = pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         const status = pedido.status.status;
         const autorizacao = pedido.link.link;
         const dtInclusao = formatDate(pedido.dt_inclusao);
         const dtAprovacao = formatDate(pedido.dt_assinatura);
 
-        return [index + 1, local, descricao, valor, status, `${autorizacao} @`, dtInclusao, dtAprovacao];
+        return [index + 1, local, descricao, protheus, valor, status, `${autorizacao} @`, dtInclusao, dtAprovacao];
     });
 
     // Adiciona a tabela ao documento PDF
@@ -89,12 +90,13 @@ export function generatePDF(data) {
         columnStyles: {
             0: { halign: 'center', columnWidth: 5 },
             1: { halign: 'center', columnWidth: 15 },
-            2: { halign: 'center', columnWidth: 40 },
-            3: { halign: 'center', columnWidth: 30 },
-            4: { halign: 'center', columnWidth: 15 },
-            5: { halign: 'center', columnWidth: 20 },
-            6: { halign: 'center', columnWidth: 25 },
-            7: { halign: 'center', columnWidth: 30 }
+            2: { halign: 'center', columnWidth: 30 },
+            3: { halign: 'center', columnWidth: 15 },
+            4: { halign: 'center', columnWidth: 25 },
+            5: { halign: 'center', columnWidth: 15 },
+            6: { halign: 'center', columnWidth: 20 },
+            7: { halign: 'center', columnWidth: 25 },
+            8: { halign: 'center', columnWidth: 30 }
         },
         bodyStyles: { halign: 'center', fontSize: 7 }
     });

@@ -57,6 +57,24 @@ export default class RelatorioService {
             });
     }
 
+    async buscaStatusPedidosPessoa(id) {
+        return await fetch(`${API_URL}/relatorios/quantidade-pedidos-por-status-pessoal/${id}`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
     formatDateToYMD(date) {
         const d = new Date(date);
         const year = d.getFullYear();

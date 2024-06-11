@@ -1,36 +1,26 @@
 <script>
 import { ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
-import { useConfirm } from 'primevue/useconfirm';
 import PedidoService from '../../../service/Pedido';
-import EmpresaService from '../../../service/EmpresaService';
-import StatusService from '../../../service/StatusService';
 import ChatService from '../../../service/ChatService';
+import ParcelaService from '../../../service/ParcelaService';
 
 export default {
     data() {
         return {
             toast: new useToast(),
-            displayConfirmation: ref(false),
             pedidoService: new PedidoService(),
-            empresaService: new EmpresaService(),
-            statusService: new StatusService(),
             chatService: new ChatService(),
-            displayConfirmationActivation: ref(false),
-            visibleRight: ref(false),
-            confirm: new useConfirm(),
-            loading1: ref(null),
-            empresas: ref([]),
+            parcelaService: new ParcelaService(),
             pedidos: ref(null),
-            status: ref(null),
             form: ref({}),
-            destino: ref(null),
-            editar: ref(false),
-            caminhoComprovante: ref(null),
             preloading: ref(true),
             displayChat: ref(false),
             novaMensagem: ref(null),
             displayDiretorio: ref(false),
+            totalPagar: ref(null),
+            totalQtd: ref(null),
+            totalPagamentos: ref(null),
             display: ref(false),
             urlBase: 'https://link.gruporialma.com.br/storage',
             pdf: ref(null),
@@ -42,21 +32,24 @@ export default {
     },
 
     mounted: function () {
-        // Metódo responsável por buscar todas os pedidos
-        this.pedidoService.buscaPedidosFinanceiro(localStorage.getItem('local_id')).then((data) => {
-            this.pedidos = data.pedidos;
+        // Metódo responsável por buscar todas os pagamentos
+        this.parcelaService.buscaPedidosHoje().then((data) => {
+            this.pedidos = data.parcelas;
             this.preloading = false;
-            this.loading = false;
+            this.totalPagar = data.total;
+            this.totalQtd = data.totalParcelas;
         });
     },
 
     methods: {
         // Metódo responsável por buscar todos pedidos
-        buscaPedidosFinanceiro() {
+        buscaPedidosHoje() {
             this.preloading = true;
-            this.pedidoService.buscaPedidosFinanceiro(localStorage.getItem('local_id')).then((data) => {
-                this.pedidos = data.pedidos;
+            this.parcelaService.buscaPedidosHoje().then((data) => {
+                this.pedidos = data.parcelas;
                 this.preloading = false;
+                this.totalPagar = data.total;
+                this.totalQtd = data.totalParcelas;
             });
         },
 
@@ -71,7 +64,7 @@ export default {
                 } else {
                     this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
                 }
-                this.buscaPedidosFinanceiro();
+                this.buscaPedidosHoje();
             });
         },
 
@@ -89,15 +82,6 @@ export default {
 
                 this.buscaPedidosFinanceiro();
             });
-        },
-
-        // Metódo responsável por reprovar
-        reprovar() {
-            if (this.destino == 'comprador') {
-                this.reprovarPedidoComprador();
-            } else {
-                this.reprovarPedidoFiscal();
-            }
         },
 
         // Metódo responsável por formatar data padrão br
@@ -125,7 +109,6 @@ export default {
 
         // Metódo responsável por abrir chat
         abrirChat(botao) {
-            this.destino = botao;
             this.chat(this.idPedido); // Buscando histórico desse chat
             this.displayChat = true;
         },
@@ -280,12 +263,56 @@ export default {
             <div class="col-12 lg:col-6">
                 <Toast />
             </div>
-            <!-- Tabela com Pedidos com Nota -->
+
+            <!-- Tabela com Pedidos -->
             <div class="card">
+                <div class="p-fluid formgrid grid mb-5">
+                    <div class="field col-2 md:col-2">
+                        <label for="firstname2">Dt de Início <span class="obrigatorio">*</span></label>
+                        <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de vencimento'" v-model="form.dt_vencimento" showIcon iconDisplay="input" />
+                    </div>
+                    <div class="field col-2 md:col-2">
+                        <label for="firstname2">Dt Fim <span class="obrigatorio">*</span></label>
+                        <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de vencimento'" v-model="form.dt_vencimento" showIcon iconDisplay="input" />
+                    </div>
+                    <div class="field col-2 md:col-2">
+                        <label style="color: white" for="firstname2">.</label><br />
+                        <Button label="Pesquisar" @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-search" class="p-button-info" />
+                    </div>
+                    <div class="field col-3 md:col-3">
+                        <div class="card mb-0">
+                            <div class="flex justify-content-between mb-3">
+                                <div>
+                                    <span class="block text-500 font-medium mb-3">TOTAL A PAGAR</span>
+                                    <div class="text-900 font-medium text-xl"></div>
+                                </div>
+                                <div class="flex align-items-center justify-content-center bg-green-100 border-round" style="width: 2.5rem; height: 2.5rem">
+                                    <i class="pi pi-chart-bar text-green-500 text-xl"></i>
+                                </div>
+                            </div>
+                            <span class="text-green-500 font-medium"></span>
+                            <span v-if="this.totalPagar" class="text-500"> {{ this.totalPagar.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</span>
+                        </div>
+                    </div>
+                    <div class="field col-3 md:col-3">
+                        <div class="card mb-0">
+                            <div class="flex justify-content-between mb-3">
+                                <div>
+                                    <span class="block text-500 font-medium mb-3">Qtd. DE PAGAMENTOS</span>
+                                    <div class="text-900 font-medium text-xl"></div>
+                                </div>
+                                <div class="flex align-items-center justify-content-center bg-blue-100 border-round" style="width: 2.5rem; height: 2.5rem">
+                                    <i class="pi pi-chart-bar text-blue-500 text-xl"></i>
+                                </div>
+                            </div>
+                            <span class="text-green-500 font-medium"></span>
+                            <span class="text-500"> {{ this.totalQtd }} registros</span>
+                        </div>
+                    </div>
+                </div>
+
                 <DataTable
                     dataKey="id"
-                    :rowClass="rowClass"
-                    :rowStyle="rowStyle"
                     :value="pedidos"
                     :paginator="true"
                     :rows="10"
@@ -296,9 +323,6 @@ export default {
                     filterDisplay="menu"
                     stripedRows
                 >
-                    <template #header>
-                        <h4>Pedidos:</h4>
-                    </template>
                     <template #empty> Nenhum pedido encontrado! </template>
                     <template #loading> Carregando informações... Por favor, aguarde! </template>
 
@@ -309,31 +333,38 @@ export default {
                         </template>
                     </Column>
 
-                    <Column field="Empresa" header="Empresa" :sortable="true" class="w-1">
+                    <Column field="Fornecedor" header="Fornecedor" :sortable="true" class="w-1">
                         <template #body="slotProps">
-                            <span class="p-column-title">Empresa</span>
-                            {{ slotProps.data.empresa }}
+                            <span class="p-column-title">Fornecedor</span>
+                            {{ slotProps.data.pedido.descricao }}
                         </template>
                     </Column>
 
-                    <Column field="Descrição" header="Fornecedor" :sortable="true" class="w-4">
+                    <Column field="Nº Pedido" header="Nº Pedido" :sortable="true" class="w-2">
                         <template #body="slotProps">
-                            <span class="p-column-title">Descrição</span>
-                            {{ slotProps.data.descricao }}
+                            <span class="p-column-title">Nº Pedido</span>
+                            {{ slotProps.data.pedido.protheus }}
+                        </template>
+                    </Column>
+
+                    <Column field="Empresa" header="Empresa" :sortable="true" class="w-4">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Empresa</span>
+                            {{ slotProps.data.pedido.empresa }}
                         </template>
                     </Column>
 
                     <Column field="Valor" header="Valor" :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">CNPJ</span>
-                            {{ slotProps.data.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
+                            {{ slotProps.data.valor_parcela.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
                         </template>
                     </Column>
 
                     <Column field="Comprador" header="Comprador" :sortable="true" class="w-1">
                         <template #body="slotProps">
                             <span class="p-column-title">Comprador</span>
-                            {{ slotProps.data.comprador }}
+                            {{ slotProps.data.pedido.criador }}
                         </template>
                     </Column>
 

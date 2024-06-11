@@ -20,8 +20,14 @@ const model = ref([
             { label: 'Pedidos com Emival', icon: 'pi pi-fw pi-book', to: '/pedidos-emival', requiredRole: ['Gestor de Fluxo', 'Administrador', 'Comprador Externo'] },
             { label: 'Pedidos com Monica', icon: 'pi pi-fw pi-book', to: '/pedidos-monica', requiredRole: ['Gestor de Fluxo', 'Administrador'] },
             { label: 'Análise de Fluxo', icon: 'pi pi-fw pi-sitemap', to: '/gestor-fluxo', requiredRole: ['Gestor de Fluxo', 'Administrador'] },
-            { label: 'Cadastro sem Fluxo', icon: 'pi pi-fw pi-book', to: '/cadastro-sem-fluxo', requiredRole: ['Gestor de Fluxo', 'Administrador', 'Comprador Externo', 'Comprador'] },
             { label: 'Todos', icon: 'pi pi-fw pi-book', to: '/todos-pedidos-soleni', requiredRole: ['Gestor de Fluxo', 'Administrador'] }
+        ]
+    },
+    {
+        label: 'Cadastro de Pedido',
+        items: [
+            { label: 'Cadastro SEM FLUXO', icon: 'pi pi-fw pi-book', to: '/cadastro-sem-fluxo', requiredRole: ['Gestor de Fluxo', 'Administrador', 'Comprador Externo', 'Comprador'] },
+            { label: 'Cadastro COM FLUXO', icon: 'pi pi-fw pi-book', to: '/cadastro-pedido', requiredRole: ['Gerente', 'Administrador', 'Comprador', 'Gestor de Fluxo'] }
         ]
     },
     {
@@ -35,6 +41,7 @@ const model = ref([
         label: 'Módulo Financeiro',
         items: [
             { label: 'Pedidos', icon: 'pi pi-fw pi-book', to: '/pedidos-financeiro', requiredRole: ['Fiscal', 'Administrador'] },
+            { label: 'Pagamentos', icon: 'pi pi-fw pi-book', to: '/pagamento-parcelas', requiredRole: ['Fiscal', 'Administrador'] },
             { label: 'Pedidos | Conferência', icon: 'pi pi-fw pi-book', to: '/pedidos-financeiro', requiredRole: ['Fiscal', 'Administrador'] }
         ]
     },
@@ -43,7 +50,6 @@ const model = ref([
         items: [
             { label: 'Todos', icon: 'pi pi-fw pi-book', to: '/pedidos-todos', requiredRole: ['Administrador', 'Comprador', 'Gerente'] },
             { label: 'Todos - Comprador Externo', icon: 'pi pi-fw pi-book', to: '/pedidos-todos-externo', requiredRole: ['Administrador', 'Comprador Externo'] },
-            { label: 'Cadastro de Pedido', icon: 'pi pi-fw pi-book', to: '/cadastro-pedido', requiredRole: ['Gerente', 'Administrador', 'Comprador', 'Gestor de Fluxo'] },
             { label: 'Pedidos Aprovados', icon: 'pi pi-fw pi-check-circle', to: '/pedidos-aprovados', requiredRole: ['Gerente', 'Administrador', 'Comprador', 'Comprador Externo'] },
             { label: 'Para Aprovação de Fluxo', icon: 'pi pi-fw pi-reply', to: '/aprovacao-gerentes', requiredRole: ['Diretor', 'Gerente', 'Administrador'] },
             { label: 'Justificar Pedidos Reprovados por Gestor | Diretor', icon: 'pi pi-fw pi-pencil', to: '/reprovados-gestor', requiredRole: ['Comprador', 'Administrador'] },

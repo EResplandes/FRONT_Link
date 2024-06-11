@@ -1,20 +1,12 @@
 <script>
 import { ref } from 'vue';
-import { useToast } from 'primevue/usetoast';
-import { generatePDF } from '../../pages/relatorios/pdf/pdfAprovados';
 import RelatorioService from '../../../service/RelatorioService';
 export default {
     data() {
         return {
-            toast: new useToast(),
             relatorioService: new RelatorioService(),
-            displayConfirmation: ref(false),
-            displayConfirmationActivation: ref(false),
-            visibleRight: ref(false),
-            loading1: ref(null),
             informacoes: ref(null),
             preloading: ref(false),
-            data: ref(null),
             chartData: ref({}),
             chartOptions: ref({})
         };
@@ -30,26 +22,6 @@ export default {
     },
 
     methods: {
-        gerarRelatorio() {
-            if (this.data) {
-                this.preloading = true;
-                this.relatorioService.buscaPedidosAprovados(this.data).then((data) => {
-                    this.preloading = false;
-                    try {
-                        console.log(data.pedidos);
-                        generatePDF(data.pedidos);
-                        this.showSuccess('Relatório gerado com sucesso!');
-                    } catch (error) {
-                        console.error('Erro ao gerar PDF:', error);
-                    } finally {
-                        this.loading = false;
-                    }
-                });
-            } else {
-                this.showError('Preencha o campo DATA!');
-            }
-        },
-
         setChartOptions() {
             const documentStyle = getComputedStyle(document.documentElement);
             const textColor = documentStyle.getPropertyValue('--text-color');

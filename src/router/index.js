@@ -71,7 +71,12 @@ const router = createRouter({
                 {
                     path: '/pedidos-financeiro',
                     name: 'pedidos-financeiro',
-                    component: () => import('@/views/pages/financeiro/Pedidos.vue')
+                    component: () => import('@/views/pages/financeiro/GeracaoParcelas.vue')
+                },
+                {
+                    path: '/pagamento-parcelas',
+                    name: 'pagamento-parcelas',
+                    component: () => import('@/views/pages/financeiro/Pagamento.vue')
                 },
                 {
                     path: '/pedidos-justificar',
