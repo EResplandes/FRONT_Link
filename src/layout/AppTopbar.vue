@@ -30,9 +30,7 @@ onMounted(() => {
     }
 
     relatorioService.buscaStatusPedidosPessoa(localStorage.getItem('usuario_id')).then((data) => {
-        console.log(data);
         pedidos.value = data.informacoes;
-        console.log(pedidos.value);
     });
 
     // // Verifica se o usuário está ativo, se não estiver ele deslogado o usuário

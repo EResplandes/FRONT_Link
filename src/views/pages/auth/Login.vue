@@ -38,10 +38,11 @@ export default {
                     localStorage.setItem('status_usuario', data.usuario[0].status);
 
                     if (data.usuario[0].id == '1') {
-                        this.router.push('/emival'); // Mandando para tela principal
+                        this.router.push('/emival');
+                    } else if (data.usuario[0].id == '3') {
+                        this.router.push('/monica');
                     } else {
-                        console.log('caiu aqui!');
-                        this.router.push('/'); // Mandando para tela principal
+                        this.router.push('/');
                     }
                 }
             });
