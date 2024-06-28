@@ -57,8 +57,6 @@ export default class CadastraPedidoService {
         // Adicione o array de objetos ao FormData
         formData.append('fluxo', JSON.stringify(usuarios));
 
-        console.log(formData);
-
         return fetch(`${API_URL}/pedidos/cadastrar`, {
             method: 'POST',
             headers: headers,
