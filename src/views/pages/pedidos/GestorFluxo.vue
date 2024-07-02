@@ -43,8 +43,6 @@ export default {
         // Metódo responsável por buscar todas os pedidos com status 6
         this.pedidoService.buscaAnalisando().then((data) => {
             this.pedidos = data.pedidos;
-            console.log(data);
-
             this.preloading = false;
         });
 
@@ -97,6 +95,7 @@ export default {
                     this.display = false;
                     this.displayChat = false;
                     this.displayFluxo = false;
+                    this.form = {};
                 }
                 this.buscaPedidos();
                 this.preloading = false;
@@ -151,9 +150,30 @@ export default {
             });
         },
 
-        filtrar() {
-            this.visibleRight = true;
-            this.editar = false;
+        urgente(idPedido) {
+            this.preloading = true;
+            this.pedidoService.pedidoUrgente(idPedido).then((data) => {
+                if (data.resposta == 'Pedido foi definido como urgente com sucesso!') {
+                    this.buscaPedidos();
+                    this.showSuccess('Pedido definido como urgente com sucesso!');
+                    this.preloading = false;
+                } else {
+                    this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
+                }
+            });
+        },
+
+        normal(idPedido) {
+            this.preloading = true;
+            this.pedidoService.pedidoNormal(idPedido).then((data) => {
+                if (data.resposta == 'Pedido foi definido como normal com sucesso!') {
+                    this.buscaPedidos();
+                    this.showSuccess('Pedido foi definido como normal com sucesso!');
+                    this.preloading = false;
+                } else {
+                    this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
+                }
+            });
         },
 
         showSuccess(mensagem) {
@@ -344,12 +364,26 @@ export default {
                         </template>
                     </Column>
 
-                    <Column field="..." header="..." :sortable="true" class="w-2">
+                    <Column field="..." header="..." :sortable="true" class="w-1">
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
                             <div class="grid">
-                                <div class="col-4 md:col-4 mr-3">
-                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data.anexo)" icon="pi pi-eye" class="p-button-info" />
+                                <div class="col-4 md:col-">
+                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data.anexo)" icon="pi pi-eye" class="p-button-secondary" />
+                                </div>
+                            </div>
+                        </template>
+                    </Column>
+
+                    <Column field="Urgente" header="..." :sortable="true" class="w-2">
+                        <template #body="slotProps">
+                            <span class="p-column-title"></span>
+                            <div class="grid">
+                                <div class="col-4 md:col-1 mr-6">
+                                    <Button @click.prevent="urgente(slotProps.data.id)" label="Urgente" class="p-button-danger" />
+                                </div>
+                                <div class="col-4 md:col-1 ml-6">
+                                    <Button @click.prevent="normal(slotProps.data.id)" label="Normal" class="p-button-info" />
                                 </div>
                             </div>
                         </template>

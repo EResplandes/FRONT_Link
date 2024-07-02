@@ -382,6 +382,7 @@ export default {
                     this.pedidoService.aprovarEmival([{ id: this.pedidos[this.currentIndex].id, status: 3, mensagem: this.mensagemEmival }]).then((data) => {
                         this.showSuccess('Pedidos Reprovado com Sucesso!');
                         this.pedidosReprovados = [];
+                        this.mensagemEmival = '';
 
                         this.pedidos.splice(this.currentIndex, 1);
 
@@ -412,6 +413,7 @@ export default {
                         this.showSuccess('Pedidos Reprovado com Sucesso!');
                         this.pedidosReprovados = [];
                         this.pedidos.splice(this.currentIndex, 1);
+                        this.mensagemEmival = '';
 
                         if (this.currentIndex < this.pedidos.length) {
                             this.visualizarAcima(1, this.pedidos[this.currentIndex]);
@@ -433,6 +435,7 @@ export default {
                     this.pedidoService.aprovarEmival([{ id: this.pedidos[this.currentIndex].id, status: 5, mensagem: this.mensagemEmival }]).then((data) => {
                         this.showSuccess('Pedidos Aprovado com Ressalva com Sucesso!');
                         this.pedidosReprovados = [];
+                        this.mensagemEmival = '';
 
                         this.pedidos.splice(this.currentIndex, 1);
 
@@ -462,6 +465,7 @@ export default {
                         this.showSuccess('Pedidos Aprovado com Ressalva com Sucesso!');
                         this.pedidosReprovados = [];
                         this.pedidos.splice(this.currentIndex, 1);
+                        this.mensagemEmival = '';
 
                         if (this.currentIndex < this.pedidos.length) {
                             this.visualizarAcima(1, this.pedidos[this.currentIndex]);

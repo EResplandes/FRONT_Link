@@ -285,14 +285,12 @@ export default {
 
         // Abaixo de 1000
         salvaMensagemPedido(status) {
-            // this.chat(this.proximoPedido);
-
             switch (status) {
                 case 0: // REPROVAR PEDIDO ABAIXO DE MIL
                     this.pedidoService.aprovarMonica([{ id: this.pedidos[this.currentIndex].id, status: 3, mensagem: this.mensagemEmival }]).then((data) => {
                         this.showSuccess('Pedidos Reprovado com Sucesso!');
                         this.pedidosReprovados = [];
-
+                        this.mensagemEmival = '';
                         this.pedidos.splice(this.currentIndex, 1);
 
                         if (this.currentIndex < this.pedidos.length) {
@@ -322,6 +320,7 @@ export default {
                         this.showSuccess('Pedidos Reprovado com Sucesso!');
                         this.pedidosReprovados = [];
                         this.pedidos.splice(this.currentIndex, 1);
+                        this.mensagemEmival = '';
 
                         if (this.currentIndex < this.pedidos.length) {
                             this.visualizarAcima(1, this.pedidos[this.currentIndex]);
@@ -343,6 +342,7 @@ export default {
                     this.pedidoService.aprovarMonica([{ id: this.pedidos[this.currentIndex].id, status: 5, mensagem: this.mensagemEmival }]).then((data) => {
                         this.showSuccess('Pedidos Aprovado com Ressalva com Sucesso!');
                         this.pedidosReprovados = [];
+                        this.mensagemEmival = '';
 
                         this.pedidos.splice(this.currentIndex, 1);
 
@@ -372,6 +372,7 @@ export default {
                         this.showSuccess('Pedidos Aprovado com Ressalva com Sucesso!');
                         this.pedidosReprovados = [];
                         this.pedidos.splice(this.currentIndex, 1);
+                        this.mensagemEmival = '';
 
                         if (this.currentIndex < this.pedidos.length) {
                             this.visualizarAcima(1, this.pedidos[this.currentIndex]);
