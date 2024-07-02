@@ -40,9 +40,9 @@ export default class GerenteService {
             });
     }
 
-    async aprovarPedidoDiretor(id, idLink) {
+    async aprovarPedidoDiretor(id, idLink, urgente) {
         console.log(id, idLink);
-        return await fetch(`${API_URL}/pedidos/aprovar-fluxo-diretor/` + id + '/' + idLink, {
+        return await fetch(`${API_URL}/pedidos/aprovar-fluxo-diretor/` + id + '/' + idLink + '/' + urgente, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

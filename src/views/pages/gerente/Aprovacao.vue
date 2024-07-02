@@ -26,6 +26,7 @@ export default {
             form: ref({
                 id_usuario: localStorage.getItem('usuario_id')
             }),
+            urgente: ref(0),
             displayChat: ref(false),
             idFluxo: ref(null),
             preloading: ref(true),
@@ -90,7 +91,7 @@ export default {
 
         // Metódo responsável por diretor aprovar pedido
         aprovarPedidoDiretor(idLink) {
-            this.gerenteService.aprovarPedidoDiretor(this.idFluxo, idLink).then((data) => {
+            this.gerenteService.aprovarPedidoDiretor(this.idFluxo, idLink, this.urgente).then((data) => {
                 this.display = false;
                 this.showSuccess('Pedido aprovado com sucesso!');
                 this.buscaPedidos();
@@ -219,6 +220,11 @@ export default {
 
         <!-- Visualizar -->
         <Dialog header="Documento" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
+            <div style="text-align: center; align-items: center; justify-content: center" class="flex items-center m">
+                <InputSwitch :trueValue="1" :falseValue="0" :modelValue="urgente" v-model="urgente" />
+                <label class="p-3" for="firstname2"><b>URGENTE?</b></label>
+            </div>
+            <br />
             <div class="flex justify-content-center">
                 <div class="flex-1 m-1">
                     <Button @click.prevent="aprovarPedidoDiretor(2)" icon="pi pi-check" label="Aprovar e Enviar Dr. Emival" class="p-button-success" style="width: 100%" />
@@ -230,6 +236,7 @@ export default {
                     <Button @click.prevent="reprovarPedido()" icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%" />
                 </div>
             </div>
+            <br />
             <div class="col-12 md:col-12">
                 <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
             </div>
@@ -290,7 +297,7 @@ export default {
                 >
                     <template #header>
                         <div class="flex justify-content-between">
-                            <h5 for="empresa">Pedidos para Aprovações:</h5>
+                            <h5 for="empresa">Pedidos Para Aprovação:</h5>
                         </div>
                     </template>
                     <template #empty> Nenhum pedido encontrado! </template>
