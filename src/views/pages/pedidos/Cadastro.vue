@@ -25,7 +25,9 @@ export default {
             gerentes: ref(null),
             diretores: ref(null),
             locais: ref(null),
-            form: ref({}),
+            form: ref({
+                urgente: 0
+            }),
             preloading: ref(true)
         };
     },
