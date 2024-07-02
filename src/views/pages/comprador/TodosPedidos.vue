@@ -362,11 +362,10 @@ export default {
         <Sidebar style="width: 500px" v-model:visible="displayAlteracao" :baseZIndex="1000" position="right">
             <div class="card p-fluid">
                 <h6 class="titleForm">Formulário de Edição</h6>
-
-                <div class="field">
+                <!-- <div class="field">
                     <label for="descricao">Urgente: </label><br />
                     <InputSwitch :trueValue="1" :falseValue="0" :modelValue="form.urgente" v-model="form.urgente" />
-                </div>
+                </div> -->
                 <div class="field">
                     <label for="empresa">Empresa:</label>
                     <Dropdown v-model="form.empresa" :options="empresa" showClear optionLabel="nome_empresa" placeholder="Selecione..." class="w-full" />
