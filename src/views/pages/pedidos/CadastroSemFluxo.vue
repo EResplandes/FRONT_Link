@@ -24,7 +24,8 @@ export default {
             form: ref({
                 urgente: 0
             }),
-            preloading: ref(true)
+            preloading: ref(true),
+            validaInputUrgente: localStorage.getItem('grupo')
         };
     },
 
@@ -133,10 +134,10 @@ export default {
                 <TabView>
                     <TabPanel header="Formulário">
                         <div class="p-fluid formgrid grid">
-                            <!-- <div class="field col-1 md:col-1">
+                            <div v-if="this.validaInputUrgente == 'Administrador' || this.validaInputUrgente == 'Gestor de Fluxo'" class="field col-1 md:col-1">
                                 <label for="firstname2">Urgente</label>
                                 <InputSwitch :trueValue="1" :falseValue="0" :modelValue="form.urgente" v-model="form.urgente" />
-                            </div> -->
+                            </div>
                             <div class="field col-12 md:col-4">
                                 <label for="firstname2">Valor <span class="obrigatorio">*</span></label>
                                 <InputNumber v-tooltip.top="'Digite o valor do pedido'" v-model="form.valor" inputId="minmaxfraction" :minFractionDigits="2" :maxFractionDigits="2" placeholder="R$..." />

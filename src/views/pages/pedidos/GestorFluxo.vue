@@ -35,7 +35,8 @@ export default {
             urlBase: 'https://link.gruporialma.com.br/storage',
             pdf: ref(null),
             pdfsrc: ref(null),
-            fluxoPedido: ref(null)
+            fluxoPedido: ref(null),
+            validaExclusaoButton: localStorage.getItem('grupo')
         };
     },
 
@@ -375,7 +376,7 @@ export default {
                         </template>
                     </Column>
 
-                    <Column field="Urgente" header="..." :sortable="true" class="w-2">
+                    <Column v-if="this.validaExclusaoButton == 'Administrador'" field="Urgente" header="..." :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
                             <div class="grid">
