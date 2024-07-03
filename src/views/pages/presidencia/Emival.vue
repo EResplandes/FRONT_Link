@@ -717,6 +717,12 @@ export default {
 
     <!-- Visualizar - Abaixo de 1000 reais -->
     <Dialog :header="this.titleDocumento" v-model:visible="display" :style="{ width: '98%' }" :modal="true">
+        <div v-if="this.pedidoSelecionado.verifica_chat && this.pedidoSelecionado.status.id == 2" class="flex align-items-center justify-content-center">
+            <InlineMessage class="mb-3 msg-aviso" severity="error"> RESPOSTA DO PEDIDO DE COMPRA REPROVADO </InlineMessage>
+        </div>
+        <div v-if="this.pedidoSelecionado.verifica_chat && this.pedidoSelecionado.status.id == 12" class="flex align-items-center justify-content-center">
+            <InlineMessage class="mb-3 msg-aviso" severity="success"> RESPOSTA DO PEDIDO DE COMPRA APROVADO COM RESSALVA </InlineMessage>
+        </div>
         <div class="flex align-items-center justify-content-start" v-if="this.pedidoSelecionado.assinados.length > 0">
             <label for="buttondisplay" class="font-bold block mb-2">Autorizações: </label>
             <div v-for="(message, index) in this.pedidoSelecionado.assinados" :key="index">
@@ -759,6 +765,12 @@ export default {
 
     <!-- Visualizar - Acima de 1000 reais -->
     <Dialog :header="this.titleDocumento" v-model:visible="displayAcima" :style="{ width: '95%' }" :modal="true">
+        <div v-if="this.pedidoSelecionado.verifica_chat && this.pedidoSelecionado.status.id == 2" class="flex align-items-center justify-content-center">
+            <InlineMessage class="mb-3 msg-aviso" severity="error"> RESPOSTA DO PEDIDO DE COMPRA REPROVADO </InlineMessage>
+        </div>
+        <div v-if="this.pedidoSelecionado.verifica_chat && this.pedidoSelecionado.status.id == 12" class="flex align-items-center justify-content-center">
+            <InlineMessage class="mb-3 msg-aviso" severity="success"> RESPOSTA DO PEDIDO DE COMPRA APROVADO COM RESSALVA </InlineMessage>
+        </div>
         <div class="flex align-items-center justify-content-start" v-if="this.pedidoSelecionado.assinados.length > 0">
             <label for="buttondisplay" class="font-bold block mb-2">Autorizações: </label>
             <div v-for="(message, index) in this.pedidoSelecionado.assinados" :key="index">

@@ -55,7 +55,6 @@ export default {
 
         // Metódo responsável por buscar quantidades de pedidos para aprovação
         this.pedidoService.pedidosMonica().then((data) => {
-            console.log(data);
             this.pedidos = data.pedidos;
             this.preloading = false;
         });
@@ -216,15 +215,12 @@ export default {
                 } else {
                     this.listarEmivalMaiorMil();
                 }
-
-                console.log(data);
             });
         },
 
         buscaPedidos() {
             // Metódo responsável por buscar quantidades de pedidos para aprovação
             this.pedidoService.pedidosMonica().then((data) => {
-                console.log(data);
                 this.pedidos = data.pedidos;
                 this.preloading = false;
             });
@@ -347,7 +343,6 @@ export default {
         visualizarAcima(id, data) {
             this.pedidoSelecionado = data;
             this.titleDocumento = `Pedido ${this.currentIndex + 1} de ${this.pedidos.length} Pedidos`;
-            console.log(data.anexo);
             this.pedidoAcima = data;
             this.display = true;
             const dataAgora = new Date();
@@ -408,7 +403,6 @@ export default {
                 : 'Data não disponível';
 
             const res = `${nomeUsuario} ${funcao} - ${dataAssinatura}`;
-            console.log('Formatted Message:', res);
             return res;
         },
 
