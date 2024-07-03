@@ -328,10 +328,6 @@ export default {
             }
         },
 
-        salvaMensagemAcima() {
-            // this.chat(this.proximoPedido);
-        },
-
         // Metódo responsável por voltar com pedidos acima de 1000
         voltarAcima() {
             if (this.currentIndex == 0) {
@@ -468,10 +464,6 @@ export default {
                         @click.prevent="proximoItemAcima()"
                         :disabled="this.currentIndex == this.pedidos.length"
                     />
-                </div>
-
-                <div v-if="this.pedidosAprovados.length > 0" class="col-12 md:col-12">
-                    <Button icon="pi pi-check" label="Finalizar Aprovações" class="p-button-success" style="width: 100%; height: 50px" @click.prevent="aprovar()" />
                 </div>
             </div>
         </Dialog>
