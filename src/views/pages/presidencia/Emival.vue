@@ -54,7 +54,6 @@ export default {
 
         // Metódo responsável por buscar quantidades de pedidos para aprovação
         this.pedidoService.buscaQuantidades().then((data) => {
-            console.log(data);
             this.quantidadesPedidos = data.quantidades;
             this.preloading = false;
         });
@@ -99,7 +98,6 @@ export default {
         chat(id) {
             this.id_pedido = id;
             this.chatService.buscaConversa(id).then((data) => {
-                console.log(data);
                 this.conversa = data.conversa;
                 this.displayChat = true;
 
@@ -213,7 +211,6 @@ export default {
         },
         buscaQuantidades() {
             this.pedidoService.buscaQuantidades().then((data) => {
-                console.log(data);
                 this.quantidadesPedidos = data.quantidades;
                 this.preloading = false;
             });
@@ -244,8 +241,6 @@ export default {
                 } else {
                     this.listarEmivalMaiorMil();
                 }
-
-                console.log(data);
             });
         },
 
@@ -282,7 +277,6 @@ export default {
             // Incrementa currentIndex e verifica se está dentro dos limites do array
             if (this.currentIndex < this.pedidos.length) {
                 this.pedidosAprovados.push({ id: this.pedidos[this.currentIndex].id, status: 4 });
-                console.log(this.pedidosAprovados);
 
                 this.currentIndex++;
 
@@ -483,7 +477,6 @@ export default {
                     });
                     break;
                 default:
-                    console.log('Status Não Encontrado.');
             }
         },
 
@@ -524,20 +517,6 @@ export default {
         salvaMensagemAcima() {
             // this.chat(this.proximoPedido);
         },
-
-        // async chat(id) {
-        //     return new Promise((resolve, reject) => {
-        //         this.chatService.buscaConversa(id).then((data) => {
-        //             if (data.resposta == 'Chat listado com sucesso!') {
-        //                 this.conversa = data.conversa;
-        //                 resolve();
-        //             } else {
-        //                 this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
-        //                 reject(new Error('Erro ao buscar conversa'));
-        //             }
-        //         });
-        //     });
-        // },
 
         // Metódo responsável por voltar com pedidos abaixo de 1000
         voltar() {
@@ -595,7 +574,6 @@ export default {
         visualizarAcima(id, data) {
             this.pedidoSelecionado = data;
             this.titleDocumento = `Visualizando Pedido ${this.currentIndex + 1} de ${this.pedidos.length} Pedidos`;
-            console.log(data.anexo);
             this.pedidoAcima = data;
             this.displayAcima = true;
             const dataAgora = new Date();
@@ -661,7 +639,6 @@ export default {
                 : 'Data não disponível';
 
             const res = `${nomeUsuario} ${funcao} - ${dataAssinatura}`;
-            console.log('Formatted Message:', res);
             return res;
         }
     }

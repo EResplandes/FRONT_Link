@@ -403,6 +403,46 @@ export default class PedidoService {
             });
     }
 
+    // Requisição responsável por reprovar apenas 1 pedidi
+    async reprovarPedidoUnico(id_pedido, mensagem) {
+        const idUsuario = localStorage.getItem('usuario_id');
+        return await fetch(`${API_URL}/app/reprovar-acima/${id_pedido}/${idUsuario}/${mensagem}`, {
+            method: 'PUT',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    // Requisição responsável por aprovar com ressalva apenas 1 pedido
+    async ressalvaPedidoUnico(id_pedido, mensagem) {
+        const idUsuario = localStorage.getItem('usuario_id');
+        return await fetch(`${API_URL}/app/ressalva-acima/${id_pedido}/${idUsuario}/${mensagem}`, {
+            method: 'PUT',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
     // Requisição responsável por buscar quantidades
     async buscaQuantidades() {
         return await fetch(`${API_URL}/app/listarQuantidades`, {

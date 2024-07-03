@@ -93,6 +93,7 @@ export default {
         aprovarPedidoDiretor(idLink) {
             this.gerenteService.aprovarPedidoDiretor(this.idFluxo, idLink, this.urgente).then((data) => {
                 this.display = false;
+                this.urgente = 0;
                 this.showSuccess('Pedido aprovado com sucesso!');
                 this.buscaPedidos();
             });

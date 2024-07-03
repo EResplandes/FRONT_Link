@@ -117,6 +117,7 @@ export default {
                     this.showSuccess('Mensagem enviada com sucesso!');
                     this.displayChat = false;
                     this.buscaPedidos();
+                    this.novaMensagem = null;
                 } else {
                     this.showError('Ocorreu algum problema, entre em contato com o Administrador');
                 }

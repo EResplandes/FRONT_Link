@@ -87,7 +87,6 @@ export default {
         chat(id) {
             this.id_pedido = id;
             this.chatService.buscaConversa(id).then((data) => {
-                console.log(data);
                 this.conversa = data.conversa;
                 this.displayChat = true;
 
@@ -276,7 +275,7 @@ export default {
         async ressalvaItemAcima() {
             this.chat(this.pedidoSelecionado.id);
             this.titleChat = 'Aprovar com Ressalva';
-            this.salvarMensagemPedidoStatus = 3;
+            this.salvarMensagemPedidoStatus = 2;
             localStorage.setItem('ultimoPedidoAprovado', this.currentIndex); // Alterado para 'ultimoPedidoAprovado'
             if (this.currentIndex == this.pedidos.length) {
                 this.showInfo('Você chegou ao último para aprovação!');
@@ -286,111 +285,46 @@ export default {
         // Abaixo de 1000
         salvaMensagemPedido(status) {
             switch (status) {
-                case 0: // REPROVAR PEDIDO ABAIXO DE MIL
-                    this.pedidoService.aprovarMonica([{ id: this.pedidos[this.currentIndex].id, status: 3, mensagem: this.mensagemEmival }]).then((data) => {
-                        this.showSuccess('Pedidos Reprovado com Sucesso!');
-                        this.pedidosReprovados = [];
+                case 1: // REPROVAR PEDIDO ACIMA DE MIL
+                    this.pedidoService.reprovarPedidoUnico(this.pedidoAcima.id, this.mensagemEmival).then((data) => {
+                        if (data.resposta == 'Pedido reprovado com sucesso!') {
+                            this.showSuccess('Pedido reprovado com sucesso!');
+                        }
                         this.mensagemEmival = '';
-                        this.pedidos.splice(this.currentIndex, 1);
+                        this.currentIndex++;
 
                         if (this.currentIndex < this.pedidos.length) {
-                            this.visualizar(1, this.pedidos[this.currentIndex]);
-                        } else if (this.pedidos.length > 0) {
-                            this.visualizar(1, this.pedidos[this.currentIndex - 1]);
+                            this.visualizarAcima(this.pedidos[this.currentIndex].id, this.pedidos[this.currentIndex]);
+                            localStorage.setItem('ultimoPedidoAprovado', this.currentIndex);
                         } else {
                             this.display = false;
-                            this.displayChat = false;
-
-                            if (this.pedidos[0].valor <= 500) {
-                                this.listarEmivalMenorQuinhentos();
-                            } else if (this.pedidos[0].valor > 500 && this.pedidos[0].valor < 1000) {
-                                this.listarEmivalMenorMil();
-                            } else {
-                                this.listarEmivalMaiorMil();
-                            }
+                            this.buscaPedidos();
                         }
 
                         this.displayChat = false;
-                        this.mensagemEmival = null;
-                    });
-
-                    break;
-                case 1: // REPROVAR PEDIDO ACIMA DE MIL
-                    this.pedidoService.aprovarMonica([{ id: this.pedidos[this.currentIndex].id, status: 3, mensagem: this.mensagemEmival }]).then((data) => {
-                        this.showSuccess('Pedidos Reprovado com Sucesso!');
-                        this.pedidosReprovados = [];
-                        this.pedidos.splice(this.currentIndex, 1);
-                        this.mensagemEmival = '';
-
-                        if (this.currentIndex < this.pedidos.length) {
-                            this.visualizarAcima(1, this.pedidos[this.currentIndex]);
-                        } else if (this.pedidos.length > 0) {
-                            this.visualizarAcima(1, this.pedidos[this.currentIndex - 1]);
-                        } else {
-                            this.displayAcima = false;
-                            this.displayChat = false;
-
-                            this.listarEmivalMaiorMil();
-                        }
-
-                        this.displayChat = false;
-                        this.mensagemEmival = null;
                     });
 
                     break;
                 case 2:
-                    this.pedidoService.aprovarMonica([{ id: this.pedidos[this.currentIndex].id, status: 5, mensagem: this.mensagemEmival }]).then((data) => {
-                        this.showSuccess('Pedidos Aprovado com Ressalva com Sucesso!');
-                        this.pedidosReprovados = [];
+                    this.pedidoService.ressalvaPedidoUnico(this.pedidoAcima.id, this.mensagemEmival).then((data) => {
+                        if (data.resposta == 'Pedido aprovado ressalva com sucesso') {
+                            this.showSuccess('Pedido aprovado com ressalva com sucesso!');
+                        }
                         this.mensagemEmival = '';
-
-                        this.pedidos.splice(this.currentIndex, 1);
+                        this.currentIndex++;
 
                         if (this.currentIndex < this.pedidos.length) {
-                            this.visualizar(1, this.pedidos[this.currentIndex]);
-                        } else if (this.pedidos.length > 0) {
-                            this.visualizar(1, this.pedidos[this.currentIndex - 1]);
+                            this.visualizarAcima(this.pedidos[this.currentIndex].id, this.pedidos[this.currentIndex]);
+                            localStorage.setItem('ultimoPedidoAprovado', this.currentIndex);
                         } else {
                             this.display = false;
-                            this.displayChat = false;
-
-                            if (this.pedidos[0].valor <= 500) {
-                                this.listarEmivalMenorQuinhentos();
-                            } else if (this.pedidos[0].valor > 500 && this.pedidos[0].valor < 1000) {
-                                this.listarEmivalMenorMil();
-                            } else {
-                                this.listarEmivalMaiorMil();
-                            }
+                            this.buscaPedidos();
                         }
 
                         this.displayChat = false;
-                        this.mensagemEmival = null;
-                    });
-                    break;
-                case 3:
-                    this.pedidoService.aprovarMonica([{ id: this.pedidos[this.currentIndex].id, status: 5, mensagem: this.mensagemEmival }]).then((data) => {
-                        this.showSuccess('Pedidos Aprovado com Ressalva com Sucesso!');
-                        this.pedidosReprovados = [];
-                        this.pedidos.splice(this.currentIndex, 1);
-                        this.mensagemEmival = '';
-
-                        if (this.currentIndex < this.pedidos.length) {
-                            this.visualizarAcima(1, this.pedidos[this.currentIndex]);
-                        } else if (this.pedidos.length > 0) {
-                            this.visualizarAcima(1, this.pedidos[this.currentIndex - 1]);
-                        } else {
-                            this.displayAcima = false;
-                            this.displayChat = false;
-
-                            this.listarEmivalMaiorMil();
-                        }
-
-                        this.displayChat = false;
-                        this.mensagemEmival = null;
                     });
                     break;
                 default:
-                    console.log('Status Não Encontrado.');
             }
         },
 
@@ -416,7 +350,7 @@ export default {
 
         visualizarAcima(id, data) {
             this.pedidoSelecionado = data;
-            this.titleDocumento = `Visualizando Pedido ${this.currentIndex + 1} de ${this.pedidos.length} Pedidos`;
+            this.titleDocumento = `Pedido ${this.currentIndex + 1} de ${this.pedidos.length} Pedidos`;
             console.log(data.anexo);
             this.pedidoAcima = data;
             this.display = true;
@@ -480,6 +414,10 @@ export default {
             const res = `${nomeUsuario} ${funcao} - ${dataAssinatura}`;
             console.log('Formatted Message:', res);
             return res;
+        },
+
+        fecharModal() {
+            this.buscaPedidos();
         }
     }
 };
@@ -493,7 +431,21 @@ export default {
         <Toast />
 
         <!-- Visualizar - Abaixo de 1000 reais -->
-        <Dialog :header="this.titleDocumento" v-model:visible="display" :style="{ width: '90%' }" :modal="true">
+        <Dialog @hide="fecharModal()" :header="this.titleDocumento" v-model:visible="display" :style="{ width: '90%' }" :modal="true">
+            <div v-if="this.pedidoSelecionado.verifica_chat && this.pedidoSelecionado.status.id == 2" class="flex align-items-center justify-content-center">
+                <InlineMessage class="mb-3 msg-aviso" severity="error"> RESPOSTA DO PEDIDO DE COMPRA REPROVADO </InlineMessage>
+            </div>
+            <div v-if="this.pedidoSelecionado.verifica_chat && this.pedidoSelecionado.status.id == 12" class="flex align-items-center justify-content-center">
+                <InlineMessage class="mb-3 msg-aviso" severity="success"> RESPOSTA DO PEDIDO DE COMPRA APROVADO COM RESSALVA </InlineMessage>
+            </div>
+            <div class="flex align-items-center justify-content-start" v-if="this.pedidoSelecionado.assinados.length > 0">
+                <label for="buttondisplay" class="font-bold block mb-2">Autorizações: </label>
+                <div v-for="(message, index) in this.pedidoSelecionado.assinados" :key="index">
+                    <InlineMessage class="m-2" severity="success">
+                        {{ formattedMessage(message) }}
+                    </InlineMessage>
+                </div>
+            </div>
             <div class="grid flex justify-content-center">
                 <div class="col-12 md:col-12">
                     <div ref="pdfContainerAcima" :style="pdfContainerStyle"></div>
@@ -689,5 +641,11 @@ export default {
 
 .splitter-panel:hover {
     background-color: rgb(231, 231, 231);
+}
+.msg-aviso {
+    position: absolute;
+    margin-top: -46px;
+    margin-left: 6%;
+    z-index: 1;
 }
 </style>

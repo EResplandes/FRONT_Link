@@ -87,6 +87,8 @@ export default {
                     this.showSuccess('Mensagem enviada com sucesso!');
                     this.buscaPedidos();
                     this.displayChat = false;
+                    this.form = {};
+                    this.novaMensagem = null;
                 }
             });
         },
