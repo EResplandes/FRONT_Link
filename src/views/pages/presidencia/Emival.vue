@@ -222,6 +222,7 @@ export default {
             this.acimaMil = false;
             this.pedidoService.listarEmivalMenorQuinhentos().then((data) => {
                 this.pedidos = data.pedidos;
+                console.log(this.pedidos);
                 this.ocultaFiltros = true;
                 this.preloading = false;
             });
@@ -977,5 +978,12 @@ export default {
 
 .splitter-panel:hover {
     background-color: rgb(231, 231, 231);
+}
+
+.msg-aviso {
+    position: absolute;
+    margin-top: -46px;
+    margin-left: 6%;
+    z-index: 1;
 }
 </style>
