@@ -224,6 +224,25 @@ export default class PedidoService {
     }
 
     // Requisição responsável por buscar todos pedidos de acordo com local
+    async buscaPedidosLimitados(id_local) {
+        return await fetch(`${API_URL}/pedidos/listar-pedidos-limitado/` + id_local, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    // Requisição responsável por buscar todos pedidos de acordo com local
     async buscaPedidosPorComprador(id_usuario) {
         return await fetch(`${API_URL}/pedidos/listar-pedidos-por-comprador/` + id_usuario, {
             method: 'GET',

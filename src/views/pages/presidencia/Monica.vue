@@ -8,7 +8,6 @@ export default {
     data() {
         return {
             toast: new useToast(),
-            displayConfirmation: ref(false),
             pedidoService: new PedidoService(),
             chatService: new ChatService(),
             displayChat: ref(false),

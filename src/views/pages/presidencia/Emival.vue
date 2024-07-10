@@ -9,14 +9,12 @@ export default {
     data() {
         return {
             toast: new useToast(),
-            displayConfirmation: ref(false),
             pedidoService: new PedidoService(),
             chatService: new ChatService(),
-            displayConfirmationActivation: ref(false),
-            visibleRight: ref(false),
             displayChat: ref(false),
             confirm: new useConfirm(),
             currentIndex: 0,
+            displayChat2: ref(false),
             loading1: ref(null),
             sleep: ref(null),
             mensagemEmival: ref(null),
@@ -33,7 +31,6 @@ export default {
             quantidadesPedidos: ref({}),
             pdfsrc: ref(null),
             urlBase: 'https://link.gruporialma.com.br/storage', // Ambiente de Produção
-            // urlBase: 'https://www.gruporialma.com.br/wp-content/uploads', // Ambiente de Desenvolvimento
             adobeApiReady: false,
             previewFilePromise: null,
             titleDocumento: '',
@@ -100,6 +97,20 @@ export default {
             this.chatService.buscaConversa(id).then((data) => {
                 this.conversa = data.conversa;
                 this.displayChat = true;
+
+                this.$nextTick(function () {
+                    var container = this.$refs.msgContainer;
+                    container.scrollTop = container.scrollHeight + 120;
+                });
+            });
+        },
+
+        // Metódo responsável por buscar chat
+        chatAcima(id) {
+            this.id_pedido = id;
+            this.chatService.buscaConversa(id).then((data) => {
+                this.conversa = data.conversa;
+                this.displayChat2 = true;
 
                 this.$nextTick(function () {
                     var container = this.$refs.msgContainer;
@@ -222,7 +233,6 @@ export default {
             this.acimaMil = false;
             this.pedidoService.listarEmivalMenorQuinhentos().then((data) => {
                 this.pedidos = data.pedidos;
-                console.log(this.pedidos);
                 this.ocultaFiltros = true;
                 this.preloading = false;
             });
@@ -269,9 +279,11 @@ export default {
 
         // Metódo responsávle por buscar proximo pedido
         proximoItem() {
+            this.displayChat = false;
             // Verifica se currentIndex é igual ao comprimento dos pedidos
             if (this.currentIndex === this.pedidos.length) {
                 this.showInfo('Você chegou ao último para aprovação!');
+                this.aprovar();
                 return;
             }
 
@@ -298,6 +310,7 @@ export default {
 
         // Metódo responsávle por buscar proximo pedidoAcima
         proximoItemAcima() {
+            this.displayChat2 = false;
             // Verifica se currentIndex é igual ao comprimento dos pedidos
             if (this.currentIndex === this.pedidos.length) {
                 this.showInfo('Você chegou ao último para aprovação!');
@@ -320,6 +333,38 @@ export default {
                     } else {
                         this.listarEmivalMaiorMil();
                         this.displayAcima = false;
+                    }
+                });
+            } else {
+                // Se currentIndex for igual ao comprimento dos pedidos, não há próximo pedido
+                this.showInfo('Você chegou ao último para aprovação!');
+            }
+        },
+
+        finalizarConversa() {
+            this.displayChat = false;
+            // Verifica se currentIndex é igual ao comprimento dos pedidos
+            if (this.currentIndex === this.pedidos.length) {
+                this.showInfo('Você chegou ao último para aprovação!');
+                this.display = false;
+                this.listarEmivalMenorMil();
+                this.listarEmivalMenorQuinhentos();
+                return;
+            }
+
+            // Incrementa currentIndex e verifica se está dentro dos limites do array
+            if (this.currentIndex < this.pedidos.length) {
+                // Enviando id do pedido
+                this.pedidoService.aprovarPedidoUnico(this.pedidoSelecionado.id).then((data) => {
+                    if (data.resposta == 'Pedido aprovado com sucesso') {
+                        this.showSuccess('Pedido aprovado com sucesso');
+                    }
+
+                    this.currentIndex++;
+
+                    if (this.currentIndex < this.pedidos.length) {
+                        this.visualizar(this.pedidos[this.currentIndex].id, this.pedidos[this.currentIndex]);
+                        localStorage.setItem('ultimoPedidoAprovado', this.currentIndex);
                     }
                 });
             } else {
@@ -359,7 +404,7 @@ export default {
         },
 
         async ressalvaItemAcima() {
-            this.chat(this.pedidoSelecionado.id);
+            this.chatAcima(this.pedidoSelecionado.id);
             this.titleChat = 'Aprovar com Ressalva';
             this.salvarMensagemPedidoStatus = 3;
             localStorage.setItem('ultimoPedidoAprovado', this.currentIndex); // Alterado para 'ultimoPedidoAprovado'
@@ -712,6 +757,43 @@ export default {
                 <hr />
                 <InputText class="col-12" type="text" v-model="mensagemEmival" placeholder="Digite a mensagem..." />
                 <Button @click="salvaMensagemPedido(this.salvarMensagemPedidoStatus)" label="Enviar Mensagem" class="mr-2 mt-3 p-button-success col-12" />
+                <Button v-if="this.pedidoSelecionado.status.status == 'Resposta do Pedido de Compra Aprovado com Ressalva'" @click="finalizarConversa()" label="Finalizar Conversa" class="mr-2 mt-3 p-button-info col-12" />
+            </div>
+        </div>
+    </Dialog>
+
+    <!-- Chat 2 -->
+    <Dialog :header="this.titleChat" v-model:visible="displayChat2" :style="{ width: '80%' }" :modal="true">
+        <div class="grid">
+            <div class="col-12">
+                <div class="card timeline-container" ref="msgContainer">
+                    <Timeline :value="conversa" align="alternate" class="customized-timeline">
+                        <template #marker="slotProps">
+                            <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
+                                <i :class="slotProps.item.icon"></i>
+                            </span>
+                        </template>
+                        <template #content="slotProps">
+                            <Card>
+                                <template #title>
+                                    {{ slotProps.item.id_usuario.name }}
+                                </template>
+                                <template #subtitle>
+                                    {{ this.formatarData(slotProps.item.data_mensagem) }}
+                                </template>
+                                <template #content>
+                                    <h6>
+                                        {{ slotProps.item.mensagem }}
+                                    </h6>
+                                </template>
+                            </Card>
+                        </template>
+                    </Timeline>
+                </div>
+                <hr />
+                <InputText class="col-12" type="text" v-model="mensagemEmival" placeholder="Digite a mensagem..." />
+                <Button @click="salvaMensagemPedido(this.salvarMensagemPedidoStatus)" label="Enviar Mensagem" class="mr-2 mt-3 p-button-success col-12" />
+                <Button v-if="this.pedidoSelecionado.status.status == 'Resposta do Pedido de Compra Aprovado com Ressalva'" @click="proximoItemAcima()" label="Finalizar Conversa" class="mr-2 mt-3 p-button-info col-12" />
             </div>
         </div>
     </Dialog>
@@ -741,13 +823,19 @@ export default {
             <div class="col-4 md:col-3">
                 <Button icon="pi pi-times" label="Pedido Anterior" class="p-button-secondary" style="width: 100%; height: 50px" @click.prevent="voltar()" :disabled="this.currentIndex == 0" />
             </div>
-            <div class="col-4 md:col-3">
+            <div v-if="this.pedidoSelecionado.status.status != 'Resposta do Pedido de Compra Aprovado com Ressalva'" class="col-4 md:col-3">
                 <Button icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%; height: 50px" @click.prevent="reprovarItem()" />
             </div>
             <div class="col-4 md:col-3">
-                <Button icon="pi pi-times" label="Aprovar c/ Ressalva " class="p-button-warning" style="width: 100%; height: 50px" @click.prevent="ressalvaItem()" />
+                <Button
+                    icon="pi pi-times"
+                    :label="this.pedidoSelecionado.status.status == 'Resposta do Pedido de Compra Aprovado com Ressalva' ? 'Visualizar Conversa' : 'Aprovar c/ Ressalva'"
+                    class="p-button-warning"
+                    style="width: 100%; height: 50px"
+                    @click.prevent="ressalvaItem()"
+                />
             </div>
-            <div class="col-4 md:col-3">
+            <div v-if="this.pedidoSelecionado.status.status != 'Resposta do Pedido de Compra Aprovado com Ressalva'" class="col-4 md:col-3">
                 <Button
                     icon="pi pi-check"
                     :label="this.currentIndex >= this.pedidos.length - 1 ? 'Aprovar Último Pedido' : 'Próximos Pedidos'"
@@ -781,22 +869,28 @@ export default {
             </div>
         </div>
 
-        <div class="grid">
+        <div class="grid justify-content-center">
             <div class="col-12 md:col-12">
-                <!-- <pdf :src="this.urlBase"></pdf> -->
                 <div ref="pdfContainerAcima" style="width: 100%; height: 750px; border: none"></div>
-                <!-- <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe> -->
             </div>
             <div class="col-4 md:col-3">
                 <Button icon="pi pi-times" label="Pedido Anterior" class="p-button-secondary" style="width: 100%; height: 50px" @click.prevent="voltarAcima()" :disabled="this.currentIndex == 0" />
             </div>
-            <div class="col-4 md:col-3">
+            <div v-if="this.pedidoSelecionado.status.status != 'Resposta do Pedido de Compra Aprovado com Ressalva'" class="col-4 md:col-3">
                 <Button icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%; height: 50px" @click.prevent="reprovarItemAcima()" />
             </div>
             <div class="col-4 md:col-3">
-                <Button icon="pi pi-times" label="Aprovar c/ Ressalva " class="p-button-warning" style="width: 100%; height: 50px" @click.prevent="ressalvaItemAcima()" />
+                <Button
+                    icon="pi pi-times"
+                    :label="this.pedidoSelecionado.status.status == 'Resposta do Pedido de Compra Aprovado com Ressalva' ? 'Visualizar Conversa' : 'Aprovar c/ Ressalva'"
+                    class="p-button-warning"
+                    style="width: 100%; height: 50px"
+                    @click.prevent="ressalvaItemAcima()"
+                />
             </div>
-            <div class="col-4 md:col-3"><Button icon="pi pi-check" label="Aprovar" class="p-button-info" style="width: 100%; height: 50px" @click.prevent="proximoItemAcima()" :disabled="this.currentIndex == this.pedidos.length" /></div>
+            <div v-if="this.pedidoSelecionado.status.status != 'Resposta do Pedido de Compra Aprovado com Ressalva'" class="col-4 md:col-3">
+                <Button icon="pi pi-check" label="Aprovar" class="p-button-info" style="width: 100%; height: 50px" @click.prevent="proximoItemAcima()" :disabled="this.currentIndex == this.pedidos.length" />
+            </div>
         </div>
     </Dialog>
 
@@ -833,6 +927,20 @@ export default {
                             <span class="p-column-title">Dt. Inclusão</span>
                             <Tag v-if="slotProps.data.urgente == 1" class="mr-2" severity="danger" value="Urgente"></Tag>
                             <Tag v-else class="mr-2" severity="info" value="Normal"></Tag>
+                        </template>
+                    </Column>
+
+                    <Column field="Status" header="Status" :sortable="true" class="w-2">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Status</span>
+                            <span
+                                :class="{
+                                    'text-red': slotProps.data.status.status == 'Resposta do Pedido de Compra Aprovado com Ressalva',
+                                    'text-bold': slotProps.data.status.status != 'Resposta do Pedido de Compra Aprovado com Ressalva'
+                                }"
+                            >
+                                {{ slotProps.data.status.status == 'Resposta do Pedido de Compra Aprovado com Ressalva' ? 'Resposta do Pedido de Compra Aprovado com Ressalva' : 'Novo Pedido' }}
+                            </span>
                         </template>
                     </Column>
 
@@ -985,5 +1093,14 @@ export default {
     margin-top: -46px;
     margin-left: 6%;
     z-index: 1;
+}
+
+.text-red {
+    color: red;
+    font-weight: 900;
+}
+
+.text-bold {
+    font-weight: 900;
 }
 </style>

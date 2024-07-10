@@ -41,7 +41,7 @@ export default {
                 descricao: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 dt_inclusao_formatada: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 'empresa.nome_empresa': { value: null, matchMode: FilterMatchMode.CONTAINS },
-                status: { value: null, matchMode: FilterMatchMode.IN },
+                status: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 valor_formatado: { value: null, matchMode: FilterMatchMode.CONTAINS }
             },
             loading: true
@@ -243,7 +243,7 @@ export default {
         <Toast />
         <!-- Visualizar -->
         <Dialog header="Documento" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
-            <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
+            <iframe :src="pdfsrc" style="width: 100%; height: 00px; border: none"> Oops! ocorreu um erro. </iframe>
         </Dialog>
 
         <!-- Chat -->
