@@ -997,6 +997,20 @@ export default {
                     <template #empty> Nenhum pedido encontrado! </template>
                     <template #loading> Carregando informações... Por favor, aguarde! </template>
 
+                    <Column field="Status" header="Status" :sortable="true" class="w-2">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Status</span>
+                            <span
+                                :class="{
+                                    'text-red': slotProps.data.status.status == 'Resposta do Pedido de Compra Aprovado com Ressalva',
+                                    'text-bold': slotProps.data.status.status != 'Resposta do Pedido de Compra Aprovado com Ressalva'
+                                }"
+                            >
+                                {{ slotProps.data.status.status == 'Resposta do Pedido de Compra Aprovado com Ressalva' ? 'Resposta do Pedido de Compra Aprovado com Ressalva' : 'Novo Pedido' }}
+                            </span>
+                        </template>
+                    </Column>
+
                     <Column field="" header="" class="w-1">
                         <template #body="slotProps">
                             <span class="p-column-title">Dt. Inclusão</span>
