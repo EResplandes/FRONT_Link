@@ -997,6 +997,14 @@ export default {
                     <template #empty> Nenhum pedido encontrado! </template>
                     <template #loading> Carregando informações... Por favor, aguarde! </template>
 
+                    <Column field="" header="" class="w-1">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Dt. Inclusão</span>
+                            <Tag v-if="slotProps.data.urgente == 1" class="mr-2" severity="danger" value="Urgente"></Tag>
+                            <Tag v-else class="mr-2" severity="info" value="Normal"></Tag>
+                        </template>
+                    </Column>
+
                     <Column field="Status" header="Status" :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">Status</span>
@@ -1008,14 +1016,6 @@ export default {
                             >
                                 {{ slotProps.data.status.status == 'Resposta do Pedido de Compra Aprovado com Ressalva' ? 'Resposta do Pedido de Compra Aprovado com Ressalva' : 'Novo Pedido' }}
                             </span>
-                        </template>
-                    </Column>
-
-                    <Column field="" header="" class="w-1">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Dt. Inclusão</span>
-                            <Tag v-if="slotProps.data.urgente == 1" class="mr-2" severity="danger" value="Urgente"></Tag>
-                            <Tag v-else class="mr-2" severity="info" value="Normal"></Tag>
                         </template>
                     </Column>
 
