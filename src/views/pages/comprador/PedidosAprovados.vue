@@ -13,16 +13,12 @@ export default {
     data() {
         return {
             toast: new useToast(),
-            displayConfirmation: ref(false),
             empresaService: new EmpresaService(),
             statusService: new StatusService(),
             boletoService: new BoletoService(),
             pedidoService: new PedidoService(),
             notaService: new NotaService(),
-            displayConfirmationActivation: ref(false),
-            visibleRight: ref(false),
             confirm: new useConfirm(),
-            loading1: ref(null),
             empresas: ref(null),
             pedidos: ref(null),
             status: ref(null),
@@ -34,12 +30,12 @@ export default {
             displayFluxo: ref(false),
             display: ref(false),
             displayNota: ref(false),
-            // urlBase: 'http://localhost:8000/storage',
             urlBase: 'https://link.gruporialma.com.br/storage',
             pdf: ref(null),
             pdfsrc: ref(null),
             fluxoPedido: ref(null),
-            informacoesPedidos: ref(null)
+            informacoesPedidos: ref(null),
+            validaAnexo: localStorage.getItem('nome')
         };
     },
 
@@ -365,9 +361,10 @@ export default {
                                 <div class="col-3 md:col-3 ml-1">
                                     <Button @click.prevent="buscaInformacoesPedido(slotProps.data.id)" icon="pi pi-print" class="p-button-secondary" />
                                 </div>
-                                <!-- <div v-if="slotProps.data.status.status == 'Aprovado' || slotProps.data.status.status == 'Aprovado com Ressalva' || slotProps.data.status.status == 'Sem Nota'" class="col-3 md:col-3 ml-1">
+                                <!-- v-if="slotProps.data.status.status == 'Aprovado' || slotProps.data.status.status == 'Aprovado com Ressalva' || slotProps.data.status.status == 'Sem Nota'" -->
+                                <div v-if="this.validaAnexo == 'Danilo Ornelas'" class="col-3 md:col-3 ml-1">
                                     <Button @click.prevent="modalForm(slotProps.data.id, slotProps.data.status.status)" icon="pi pi-folder-open" class="p-button-warning" />
-                                </div> -->
+                                </div>
                             </div>
                         </template>
                     </Column>
