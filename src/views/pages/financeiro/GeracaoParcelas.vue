@@ -113,7 +113,7 @@ export default {
             this.display = true;
             this.pdf = data.anexo;
             this.pdfsrc = `${this.urlBase}/${this.pdf}`;
-            this.pdfsrcboleto = `${this.urlBase}/${data.boleto.boleto}`;
+            this.pdfsrcboleto = `${this.urlBase}/${data.boleto[0].boleto}`;
         },
 
         // Metódo responsável por abrir chat
