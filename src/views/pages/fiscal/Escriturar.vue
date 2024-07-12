@@ -106,6 +106,7 @@ export default {
 
         // Metódo responsável por visualizar pdf
         visualizar(id, data) {
+            console.log(data);
             this.idPedido = id;
             this.display = true;
             this.pdf = data.pedido.anexo;

@@ -111,7 +111,7 @@ export default {
         visualizar(id, data) {
             this.idPedido = id;
             this.display = true;
-            this.pdf = data.pedidos.anexo;
+            this.pdf = data.anexo;
             this.pdfsrc = `${this.urlBase}/${this.pdf}`;
             this.pdfsrcboleto = `${this.urlBase}/${data.boleto.boleto}`;
         },
