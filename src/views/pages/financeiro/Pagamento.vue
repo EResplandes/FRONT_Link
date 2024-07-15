@@ -18,7 +18,7 @@ export default {
             displayChat: ref(false),
             novaMensagem: ref(null),
             displayDiretorio: ref(false),
-            totalPagar: ref(null),
+            totalPagar: ref(0),
             totalQtd: ref(null),
             totalPagamentos: ref(null),
             display: ref(false),
@@ -79,7 +79,6 @@ export default {
                 } else {
                     this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
                 }
-
                 this.buscaPedidosFinanceiro();
             });
         },
@@ -99,6 +98,7 @@ export default {
 
         // Metódo responsável por visualizar pdf
         visualizar(id, data) {
+            console.log(data);
             this.idPedido = id;
             this.display = true;
             this.pdf = data.pedido.anexo;
@@ -291,7 +291,10 @@ export default {
                                 </div>
                             </div>
                             <span class="text-green-500 font-medium"></span>
-                            <span v-if="this.totalPagar" class="text-500"> {{ this.totalPagar.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</span>
+                            <span v-if="totalPagar !== 0" class="text-500">
+                                {{ totalPagar.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
+                            </span>
+                            <span v-else class="text-500"> Nenhum pagamento até o momento!</span>
                         </div>
                     </div>
                     <div class="field col-3 md:col-3">
@@ -306,7 +309,7 @@ export default {
                                 </div>
                             </div>
                             <span class="text-green-500 font-medium"></span>
-                            <span class="text-500"> {{ this.totalQtd }} registros</span>
+                            <span class="text-500"> {{ this.totalQtd }}</span>
                         </div>
                     </div>
                 </div>

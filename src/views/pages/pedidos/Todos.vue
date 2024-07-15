@@ -121,9 +121,10 @@ export default {
 
         // Metódo responsável por visualizar pdf
         visualizar(id, data) {
-            this.display = true;
             this.pdf = data.anexo;
             this.pdfsrc = `${this.urlBase}/${this.pdf}`;
+            console.log(this.pdfsrc);
+            this.display = true;
         },
 
         chat(id, data) {
@@ -242,8 +243,9 @@ export default {
     <div class="grid">
         <Toast />
         <!-- Visualizar -->
+        <!-- Visualizar -->
         <Dialog header="Documento" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
-            <iframe :src="pdfsrc" style="width: 100%; height: 00px; border: none"> Oops! ocorreu um erro. </iframe>
+            <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
         </Dialog>
 
         <!-- Chat -->
