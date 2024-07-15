@@ -224,8 +224,8 @@ export default class PedidoService {
     }
 
     // Requisição responsável por buscar todos pedidos de acordo com local
-    async buscaPedidosLimitados(id_local) {
-        return await fetch(`${API_URL}/pedidos/listar-pedidos-limitado/` + id_local, {
+    async buscaPedidosLimitados(id_local, form) {
+        return await fetch(`${API_URL}/pedidos/listar-pedidos-limitado/${id_local}/${this.formatarDataParaYMD(form.dt_inicio)}/${this.formatarDataParaYMD(form.dt_fim)}`, {
             method: 'GET',
             headers: {
                 Accept: 'application/json',

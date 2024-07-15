@@ -44,7 +44,8 @@ export default {
                 status: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 valor_formatado: { value: null, matchMode: FilterMatchMode.CONTAINS }
             },
-            loading: true
+            loading: true,
+            qtdPedidos: 1000
         };
     },
 
@@ -97,8 +98,14 @@ export default {
         buscaPedidos() {
             this.preloading = true;
             this.pedidoService.buscaPedidos(localStorage.getItem('local_id')).then((data) => {
-                this.pedidos = data.pedidos;
+                this.pedidos = data.pedidos.map((pedido) => ({
+                    ...pedido,
+                    dt_inclusao_formatada: this.formatarData(pedido.dt_inclusao),
+                    valor_formatado: pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                }));
                 this.preloading = false;
+                this.loading = false;
+                this.showInfo('Filtro removido com sucesso!');
             });
         },
 
@@ -123,7 +130,6 @@ export default {
         visualizar(id, data) {
             this.pdf = data.anexo;
             this.pdfsrc = `${this.urlBase}/${this.pdf}`;
-            console.log(this.pdfsrc);
             this.display = true;
         },
 
@@ -139,8 +145,35 @@ export default {
         },
 
         filtrar() {
-            this.visibleRight = true;
-            this.editar = false;
+            // Array com os nomes dos campos obrigatórios
+            const camposObrigatorios = ['dt_inicio', 'dt_fim'];
+
+            // Variável para verificar se todos os campos obrigatórios estão preenchidos
+            let todosCamposPreenchidos = true;
+
+            // Iterar sobre os campos obrigatórios
+            for (const campo of camposObrigatorios) {
+                // Verificar se o campo está vazio
+                if (!this.form[campo]) {
+                    // Se estiver vazio, exibir mensagem de erro e definir a variável como falsa
+                    this.showError(`O campo ${campo.toUpperCase()} é obrigatório!`);
+                    todosCamposPreenchidos = false;
+                }
+            }
+
+            if (camposObrigatorios) {
+                this.preloading = true;
+                this.pedidoService.buscaPedidosLimitados(localStorage.getItem('local_id'), this.form).then((data) => {
+                    this.qtdPedidos = data.total;
+                    this.pedidos = data.pedidos.map((pedido) => ({
+                        ...pedido,
+                        dt_inclusao_formatada: this.formatarData(pedido.dt_inclusao),
+                        valor_formatado: pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                    }));
+                    this.showInfo('Filtro aplicado com sucesso!');
+                    this.preloading = false;
+                });
+            }
         },
 
         showSuccess(mensagem) {
@@ -243,7 +276,6 @@ export default {
     <div class="grid">
         <Toast />
         <!-- Visualizar -->
-        <!-- Visualizar -->
         <Dialog header="Documento" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
             <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
         </Dialog>
@@ -288,6 +320,39 @@ export default {
             <div class="col-12 lg:col-6">
                 <Toast />
             </div>
+
+            <div class="p-fluid formgrid grid justify-content-center">
+                <div class="field col-2 md:col-2">
+                    <label for="firstname2">Dt de Início <span class="obrigatorio">*</span></label>
+                    <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de vencimento'" v-model="form.dt_inicio" showIcon iconDisplay="input" />
+                </div>
+                <div class="field col-2 md:col-2">
+                    <label for="firstname2">Dt Fim <span class="obrigatorio">*</span></label>
+                    <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de vencimento'" v-model="form.dt_fim" showIcon iconDisplay="input" />
+                </div>
+                <div class="field col-2 md:col-2">
+                    <label style="color: white" for="firstname2">.</label><br />
+                    <Button label="Pesquisar" @click.prevent="filtrar()" icon="pi pi-search" class="p-button-info" />
+                </div>
+                <div class="field col-2 md:col-2">
+                    <label style="color: white" for="firstname2">.</label><br />
+                    <Button label="Limpar Filtros" @click.prevent="buscaPedidos()" icon="pi pi-search" class="p-button-danger" />
+                </div>
+                <div class="field col-3 md:col-3">
+                    <div class="card mb-0">
+                        <div class="flex justify-content-between mb-3">
+                            <div>
+                                <span class="block text-500 font-medium">QTD. DE PEDIDOS</span>
+                                <div class="text-900 font-medium text-xl"></div>
+                            </div>
+                            <div class="flex align-items-center justify-content-center bg-green-100 border-round" style="width: 2.5rem; height: 2.5rem">
+                                {{ this.qtdPedidos }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="card">
                 <DataTable
                     v-model:filters="filters"
