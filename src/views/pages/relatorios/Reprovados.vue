@@ -13,15 +13,15 @@ export default {
             visibleRight: ref(false),
             loading1: ref(null),
             preloading: ref(false),
-            data: ref(null)
+            form: ref({})
         };
     },
 
     methods: {
         gerarRelatorio() {
-            if (this.data) {
+            if (this.form.dt_inicio && this.form.dt_fim) {
                 this.preloading = true;
-                this.relatorioService.buscaPedidosReprovados(this.data).then((data) => {
+                this.relatorioService.buscaPedidosReprovados(this.form).then((data) => {
                     this.preloading = false;
                     try {
                         generatePDF(data.pedidos);
@@ -33,7 +33,7 @@ export default {
                     }
                 });
             } else {
-                this.showError('Preencha o campo DATA!');
+                this.showError('Preencha o intervalo de datas!');
             }
         },
 
@@ -67,13 +67,17 @@ export default {
                 <Toast />
             </div>
             <div class="card">
-                <h5>Gerar Relatório de Pedidos Reprovados</h5>
+                <h5>Gerar Relatório de Pedidos Reprovados</h5> 
                 <hr />
                 <br />
                 <div class="p-fluid formgrid grid">
                     <div class="field col-12 md:col-4">
-                        <label for="firstname2">Data <span class="obrigatorio">*</span></label>
-                        <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de vencimento'" v-model="this.data" showIcon iconDisplay="input" />
+                        <label for="firstname2">Data Início: <span class="obrigatorio">*</span></label>
+                        <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de início'" v-model="this.form.dt_inicio" showIcon iconDisplay="input" />
+                    </div>
+                    <div class="field col-12 md:col-4">
+                        <label for="firstname2">Data Fim: <span class="obrigatorio">*</span></label>
+                        <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de fim'" v-model="this.form.dt_fim" showIcon iconDisplay="input" />
                     </div>
                     <div class="field col-12 md:col-12">
                         <Button @click.prevent="gerarRelatorio()" label="Gerar relatório" class="mr-2 mt-3 p-button-success col-12 p-3" />

@@ -56,7 +56,7 @@ export function generatePDF(data) {
         const descricao = pedido.descricao;
         const valor = pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         const status = pedido.status;
-        const motivo = pedido.mensagem[0].mensagem;
+        const motivo = pedido.mensagem.mensagem;
         const presidente = pedido.presidente;
         const dt_vencimento = pedido.dt_vencimento;
         const dt_reprovacao = pedido.dt_reprovacao;

@@ -44,13 +44,32 @@ export default {
     methods: {
         // Metódo responsável por buscar todos pedidos
         buscaPedidosHoje() {
+            this.form = {};
             this.preloading = true;
             this.parcelaService.buscaPedidosHoje().then((data) => {
                 this.pedidos = data.parcelas;
                 this.preloading = false;
                 this.totalPagar = data.total;
                 this.totalQtd = data.totalParcelas;
+                this.showSuccess('Filtros removidos com sucesso!');
             });
+        },
+
+        // Metódo responsável por buscar parcelas de acordo com filtro
+        filtrar() {
+            this.preloading = true;
+            if (this.form.dt_inicio && this.form.dt_fim) {
+                this.parcelaService.buscaParcelasFiltradas(this.form).then((data) => {
+                    this.pedidos = data.parcelas;
+                    this.totalPagar = data.total;
+                    this.totalQtd = data.totalParcelas;
+                    this.showSuccess('Filtros aplicados com sucesso!');
+                    this.preloading = false;
+                });
+            } else {
+                this.showError('Preencha o intevelado de datas!');
+                this.preloading = false;
+            }
         },
 
         // Metódo responsável por reprovar pedido e enviar para Fiscal
@@ -98,13 +117,12 @@ export default {
 
         // Metódo responsável por visualizar pdf
         visualizar(id, data) {
-            console.log(data);
             this.idPedido = id;
             this.display = true;
             this.pdf = data.pedido.anexo;
             this.pdfsrc = `${this.urlBase}/${this.pdf}`;
-            this.pdfsrcnota = `${this.urlBase}/${data.nota.nota}`;
-            this.pdfsrcboleto = `${this.urlBase}/${data.boleto.boleto}`;
+            this.pdfsrcnota = `${this.urlBase}/${data.nota[0].nota}`;
+            this.pdfsrcboleto = `${this.urlBase}/${data.boleto[0].boleto}`;
         },
 
         // Metódo responsável por abrir chat
@@ -183,7 +201,7 @@ export default {
         <Toast />
 
         <!-- Visualizar Pedido de Compra -->
-        <Dialog header="Pedido de Compra" v-model:visible="display" :modal="true" :style="{ width: '90%' }">
+        <Dialog header="Pedido de Compra" v-model:visible="display" :modal="true" :style="{ width: '98%' }">
             <div class="grid">
                 <!-- <div class="col-4">
                     <Button @click.prevent="abrirChat(comprador)" style="width: 100%" label="Reprovar e Enviar para Comprador" icon="pi pi-times" class="p-button-danger" />
@@ -269,15 +287,16 @@ export default {
                 <div class="p-fluid formgrid grid mb-5">
                     <div class="field col-2 md:col-2">
                         <label for="firstname2">Dt de Início <span class="obrigatorio">*</span></label>
-                        <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de vencimento'" v-model="form.dt_vencimento" showIcon iconDisplay="input" />
+                        <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data inicial'" v-model="form.dt_inicio" showIcon iconDisplay="input" />
                     </div>
                     <div class="field col-2 md:col-2">
                         <label for="firstname2">Dt Fim <span class="obrigatorio">*</span></label>
-                        <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de vencimento'" v-model="form.dt_vencimento" showIcon iconDisplay="input" />
+                        <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data final'" v-model="form.dt_fim" showIcon iconDisplay="input" />
                     </div>
                     <div class="field col-2 md:col-2">
                         <label style="color: white" for="firstname2">.</label><br />
-                        <Button label="Pesquisar" @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-search" class="p-button-info" />
+                        <Button label="Pesquisar" @click.prevent="filtrar()" icon="pi pi-search" class="p-button-info mb-1" />
+                        <Button label="Limpar" @click.prevent="buscaPedidosHoje()" icon="pi pi-trash" class="p-button-danger" />
                     </div>
                     <div class="field col-3 md:col-3">
                         <div class="card mb-0">

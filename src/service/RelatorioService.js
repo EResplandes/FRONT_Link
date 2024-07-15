@@ -21,8 +21,8 @@ export default class RelatorioService {
             });
     }
 
-    async buscaPedidosReprovados(data) {
-        return await fetch(`${API_URL}/relatorios/listar-reprovados/` + this.formatDateToYMD(data), {
+    async buscaPedidosReprovados(form) {
+        return await fetch(`${API_URL}/relatorios/listar-reprovados/${this.formatDateToYMD(form.dt_inicio)}/${this.formatDateToYMD(form.dt_fim)}`, {
             method: 'GET',
             headers: {
                 Accept: 'application/json',
