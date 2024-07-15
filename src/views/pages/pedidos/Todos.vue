@@ -44,8 +44,7 @@ export default {
                 status: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 valor_formatado: { value: null, matchMode: FilterMatchMode.CONTAINS }
             },
-            loading: true,
-            qtdPedidos: 1000
+            loading: true
         };
     },
 
@@ -161,10 +160,9 @@ export default {
                 }
             }
 
-            if (camposObrigatorios) {
+            if (todosCamposPreenchidos) {
                 this.preloading = true;
                 this.pedidoService.buscaPedidosLimitados(localStorage.getItem('local_id'), this.form).then((data) => {
-                    this.qtdPedidos = data.total;
                     this.pedidos = data.pedidos.map((pedido) => ({
                         ...pedido,
                         dt_inclusao_formatada: this.formatarData(pedido.dt_inclusao),
@@ -337,19 +335,6 @@ export default {
                 <div class="field col-2 md:col-2">
                     <label style="color: white" for="firstname2">.</label><br />
                     <Button label="Limpar Filtros" @click.prevent="buscaPedidos()" icon="pi pi-search" class="p-button-danger" />
-                </div>
-                <div class="field col-3 md:col-3">
-                    <div class="card mb-0">
-                        <div class="flex justify-content-between mb-3">
-                            <div>
-                                <span class="block text-500 font-medium">QTD. DE PEDIDOS</span>
-                                <div class="text-900 font-medium text-xl"></div>
-                            </div>
-                            <div class="flex align-items-center justify-content-center bg-green-100 border-round" style="width: 2.5rem; height: 2.5rem">
-                                {{ this.qtdPedidos }}
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
 

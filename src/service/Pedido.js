@@ -737,7 +737,6 @@ export default class PedidoService {
         formData.append('valor', form?.valor ?? null);
         formData.append('urgente', form?.urgente) ?? 0;
 
-        console.log(form.dt_vencimento);
         if (this.isValidDateFormat(form.dt_vencimento)) {
             formData.append('dt_vencimento', form?.dt_vencimento);
         } else {
