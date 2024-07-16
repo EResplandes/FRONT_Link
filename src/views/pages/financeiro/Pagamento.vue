@@ -25,6 +25,8 @@ export default {
             urlBase: 'https://link.gruporialma.com.br/storage',
             pdf: ref(null),
             pdfsrc: ref(null),
+            pdfsrcboleto: ref(null),
+            pdfsrcnota: ref(null),
             conversa: ref(null),
             customers: null,
             loading: true
@@ -121,8 +123,8 @@ export default {
             this.display = true;
             this.pdf = data.pedido.anexo;
             this.pdfsrc = `${this.urlBase}/${this.pdf}`;
-            this.pdfsrcnota = `${this.urlBase}/${data.nota[0].nota}`;
-            this.pdfsrcboleto = `${this.urlBase}/${data.boleto[0].boleto}`;
+            this.pdfsrcnota = `${this.urlBase}/${data.pedido.nota[0]?.nota}`;
+            this.pdfsrcboleto = `${this.urlBase}/${data.pedido.boleto[0]?.boleto}`;
         },
 
         // Metódo responsável por abrir chat
