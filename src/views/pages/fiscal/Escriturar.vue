@@ -23,6 +23,7 @@ export default {
             empresas: ref([]),
             empresa: ref([]),
             pedidos: ref(null),
+            displayData: ref(null),
             status: ref(null),
             form: ref({}),
             preloading: ref(true),
@@ -93,7 +94,7 @@ export default {
         // Metódo responsável por dar baixa na nota
         darBaixa() {
             this.preloading = true;
-            this.notasService.darBaixa(this.idPedido).then((data) => {
+            this.notasService.darBaixa(this.idPedido, this.form.dt_emissao).then((data) => {
                 if (data.resposta == 'Nota escriturada e enviada para o Financeiro com sucesso!') {
                     this.buscaPedidos();
                     this.showSuccess('Nota escriturada e enviada para o Financeiro com sucesso!');
@@ -101,6 +102,7 @@ export default {
                     this.showError('Ocorreu algum problema, entre em contato com o Administrador');
                 }
                 this.display = false;
+                this.displayData = false;
             });
         },
 
@@ -265,7 +267,7 @@ export default {
                     <Button @click.prevent="abrirChat()" style="width: 100%" label="Reprovar e Enviar para Comprador" icon="pi pi-times" class="p-button-danger" />
                 </div>
                 <div class="col-6">
-                    <Button @click.prevent="darBaixa()" style="width: 100%" label="Escriturar e Enviar para Financeiro" icon="pi pi-check" class="p-button-success" />
+                    <Button @click.prevent="this.displayData = true" style="width: 100%" label="Escriturar e Enviar para Financeiro" icon="pi pi-check" class="p-button-success" />
                 </div>
             </div>
 
@@ -277,6 +279,17 @@ export default {
                     <iframe :src="pdfsrcnota" style="width: 100%; height: 650px; border: none"> Oops! ocorreu um erro. </iframe>
                 </SplitterPanel>
             </Splitter>
+        </Dialog>
+
+        <Dialog header="Informe a Data de Emissão da Nota" v-model:visible="displayData" :modal="true" :style="{ width: '30%' }">
+            <div class="grid">
+                <div class="col-6 mt-2">
+                    <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de emissão da nota fiscal'" v-model="form.dt_emissao" showIcon iconDisplay="input" />
+                </div>
+                <div class="col-6">
+                    <Button @click.prevent="darBaixa()" style="width: 100%" label="Escriturar e Enviar para Financeiro" icon="pi pi-check" class="p-button-success" />
+                </div>
+            </div>
         </Dialog>
 
         <ConfirmDialog></ConfirmDialog>

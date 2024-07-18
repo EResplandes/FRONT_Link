@@ -88,8 +88,8 @@ export default class NotaService {
     }
 
     // Requisição responsável por dar baixa em nota
-    async darBaixa(id) {
-        return await fetch(`${API_URL}/notas/dar-baixa/${id}`, {
+    async darBaixa(id, emissao) {
+        return await fetch(`${API_URL}/notas/dar-baixa/${id}/${this.formatarDataParaYMD(emissao)}`, {
             method: 'GET',
             headers: {
                 Accept: 'application/json',
@@ -125,5 +125,17 @@ export default class NotaService {
                 console.error('Error:', error);
                 throw error;
             });
+    }
+
+    formatarDataParaYMD(data) {
+        if (data) {
+            const dia = String(data.getDate()).padStart(2, '0');
+            const mes = String(data.getMonth() + 1).padStart(2, '0'); // Mês começa do zero, então somamos 1
+            const ano = data.getFullYear();
+
+            return `${ano}-${mes}-${dia}`;
+        } else {
+            return false;
+        }
     }
 }

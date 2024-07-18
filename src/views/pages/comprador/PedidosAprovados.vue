@@ -362,7 +362,7 @@ export default {
                                     <Button @click.prevent="buscaInformacoesPedido(slotProps.data.id)" icon="pi pi-print" class="p-button-secondary" />
                                 </div>
                                 <!-- v-if="slotProps.data.status.status == 'Aprovado' || slotProps.data.status.status == 'Aprovado com Ressalva' || slotProps.data.status.status == 'Sem Nota'" -->
-                                <div v-if="this.validaAnexo == 'Danilo Ornelas'" class="col-3 md:col-3 ml-1">
+                                <div class="col-3 md:col-3 ml-1">
                                     <Button @click.prevent="modalForm(slotProps.data.id, slotProps.data.status.status)" icon="pi pi-folder-open" class="p-button-warning" />
                                 </div>
                             </div>
