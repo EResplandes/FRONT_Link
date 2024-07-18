@@ -19,6 +19,11 @@ const router = createRouter({
                     component: () => import('@/views/pages/pedidos/PedidosEmival.vue')
                 },
                 {
+                    path: '/pedidos-antecipados',
+                    name: 'pedidos-antecipados',
+                    component: () => import('@/views/pages/presidencia/PedidosAntecipados.vue')
+                },
+                {
                     path: '/pedidos-monica',
                     name: 'pedidos-monica',
                     component: () => import('@/views/pages/pedidos/PedidosMonica.vue')

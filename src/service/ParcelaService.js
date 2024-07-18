@@ -61,6 +61,24 @@ export default class ParcelaService {
             });
     }
 
+    async darBaixa(idParcela) {
+        return fetch(`${API_URL}/parcelas/dar-baiixa/${idParcela}`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
     formatarDataParaYMD(data) {
         if (data) {
             const dia = String(data.getDate()).padStart(2, '0');

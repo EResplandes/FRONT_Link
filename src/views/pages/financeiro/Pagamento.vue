@@ -29,7 +29,8 @@ export default {
             pdfsrcnota: ref(null),
             conversa: ref(null),
             customers: null,
-            loading: true
+            loading: true,
+            idParcela: ref(false)
         };
     },
 
@@ -120,6 +121,7 @@ export default {
         // Metódo responsável por visualizar pdf
         visualizar(id, data) {
             this.idPedido = id;
+            this.idParcela = data.id_parcela;
             this.display = true;
             this.pdf = data.pedido.anexo;
             this.pdfsrc = `${this.urlBase}/${this.pdf}`;
@@ -145,18 +147,19 @@ export default {
             });
         },
 
-        // Metódo responsável por dar baixa no pedido enviado para comprador inserir nota ou enviando para consolidar dados
-        salvarPedidoPago() {
+        // Metódo responsável por dar baixa no parcela
+        pago() {
             this.preloading = true;
-            this.pedidoService.pagarPedido(this.caminhoComprovante, this.idPedido).then((data) => {
-                if (data.resposta == 'Pedido despachado com sucesso!') {
-                    this.showSuccess('Pedido despachado com sucesso!');
-                    this.display = false;
-                    this.displayDiretorio = false;
-                    this.buscaPedidosFinanceiro();
+            this.parcelaService.darBaixa(this.idParcela).then((data) => {
+                if (data.resposta == 'Parcela paga com sucesso!') {
+                    this.showSuccess('Parcela paga com sucesso!');
+                    this.buscaPedidosHoje();
                 } else {
-                    this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
+                    this.showError('Ocorreu algum erro, entre em contato com o administrador!');
                 }
+                this.display = false;
+                this.displayDiretorio = false;
+                this.preloading = false;
             });
         },
 
@@ -212,7 +215,7 @@ export default {
                     <Button @click.prevent="abrirChat(fiscal)" style="width: 100%" label="Reprovar e Enviar para Fiscal" icon="pi pi-times" class="p-button-danger" />
                 </div>
                 <div class="col-6">
-                    <Button @click.prevent="this.displayDiretorio = true" style="width: 100%" label="Pago - Anexar Comprovante" icon="pi pi-check" class="p-button-success" />
+                    <Button @click.prevent="this.displayDiretorio = true" style="width: 100%" label="Pago" icon="pi pi-check" class="p-button-success" />
                 </div>
             </div>
 
@@ -230,16 +233,16 @@ export default {
         </Dialog>
 
         <!-- Visualizar input para inserir diretório -->
-        <Dialog header="Informe caminho onde foi salvo comprovante:" v-model:visible="displayDiretorio" :modal="true" :style="{ width: '50%' }">
+        <Dialog header="Tem certeza dessa operação?" v-model:visible="displayDiretorio" :modal="true" :style="{ width: '20%' }">
             <div class="grid">
-                <div class="field col-12 mt-6">
-                    <InputGroup>
-                        <Button style="width: 50%" label="\\server1\FILESERVER\05 FINANCEIRO$\01 - Comprovantes de Pagamentos (Fornecedores)\COMPARTILHAMENTO CLOUD\" />
-                        <InputText v-model="caminhoComprovante" style="width: 50%; height: 100%" placeholder="Digite o diretório" />
-                    </InputGroup>
+                <div class="field col-12 m-1">
+                    <span>Deseja realmente dar baixa nesse pagamento?</span>
                 </div>
-                <div class="field col-12">
-                    <Button style="width: 100%" label="Salvar" class="p-button-success" @click="salvarPedidoPago()" />
+                <div class="field col-6">
+                    <Button style="width: 100%" label="Salvar" class="p-button-success" @click="pago()" />
+                </div>
+                <div class="field col-6">
+                    <Button style="width: 100%" label="Cancelar" class="p-button-danger" @click="this.displayDiretorio = false" />
                 </div>
             </div>
         </Dialog>

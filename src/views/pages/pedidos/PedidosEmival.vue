@@ -32,6 +32,7 @@ export default {
         // Metódo responsável por buscar todas os pedidos com Emival
         this.pedidoService.pedidosEmival().then((data) => {
             this.pedidos = data.pedidos;
+            console.log(data);
             this.preloading = false;
         });
 
@@ -203,6 +204,13 @@ export default {
                         </template>
                     </Column>
 
+                    <Column field="Protheus" header="Protheus" :sortable="true" class="w-2">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Protheus</span>
+                            {{ slotProps.data.protheus }}
+                        </template>
+                    </Column>
+
                     <Column field="Empresa" header="Empresa" :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">Empresa</span>
@@ -210,14 +218,14 @@ export default {
                         </template>
                     </Column>
 
-                    <Column field="Descrição" header="Fornecedor" :sortable="true" class="w-5">
+                    <Column field="Descrição" header="Fornecedor" :sortable="true" class="w-4">
                         <template #body="slotProps">
                             <span class="p-column-title">Descrição</span>
                             {{ slotProps.data.descricao }}
                         </template>
                     </Column>
 
-                    <Column field="Valor" header="Valor" :sortable="true" class="w-1">
+                    <Column field="Valor" header="Valor" :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">CNPJ</span>
                             {{ slotProps.data.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}

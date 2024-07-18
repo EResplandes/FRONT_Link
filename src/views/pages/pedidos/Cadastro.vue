@@ -89,6 +89,18 @@ export default {
             // Variável para verificar se todos os campos obrigatórios estão preenchidos
             let todosCamposPreenchidos = true;
 
+            if (this.form.nota) {
+                if (!this.form.dt_emissao) {
+                    this.showError('Informe a data de emissão da nota fiscal!');
+                    todosCamposPreenchidos = false;
+                }
+
+                if (!this.form.boleto) {
+                    this.showError('Anexe o boleto!');
+                    todosCamposPreenchidos = false;
+                }
+            }
+
             // Iterar sobre os campos obrigatórios
             for (const campo of camposObrigatorios) {
                 // Verificar se o campo está vazio
@@ -107,9 +119,10 @@ export default {
                         this.preloading = false;
                         this.showSuccess('Pedido cadastrado com sucesso!');
                         this.form = {};
+                        window.location.reload();
+                    } else {
+                        this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
                     }
-
-                    window.location.reload();
                 });
             }
         },
@@ -128,6 +141,14 @@ export default {
 
         uploadPdf() {
             this.form.pdf = this.$refs.pdf.files[0];
+        },
+
+        uploadPdfNota() {
+            this.form.nota = this.$refs.pdfNota.files[0];
+        },
+
+        uploadPdfBoleto() {
+            this.form.boleto = this.$refs.pdfBoleto.files[0];
         }
     }
 };
@@ -149,10 +170,10 @@ export default {
                     <TabPanel header="Formulário">
                         <div class="p-fluid formgrid grid">
                             <div v-if="this.validaInputUrgente == 'Administrador' || this.validaInputUrgente == 'Gestor de Fluxo'" class="field col-1 md:col-1">
-                                <label for="firstname2">Urgente</label>
+                                <label for="firstname2">Urgente</label><br />
                                 <InputSwitch :trueValue="1" :falseValue="0" :modelValue="form.urgente" v-model="form.urgente" />
                             </div>
-                            <div class="field col-12 md:col-4">
+                            <div class="field col-12 md:col-2">
                                 <label for="firstname2">Valor <span class="obrigatorio">*</span></label>
                                 <InputNumber v-tooltip.top="'Digite o valor do pedido'" v-model="form.valor" inputId="minmaxfraction" :minFractionDigits="2" :maxFractionDigits="2" placeholder="R$..." />
                             </div>
@@ -166,8 +187,8 @@ export default {
                                 <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de vencimento'" v-model="form.dt_vencimento" showIcon iconDisplay="input" />
                             </div>
 
-                            <div class="field col-1 md:col-3">
-                                <label for="firstname2">PDF<span class="obrigatorio">*</span></label>
+                            <div class="field col-1 md:col-2">
+                                <label for="firstname2">Pedido<span class="obrigatorio">*</span></label>
                                 <FileUpload chooseLabel="Selecionar Arquivo" @change="uploadPdf" mode="basic" type="file" ref="pdf" name="demo[]" accept=".pdf,.docx" :maxFileSize="999999999"></FileUpload>
                             </div>
 
@@ -186,6 +207,26 @@ export default {
                             <div class="field col-12">
                                 <label for="descricao">Fornecedor: <span class="obrigatorio">*</span></label>
                                 <Textarea v-tooltip.top="'Digite o forncedor'" id="descricao" rows="4" v-model="form.descricao" placeholder="Digite o fornecedor..." />
+                            </div>
+                            <Divider />
+                            <div class="col-12 mb-2">
+                                <h5>Cadastro de Nota Fiscal <span class="text-400 aviso-nota">(somente se a compra foi efetuada anteriormente!)</span></h5>
+                            </div>
+                            <div class="field col-12 md:col-2">
+                                <label for="firstname2">Dt de Emissão da Nota</label>
+                                <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de emissão da nota fiscal'" v-model="form.dt_emissao" showIcon iconDisplay="input" />
+                            </div>
+                            <div class="field col-1 md:col-2">
+                                <label for="firstname2">Anexo</label>
+                                <FileUpload chooseLabel="Selecionar Arquivo" @change="uploadPdfNota" mode="basic" type="file" ref="pdfNota" name="demo[]" accept=".pdf,.docx" :maxFileSize="999999999"></FileUpload>
+                            </div>
+                            <Divider />
+                            <div class="col-12 mb-2">
+                                <h5>Cadastro de Boleto <span class="text-400 aviso-nota">(somente se a compra foi efetuada anteriormente!)</span></h5>
+                            </div>
+                            <div class="field col-1 md:col-2">
+                                <label for="firstname2">Anexo</label>
+                                <FileUpload chooseLabel="Selecionar Arquivo" @change="uploadPdfBoleto" mode="basic" type="file" ref="pdfBoleto" name="demo[]" accept=".pdf,.docx" :maxFileSize="999999999"></FileUpload>
                             </div>
                         </div>
                     </TabPanel>
@@ -250,5 +291,9 @@ export default {
     justify-content: center;
     align-items: center;
     backdrop-filter: blur(5px);
+}
+
+.aviso-nota {
+    font-size: small;
 }
 </style>

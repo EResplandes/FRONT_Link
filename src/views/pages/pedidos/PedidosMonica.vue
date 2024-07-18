@@ -31,7 +31,6 @@ export default {
     mounted: function () {
         // Metódo responsável por buscar todas os pedidos com Monica
         this.pedidoService.pedidosMonica().then((data) => {
-            console.log(data);
             this.pedidos = data.pedidos;
             this.preloading = false;
         });
@@ -229,6 +228,13 @@ export default {
                         <template #body="slotProps">
                             <span class="p-column-title">Dt. Inclusão</span>
                             {{ formatarData(slotProps.data.dt_inclusao) }}
+                        </template>
+                    </Column>
+
+                    <Column field="Protheus" header="Protheus" :sortable="true" class="w-2">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Protheus</span>
+                            {{ slotProps.data.protheus }}
                         </template>
                     </Column>
 
