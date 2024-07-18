@@ -129,42 +129,12 @@ export default {
                 <span class="text-500"> PEDIDOS HOJE</span>
             </div>
         </div>
-        <!-- <div class="col-12 lg:col-3 xl:col-3">
-            <div class="card mb-0">
-                <div class="flex justify-content-between mb-3">
-                    <div>
-                        <span class="block text-500 font-medium mb-3">EMIVAL</span>
-                        <div class="text-900 font-medium text-xl">2</div>
-                    </div>
-                    <div class="flex align-items-center justify-content-center bg-cyan-100 border-round" style="width: 2.5rem; height: 2.5rem">
-                        <i class="pi pi-chart-bar text-cyan-500 text-xl"></i>
-                    </div>
-                </div>
-                <span class="text-green-500 font-medium">520 </span>
-                <span class="text-500"> PEDIDOS HOJE</span>
-            </div>
-        </div>
-        <div class="col-12 lg:col-3 xl:col-3">
-            <div class="card mb-0">
-                <div class="flex justify-content-between mb-3">
-                    <div>
-                        <span class="block text-500 font-medium mb-3">EMIVAL</span>
-                        <div class="text-900 font-medium text-xl">2</div>
-                    </div>
-                    <div class="flex align-items-center justify-content-center bg-cyan-100 border-round" style="width: 2.5rem; height: 2.5rem">
-                        <i class="pi pi-chart-bar text-cyan-500 text-xl"></i>
-                    </div>
-                </div>
-                <span class="text-green-500 font-medium">520 </span>
-                <span class="text-500"> PEDIDOS HOJE</span>
-            </div>
-        </div> -->
     </div>
 
     <Fieldset>
         <template #legend>
             <div class="flex align-items-center pl-2">
-                <Avatar image="https://media.licdn.com/dms/image/C4E03AQFgSYhROpDDDw/profile-displayphoto-shrink_400_400/0/1653436652339?e=1721260800&v=beta&t=vcwxnYiXNqI7Zr1sYy3RMGFT1YKIabgTnzsubpZ4xuI" shape="circle" />
+                <Avatar image="https://media.licdn.com/dms/image/C4E03AQFgSYhROpDDDw/profile-displayphoto-shrink_200_200/0/1653436652339?e=1726704000&v=beta&t=F6AaKusCQubGdoQ8bjW0sIzlFPMXcDMYOfS0I8r5X4w" shape="circle" />
                 <span class="font-bold p-3">Eduardo C. Resplandes | Desenvolvedor FullStack</span>
             </div>
         </template>

@@ -205,8 +205,7 @@ export default {
     <div class="grid">
         <Toast />
 
-        <!-- Visualizar Pedido de Compra -->
-        <Dialog header="Pedido de Compra" v-model:visible="display" :modal="true" :style="{ width: '98%' }">
+        <Dialog v-model:visible="display" header="Flex Scroll" :style="{ width: '90%' }" maximizable modal :contentStyle="{ height: '80%' }">
             <div class="grid">
                 <!-- <div class="col-4">
                     <Button @click.prevent="abrirChat(comprador)" style="width: 100%" label="Reprovar e Enviar para Comprador" icon="pi pi-times" class="p-button-danger" />
@@ -221,16 +220,22 @@ export default {
 
             <Splitter>
                 <SplitterPanel class="flex align-items-center justify-content-center splitter-panel">
-                    <iframe :src="pdfsrc" style="width: 100%; height: 650px; border: none"> Oops! ocorreu um erro. </iframe>
+                    <iframe :src="pdfsrc" style="width: 100%; height: 900px; border: none"> Oops! ocorreu um erro. </iframe>
                 </SplitterPanel>
                 <SplitterPanel class="flex align-items-center justify-content-center splitter-panel">
-                    <iframe :src="pdfsrcnota" style="width: 100%; height: 650px; border: none"> Oops! ocorreu um erro. </iframe>
+                    <iframe :src="pdfsrcnota" style="width: 100%; height: 900px; border: none"> Oops! ocorreu um erro. </iframe>
                 </SplitterPanel>
                 <SplitterPanel class="flex align-items-center justify-content-center splitter-panel">
-                    <iframe :src="pdfsrcboleto" style="width: 100%; height: 650px; border: none"> Oops! ocorreu um erro. </iframe>
+                    <iframe :src="pdfsrcboleto" style="width: 100%; height: 900px; border: none"> Oops! ocorreu um erro. </iframe>
                 </SplitterPanel>
             </Splitter>
+            <template #footer>
+                <Button label="Fechar" icon="pi pi-check" @click="display = false" />
+            </template>
         </Dialog>
+
+        <!-- Visualizar Pedido de Compra -->
+        <Dialog header="Pedido de Compra" v-model:visible="display" :modal="true" :style="{ width: '98%' }"> </Dialog>
 
         <!-- Visualizar input para inserir diretório -->
         <Dialog header="Tem certeza dessa operação?" v-model:visible="displayDiretorio" :modal="true" :style="{ width: '20%' }">

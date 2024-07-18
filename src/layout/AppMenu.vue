@@ -40,8 +40,9 @@ const model = ref([
     {
         label: 'Módulo Financeiro',
         items: [
-            { label: 'Pedidos', icon: 'pi pi-fw pi-book', to: '/pedidos-financeiro', requiredRole: ['Fiscal', 'Administrador'] },
-            { label: 'Pagamentos', icon: 'pi pi-fw pi-book', to: '/pagamento-parcelas', requiredRole: ['Fiscal', 'Administrador'] }
+            { label: 'Pedidos', icon: 'pi pi-fw pi-book', to: '/pedidos-financeiro', requiredRole: ['Financeiro', 'Administrador'] },
+            { label: 'Pagamentos', icon: 'pi pi-fw pi-book', to: '/pagamento-parcelas', requiredRole: ['Financeiro', 'Administrador'] },
+            { label: 'Controle', icon: 'pi pi-fw pi-book', to: '/pedidos-controle', requiredRole: ['Financeiro', 'Administrador'] }
         ]
     },
     {

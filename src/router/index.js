@@ -34,6 +34,11 @@ const router = createRouter({
                     component: () => import('@/views/pages/gestor_fluxo/TodosPedidos.vue')
                 },
                 {
+                    path: '/pedidos-controle',
+                    name: 'pedidos-controle',
+                    component: () => import('@/views/pages/financeiro/ControleParcelas.vue')
+                },
+                {
                     path: '/pedidos-todos',
                     name: 'pedidos-todos',
                     component: () => import('@/views/pages/pedidos/Todos.vue')
