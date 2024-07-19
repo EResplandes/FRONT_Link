@@ -680,6 +680,44 @@ export default class PedidoService {
             });
     }
 
+    // Requisição responsável por buscar pedidos com parcelas
+    async buscaControleFinanceiro() {
+        return await fetch(`${API_URL}/pedidos/listar-controle-financeiro`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    // Requisição responsável por buscar pedidos com parcelas com filtro
+    async buscaControleFinanceiroFiltros(idEmpresa) {
+        return await fetch(`${API_URL}/pedidos/listar-controle-financeiro-filtro/${idEmpresa}`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
     // Requisição responsável por responder pedido reprovado
     respondePedidoReprovadoFluxo(novoAnexo, novaMensagem, id_pedido) {
         let idCriador = localStorage.getItem('usuario_id');

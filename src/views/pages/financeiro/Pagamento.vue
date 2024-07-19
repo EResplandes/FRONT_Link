@@ -205,7 +205,7 @@ export default {
     <div class="grid">
         <Toast />
 
-        <Dialog v-model:visible="display" header="Flex Scroll" :style="{ width: '90%' }" maximizable modal :contentStyle="{ height: '80%' }">
+        <Dialog v-model:visible="display" header="INFORMAÇÕES" :style="{ width: '90%' }" maximizable modal :contentStyle="{ height: '80%' }">
             <div class="grid">
                 <!-- <div class="col-4">
                     <Button @click.prevent="abrirChat(comprador)" style="width: 100%" label="Reprovar e Enviar para Comprador" icon="pi pi-times" class="p-button-danger" />

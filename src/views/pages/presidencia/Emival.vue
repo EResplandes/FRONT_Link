@@ -238,23 +238,6 @@ export default {
             });
         },
 
-        // Metódo responsável por aprovar
-        aprovar() {
-            this.pedidoService.aprovarEmival(this.pedidosAprovados).then((data) => {
-                this.display = false;
-                this.showSuccess('Pedidos aprovados com sucesso!');
-                this.pedidosAprovados = [];
-
-                if (this.pedidos[0].valor <= 500) {
-                    this.listarEmivalMenorQuinhentos();
-                } else if (this.pedidos[0].valor > 500 && this.pedidos[0].valor < 1000) {
-                    this.listarEmivalMenorMil();
-                } else {
-                    this.listarEmivalMaiorMil();
-                }
-            });
-        },
-
         // Metódo responsável por listagem de pedidos
         listarEmivalMenorMil() {
             this.preloading = true;
@@ -274,6 +257,23 @@ export default {
                 this.pedidos = data.pedidos;
                 this.preloading = false;
                 this.ocultaFiltros = true;
+            });
+        },
+
+        // Metódo responsável por aprovar
+        aprovar() {
+            this.pedidoService.aprovarEmival(this.pedidosAprovados).then((data) => {
+                this.display = false;
+                this.showSuccess('Pedidos aprovados com sucesso!');
+                this.pedidosAprovados = [];
+
+                if (this.pedidos[0].valor <= 500) {
+                    this.listarEmivalMenorQuinhentos();
+                } else if (this.pedidos[0].valor > 500 && this.pedidos[0].valor < 1000) {
+                    this.listarEmivalMenorMil();
+                } else {
+                    this.listarEmivalMaiorMil();
+                }
             });
         },
 

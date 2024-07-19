@@ -50,7 +50,6 @@ export default {
         },
 
         formatarDataSemHora(data) {
-            console.log(data);
             if (!data) {
                 return 'N/C';
             }
@@ -72,13 +71,9 @@ export default {
 
         // Metódo responsável por visualizar pdf
         visualizar(id, data) {
-            this.idPedido = id;
-            this.idParcela = data.id_parcela;
             this.display = true;
-            this.pdf = data.pedido.anexo;
+            this.pdf = data.anexo;
             this.pdfsrc = `${this.urlBase}/${this.pdf}`;
-            this.pdfsrcnota = `${this.urlBase}/${data.pedido.nota[0]?.nota}`;
-            this.pdfsrcboleto = `${this.urlBase}/${data.pedido.boleto[0]?.boleto}`;
         },
 
         showSuccess(mensagem) {
@@ -134,27 +129,12 @@ export default {
         <Toast />
 
         <!-- Visualizar Pedido de Compra -->
-        <Dialog header="Pedido de Compra" v-model:visible="display" :modal="true" :style="{ width: '98%' }">
+        <Dialog header="Pedido de Compra" v-model:visible="display" :modal="true" :style="{ width: '70%' }">
             <div class="grid">
-                <div class="col-6">
-                    <Button @click.prevent="abrirChat(fiscal)" style="width: 100%" label="Reprovar e Enviar para Fiscal" icon="pi pi-times" class="p-button-danger" />
-                </div>
-                <div class="col-6">
-                    <Button @click.prevent="this.displayDiretorio = true" style="width: 100%" label="Pago" icon="pi pi-check" class="p-button-success" />
+                <div class="col-12 md:col-12">
+                    <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
                 </div>
             </div>
-
-            <Splitter>
-                <SplitterPanel class="flex align-items-center justify-content-center splitter-panel">
-                    <iframe :src="pdfsrc" style="width: 100%; height: 650px; border: none"> Oops! ocorreu um erro. </iframe>
-                </SplitterPanel>
-                <SplitterPanel class="flex align-items-center justify-content-center splitter-panel">
-                    <iframe :src="pdfsrcnota" style="width: 100%; height: 650px; border: none"> Oops! ocorreu um erro. </iframe>
-                </SplitterPanel>
-                <SplitterPanel class="flex align-items-center justify-content-center splitter-panel">
-                    <iframe :src="pdfsrcboleto" style="width: 100%; height: 650px; border: none"> Oops! ocorreu um erro. </iframe>
-                </SplitterPanel>
-            </Splitter>
         </Dialog>
 
         <div class="col-12">
