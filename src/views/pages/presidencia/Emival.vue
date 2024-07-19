@@ -24,6 +24,7 @@ export default {
             proximoPedido: ref(null),
             preloading: ref(true),
             ocultaFiltros: ref(false),
+            displayAuditoria: ref(false),
             acimaMil: ref(false),
             display: ref(false),
             displayAcima: ref(false),
@@ -243,6 +244,7 @@ export default {
             this.preloading = true;
             this.acimaMil = false;
             this.pedidoService.listarEmivalMenorMil().then((data) => {
+                console.log(data);
                 this.pedidos = data.pedidos;
                 this.preloading = false;
                 this.ocultaFiltros = true;
@@ -762,6 +764,11 @@ export default {
         </div>
     </Dialog>
 
+    <!-- Informações -->
+    <Dialog :header="this.titleChat" v-model:visible="displayAuditoria" :style="{ width: '60%' }" :modal="true">
+        <h2>teste</h2>
+    </Dialog>
+
     <!-- Chat 2 -->
     <Dialog :header="this.titleChat" v-model:visible="displayChat2" :style="{ width: '80%' }" :modal="true">
         <div class="grid">
@@ -970,6 +977,9 @@ export default {
                             <div class="grid">
                                 <div class="col-4 md:col-4 mr-3">
                                     <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-secondary" />
+                                </div>
+                                <div v-if="slotProps.data.compra_antecipada == 'Sim'" class="col-4 md:col-4 ml-3">
+                                    <Button @click.prevent="this.displayAuditoria = true" icon="pi pi-info" class="p-button-secondary" />
                                 </div>
                             </div>
                         </template>

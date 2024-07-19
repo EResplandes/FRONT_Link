@@ -35,7 +35,7 @@ export default {
             if (data.resposta == 'Links listados com sucesso!') {
                 const localId = localStorage.getItem('local_id');
 
-                if (localId != '1') {
+                if (localId != '1' && localId != '4') {
                     // Filtra o link para remover aquelas com local_id diferente de 1
                     this.links = data.links.filter((links) => links.id == 2);
                 } else {
