@@ -108,8 +108,10 @@ export default {
         },
 
         auditoria(data) {
+            console.log(data);
             this.form.emissao = this.formatarData(data.nota[0].dt_emissao);
             this.form.dt_inclusao = this.formatarData(data.dt_inclusao);
+            this.form.comprador = data.criador;
             this.displayAuditoria = true;
         },
 
@@ -771,15 +773,19 @@ export default {
     </Dialog>
 
     <!-- Informações -->
-    <Dialog header="AUDITORIA" v-model:visible="displayAuditoria" :style="{ width: '80%' }" :modal="true">
+    <Dialog header="AUDITORIA" v-model:visible="displayAuditoria" :style="{ width: '90%' }" :modal="true">
         <div class="grid">
-            <div class="field col-6 md:col-6 mt-6">
-                <label for="firstname2">Dt de Inclusão no Link</label><br />
-                <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de vencimento'" v-model="this.form.dt_inclusao" showIcon iconDisplay="input" disabled />
+            <div class="field col-4 md:col-4 mt-3">
+                <label for="firstname2">Comprador</label><br />
+                <InputText id="username" v-model="this.form.comprador" />
             </div>
-            <div class="field col-6 md:col-6 mt-6">
+            <div class="field col-4 md:col-4 mt-3">
+                <label for="firstname2">Dt de Inclusão no Link</label><br />
+                <Calendar dateFormat="dd/mm/yy" v-model="this.form.dt_inclusao" showIcon iconDisplay="input" disabled />
+            </div>
+            <div class="field col-4 md:col-4 mt-3">
                 <label for="firstname2">Dt de Emissão Nota</label><br />
-                <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de vencimento'" v-model="this.form.emissao" showIcon iconDisplay="input" disabled />
+                <Calendar dateFormat="dd/mm/yy" v-model="this.form.emissao" showIcon iconDisplay="input" disabled />
             </div>
         </div>
     </Dialog>
