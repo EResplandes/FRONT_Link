@@ -22,7 +22,10 @@ export default {
             empresas: ref(null),
             locais: ref(null),
             form: ref({
-                urgente: 0
+                urgente: 0,
+                pdf: null,
+                pdfNota: null,
+                pdfBoleto: null
             }),
             preloading: ref(true),
             validaInputUrgente: localStorage.getItem('grupo')
@@ -129,11 +132,11 @@ export default {
         },
 
         uploadPdfNota() {
-            this.form.nota = this.$refs.pdfNota.files[0];
+            this.form.pdfNota = this.$refs.pdfNota.files[0];
         },
 
         uploadPdfBoleto() {
-            this.form.boleto = this.$refs.pdfBoleto.files[0];
+            this.form.pdfBoleto = this.$refs.pdfBoleto.files[0];
         }
     }
 };
