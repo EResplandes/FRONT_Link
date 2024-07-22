@@ -30,6 +30,7 @@ export default {
             displayAcima: ref(false),
             pedidoAcima: ref({}),
             quantidadesPedidos: ref({}),
+            form: ref({}),
             pdfsrc: ref(null),
             urlBase: 'https://link.gruporialma.com.br/storage', // Ambiente de Produção
             adobeApiReady: false,
@@ -104,6 +105,12 @@ export default {
                     container.scrollTop = container.scrollHeight + 120;
                 });
             });
+        },
+
+        auditoria(data) {
+            this.form.emissao = this.formatarData(data.nota[0].dt_emissao);
+            this.form.dt_inclusao = this.formatarData(data.dt_inclusao);
+            this.displayAuditoria = true;
         },
 
         // Metódo responsável por buscar chat
@@ -244,7 +251,6 @@ export default {
             this.preloading = true;
             this.acimaMil = false;
             this.pedidoService.listarEmivalMenorMil().then((data) => {
-                console.log(data);
                 this.pedidos = data.pedidos;
                 this.preloading = false;
                 this.ocultaFiltros = true;
@@ -765,8 +771,17 @@ export default {
     </Dialog>
 
     <!-- Informações -->
-    <Dialog :header="this.titleChat" v-model:visible="displayAuditoria" :style="{ width: '60%' }" :modal="true">
-        <h2>teste</h2>
+    <Dialog header="AUDITORIA" v-model:visible="displayAuditoria" :style="{ width: '80%' }" :modal="true">
+        <div class="grid">
+            <div class="field col-6 md:col-6 mt-6">
+                <label for="firstname2">Dt de Inclusão no Link</label><br />
+                <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de vencimento'" v-model="this.form.dt_inclusao" showIcon iconDisplay="input" disabled />
+            </div>
+            <div class="field col-6 md:col-6 mt-6">
+                <label for="firstname2">Dt de Emissão Nota</label><br />
+                <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de vencimento'" v-model="this.form.emissao" showIcon iconDisplay="input" disabled />
+            </div>
+        </div>
     </Dialog>
 
     <!-- Chat 2 -->
@@ -964,23 +979,21 @@ export default {
                             {{ slotProps.data.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
                         </template>
                     </Column>
-                    <Column field="Descrição" header="Descrição" :sortable="true" class="w-5">
+                    <Column field="Descrição" header="Descrição" :sortable="true" class="w-3">
                         <template #body="slotProps">
                             <span class="p-column-title">Descrição</span>
                             {{ slotProps.data.descricao }}
                         </template>
                     </Column>
 
-                    <Column field="..." header="..." :sortable="true" class="w-2">
+                    <Column field="..." header="..." :sortable="true" class="w-1">
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
-                            <div class="grid">
-                                <div class="col-4 md:col-4 mr-3">
-                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-secondary" />
-                                </div>
-                                <div v-if="slotProps.data.compra_antecipada == 'Sim'" class="col-4 md:col-4 ml-3">
-                                    <Button @click.prevent="this.displayAuditoria = true" icon="pi pi-info" class="p-button-secondary" />
-                                </div>
+                            <div class="col-4 md:col-4">
+                                <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-secondary" />
+                            </div>
+                            <div class="col-4 md:col-4">
+                                <Button v-if="slotProps.data.compra_antecipada == 'Sim'" @click.prevent="auditoria(slotProps.data)" icon="pi pi-info" class="p-button-info" />
                             </div>
                         </template>
                     </Column>
@@ -1052,10 +1065,11 @@ export default {
                     <Column field="..." header="..." :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
-                            <div class="grid">
-                                <div class="col-4 md:col-4 mr-3">
-                                    <Button @click.prevent="visualizarAcima(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-secondary" />
-                                </div>
+                            <div class="col-4 md:col-4">
+                                <Button @click.prevent="visualizarAcima(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-secondary" />
+                            </div>
+                            <div v-if="slotProps.data.compra_antecipada == 'Sim'" class="col-4 md:col-4">
+                                <Button @click.prevent="auditoria(slotProps.data)" icon="pi pi-info" class="p-button-info" />
                             </div>
                         </template>
                     </Column>
