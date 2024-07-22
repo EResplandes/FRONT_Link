@@ -65,7 +65,7 @@ export function generatePDF(data) {
     doc.text('PRESIDENTE', 107, 130, null, null, 'center');
 
     // Define o título da tabela
-    const headers = [['', 'Local', 'Fornecedor', 'Valor', 'Status', 'Autorização', 'Criação', 'Aprovação']];
+    const headers = [['', 'Local', 'Nº Ped.', 'Fornecedor', 'Valor', 'Status', 'Autorização', 'Criação', 'Aprovação']];
 
     // Formatação dos dados da tabela
     const tableData = data.pedido.map((pedido) => {
@@ -87,7 +87,7 @@ export function generatePDF(data) {
         const minutoAprovacao = pad(dataAprovacao.getMinutes());
         const dataFormatadaAprovacao = `${diaAprovacao}/${mesAprovacao}/${anoAprovacao} ${horaAprovacao}:${minutoAprovacao}`;
 
-        return ['1', pedido.local, pedido.descricao, pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }), pedido.status, `${pedido.link} @`, dataFormatadaInclusao, dataFormatadaAprovacao];
+        return ['1', pedido.local, pedido.protheus, pedido.descricao, pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }), pedido.status, `${pedido.link} @`, dataFormatadaInclusao, dataFormatadaAprovacao];
     });
 
     // Adiciona a tabela ao documento PDF
@@ -105,12 +105,13 @@ export function generatePDF(data) {
         columnStyles: {
             0: { halign: 'center', columnWidth: 5 },
             1: { halign: 'center', columnWidth: 15 },
-            2: { halign: 'center', columnWidth: 40 },
-            3: { halign: 'center', columnWidth: 30 },
-            4: { halign: 'center', columnWidth: 15 },
-            5: { halign: 'center', columnWidth: 20 },
-            6: { halign: 'center', columnWidth: 25 },
-            7: { halign: 'center', columnWidth: 30 }
+            2: { halign: 'center', columnWidth: 15 },
+            3: { halign: 'center', columnWidth: 35 },
+            4: { halign: 'center', columnWidth: 30 },
+            5: { halign: 'center', columnWidth: 15 },
+            6: { halign: 'center', columnWidth: 20 },
+            7: { halign: 'center', columnWidth: 22 },
+            8: { halign: 'center', columnWidth: 22 }
         },
         bodyStyles: { halign: 'center', fontSize: 8 }
     });
