@@ -161,17 +161,25 @@ export default {
                                 <label for="firstname2">Urgente</label><br />
                                 <InputSwitch :trueValue="1" :falseValue="0" :modelValue="form.urgente" v-model="form.urgente" />
                             </div>
-                            <div class="field col-12 md:col-4">
+
+                            <div class="field col-12 md:col-2">
                                 <label for="firstname2">Valor <span class="obrigatorio">*</span></label>
                                 <InputNumber v-tooltip.top="'Digite o valor do pedido'" v-model="form.valor" inputId="minmaxfraction" :minFractionDigits="2" :maxFractionDigits="2" placeholder="R$..." />
                             </div>
+
                             <div class="field col-12 md:col-2">
                                 <label for="firstname2">Nº Pedido no Protheus <span class="obrigatorio">*</span></label>
                                 <InputText type="number" v-tooltip.top="'Digite o numero do pedido'" v-model="form.protheus" />
                             </div>
+
                             <div class="field col-12 md:col-2">
                                 <label for="firstname2">Dt de Vencimento <span class="obrigatorio">*</span></label>
                                 <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de vencimento'" v-model="form.dt_vencimento" showIcon iconDisplay="input" />
+                            </div>
+
+                            <div class="field col-12 md:col-2">
+                                <label for="firstname2">Dt de Criação Pedido <span class="obrigatorio">*</span></label>
+                                <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de criação de pedido no Protheus'" v-model="form.dt_criacao_pedido" showIcon iconDisplay="input" />
                             </div>
 
                             <div class="field col-1 md:col-3">

@@ -5,6 +5,7 @@ import { useConfirm } from 'primevue/useconfirm';
 import EmpresaService from '../../../service/EmpresaService';
 import StatusService from '../../../service/StatusService';
 import PedidoService from '../../../service/Pedido';
+import ParcelaService from '../../../service/ParcelaService';
 import NotaService from '../../../service/NotaService';
 import BoletoService from '../../../service/BoletoService';
 import { generatePDF } from './aprovacao';
@@ -15,11 +16,14 @@ export default {
             toast: new useToast(),
             empresaService: new EmpresaService(),
             statusService: new StatusService(),
+            parcelaService: new ParcelaService(),
             boletoService: new BoletoService(),
             pedidoService: new PedidoService(),
             notaService: new NotaService(),
             confirm: new useConfirm(),
+            parcelasCadastradas: ref(false),
             empresas: ref(null),
+            parcelas: ref([]),
             pedidos: ref(null),
             status: ref(null),
             form: ref({}),
@@ -28,8 +32,10 @@ export default {
             editar: ref(false),
             preloading: ref(true),
             displayFluxo: ref(false),
+            liberaBotaoCadastrarBoleto: ref(false),
             display: ref(false),
             displayNota: ref(false),
+            displayParcelas: ref(false),
             urlBase: 'https://link.gruporialma.com.br/storage',
             pdf: ref(null),
             pdfsrc: ref(null),
@@ -43,7 +49,6 @@ export default {
         // Metódo responsável por buscar todos pedidos relacionas a esse usuário que foram aprovados
         this.pedidoService.buscaAprovadosPedidos(localStorage.getItem('usuario_id')).then((data) => {
             this.pedidos = data.pedidos;
-            console.log(data);
             this.preloading = false;
         });
 
@@ -89,6 +94,22 @@ export default {
             return new Intl.DateTimeFormat('pt-BR', options).format(dataFormatada);
         },
 
+        // Metódo responsável por cadastrar parcelas
+        cadastarParcelas() {
+            this.parcelasCadastradas = true;
+            this.preloading = true;
+            this.parcelaService.cadastrar(this.parcelas, this.idPedido).then((data) => {
+                if (data.resposta == 'Parcelas cadastradas com sucesso!') {
+                    this.preloading = false;
+                    this.showSuccess('Parcelas cadastradas com sucesso!');
+                    this.parcelas = null;
+                    this.qtd_parcelas = null;
+                    this.displayParcelas = false;
+                    this.liberaBotaoCadastrarBoleto = true;
+                }
+            });
+        },
+
         // Metódo responsável por visualizar pdf
         visualizar(id, data) {
             this.display = true;
@@ -114,9 +135,11 @@ export default {
             });
         },
 
-        modalForm(id, status) {
+        modalForm(id, status, data) {
             this.status = status;
             this.idPedido = id;
+            this.pdf = data.anexo;
+            this.pdfsrc = `${this.urlBase}/${this.pdf}`;
             this.displayNota = true;
         },
 
@@ -231,6 +254,14 @@ export default {
 
         uploadPdfBoleto() {
             this.form.pdfBoleto = this.$refs.pdfBoleto.files[0];
+        },
+
+        // Metódo responsável por gerar quantidade de parcelas
+        gerarParcelas() {
+            this.parcelas = Array.from({ length: this.qtd_parcelas }, () => ({
+                dataVencimento: null,
+                valor: null
+            }));
         }
     }
 };
@@ -252,6 +283,55 @@ export default {
             </div>
         </Dialog>
 
+        <!-- Geração de Parcelas -->
+        <Dialog v-model:visible="displayParcelas" header="PARCELAS" :style="{ width: '80%' }" maximizable modal :contentStyle="{ height: '80%' }">
+            <div class="grid">
+                <div class="col-12">
+                    <Button @click.prevent="cadastarParcelas()" style="width: 100%" label="Salvar Parcelas" class="p-button-success" />
+                </div>
+
+                <Divider />
+
+                <div style="height: 800px" class="col-7">
+                    <iframe :src="pdfsrc" style="width: 100%; height: 650px; border: none"> Oops! ocorreu um erro. </iframe>
+                </div>
+
+                <div class="col-5">
+                    <div class="p-fluid formgrid grid mb-5 p-3">
+                        <div class="field col-4 md:col-6">
+                            <label for="firstname2">Quantidade de Parcelas: <span class="obrigatorio">*</span></label>
+                            <InputNumber v-model="qtd_parcelas" inputId="minmax-buttons" mode="decimal" showButtons :min="0" :max="100" />
+                        </div>
+                        <div class="field col-4 md:col-6">
+                            <label style="color: white" for="firstname2">.</label>
+                            <Button style="width: 100%" label="Gerar Parcelas" class="p-button-info" @click="gerarParcelas()" />
+                        </div>
+                    </div>
+
+                    <div style="background-color: whitesmoke; padding: 5px; margin-bottom: 25px">
+                        <h3 style="text-align: center">Parcelas</h3>
+                    </div>
+
+                    <div class="parcelas-container">
+                        <div v-for="(parcela, index) in parcelas" :key="index" class="p-fluid formgrid grid mb-5 px-5">
+                            <div class="col-12">
+                                <h5>Parcela de Nº {{ index + 1 }}</h5>
+                            </div>
+                            <div class="field col-6 md:col-6">
+                                <label :for="'data-vencimento-' + index">Data de Vencimento:</label>
+                                <Calendar v-model="parcela.dataVencimento" :inputId="'data-vencimento-' + index" />
+                            </div>
+                            <div class="field col-6 md:col-6">
+                                <label :for="'valor-parcela-' + index">Valor da Parcela:</label>
+                                <InputNumber v-model="parcela.valor" :inputId="'valor-parcela-' + index" mode="currency" currency="BRL" locale="pt-BR" />
+                            </div>
+                            <Divider />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Dialog>
+
         <!-- Inserir nota -->
         <Dialog header="Nota" v-model:visible="displayNota" :style="{ width: '40%' }" :modal="true">
             <div class="grid mt-1">
@@ -263,8 +343,13 @@ export default {
                     <label for="firstname2">Selecione o Boleto: <span style="color: red">*</span></label>
                     <FileUpload style="width: 100%" chooseLabel="Selecionar Boleto" @change="uploadPdfBoleto" mode="basic" type="file" ref="pdfBoleto" name="demo[]" accept=".pdf,.docx" :maxFileSize="999999999"></FileUpload>
                 </div>
+
+                <div class="col-12 md:col-12">
+                    <Button style="width: 100%" @click="this.displayParcelas = true" label="Gerar Parcelas" :disabled="!this.form.pdfBoleto" class="p-button-warning" />
+                </div>
+
                 <div v-if="this.status != 'Sem Nota'" class="col-12 md:col-12">
-                    <Button style="width: 100%" @click.prevent="cadastrarBoleto()" label="Cadastrar (SOMENTE BOLETO) - Pagamento Antecipado" class="p-button-success" />
+                    <Button style="width: 100%" @click.prevent="cadastrarBoleto()" label="Cadastrar (SOMENTE BOLETO) - Pagamento Antecipado" :disabled="!this.liberaBotaoCadastrarBoleto" class="p-button-success" />
                 </div>
                 <div v-if="this.status != 'Sem Nota'" class="col-12 md:col-12">
                     <Button style="width: 100%" @click.prevent="cadastrarNota()" label="Cadastrar" class="p-button-info" />
@@ -363,7 +448,7 @@ export default {
                                 </div>
                                 <!-- v-if="slotProps.data.status.status == 'Aprovado' || slotProps.data.status.status == 'Aprovado com Ressalva' || slotProps.data.status.status == 'Sem Nota'" -->
                                 <div class="col-3 md:col-3 ml-1">
-                                    <Button @click.prevent="modalForm(slotProps.data.id, slotProps.data.status.status)" icon="pi pi-folder-open" class="p-button-warning" />
+                                    <Button @click.prevent="modalForm(slotProps.data.id, slotProps.data.status.status, slotProps.data)" icon="pi pi-folder-open" class="p-button-warning" />
                                 </div>
                             </div>
                         </template>
@@ -414,6 +499,11 @@ export default {
 
 .timeline-container {
     max-height: 300px; /* Defina a altura máxima desejada */
+    overflow-y: auto; /* Adiciona uma barra de rolagem vertical quando o conteúdo excede a altura máxima */
+}
+
+.parcelas-container {
+    max-height: 450px; /* Defina a altura máxima desejada */
     overflow-y: auto; /* Adiciona uma barra de rolagem vertical quando o conteúdo excede a altura máxima */
 }
 </style>

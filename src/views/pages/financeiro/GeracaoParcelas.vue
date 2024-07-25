@@ -15,7 +15,7 @@ export default {
             pedidos: ref(null),
             form: ref({}),
             destino: ref(null),
-            parcelas: ref([]),
+            parcelas: ref(null),
             caminhoComprovante: ref(null),
             preloading: ref(true),
             displayChat: ref(false),
@@ -33,9 +33,8 @@ export default {
 
     mounted: function () {
         // Metódo responsável por buscar todas os pedidos
-        this.pedidoService.buscaPedidosFinanceiro(localStorage.getItem('local_id')).then((data) => {
+        this.pedidoService.buscaPedidosFinanceiro().then((data) => {
             this.pedidos = data.pedidos;
-            console.log(data);
             this.preloading = false;
             this.loading = false;
         });
@@ -49,49 +48,6 @@ export default {
                 this.pedidos = data.pedidos;
                 this.preloading = false;
             });
-        },
-
-        // Metódo responsável por reprovar pedido e enviar para Fiscal
-        reprovarPedidoFiscal() {
-            this.preloading = true;
-            this.pedidoService.reprovarFinanceiroParaFiscal(this.novaMensagem, this.idPedido).then((data) => {
-                if (data.resposta == 'Pedido reprovado e enviado para fiscal com sucesso!') {
-                    this.showSuccess('Pedido reprovado e enviado para fiscal com sucesso!');
-                    this.display = false;
-                    this.displayChat = false;
-                } else {
-                    this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
-                }
-                this.buscaPedidosFinanceiro();
-            });
-        },
-
-        // Metódo responsável por cadastrar parcelas
-        cadastarParcelas() {
-            this.preloading = true;
-            this.parcelaService.cadastrar(this.parcelas, this.idPedido).then((data) => {
-                if (data.resposta == 'Parcelas cadastradas com sucesso!') {
-                    this.preloading = false;
-                    this.showSuccess('Parcelas cadastradas com sucesso!');
-                    this.parcelas = null;
-                    this.qtd_parcelas = null;
-                    this.buscaPedidosFinanceiro();
-                    this.display = false;
-                }
-            });
-        },
-
-        // Metódo responsável por gerar quantidade de parcelas
-        gerarParcelas() {
-            this.parcelas = Array.from({ length: this.qtd_parcelas }, () => ({
-                dataVencimento: null,
-                valor: null
-            }));
-        },
-
-        // Função de validação
-        validarParcelas() {
-            return this.parcelas.every((parcela) => parcela.dataVencimento && parcela.valor);
         },
 
         // Metódo responsável por formatar data padrão br
@@ -109,6 +65,8 @@ export default {
 
         // Metódo responsável por visualizar pdf
         visualizar(id, data) {
+            console.log(data);
+            this.parcelas = data.parcelas;
             this.idPedido = id;
             this.display = true;
             this.pdf = data.anexo;
@@ -117,8 +75,7 @@ export default {
         },
 
         // Metódo responsável por abrir chat
-        abrirChat(botao) {
-            this.destino = botao;
+        abrirChat() {
             this.chat(this.idPedido); // Buscando histórico desse chat
             this.displayChat = true;
         },
@@ -154,6 +111,50 @@ export default {
             const month = String(now.getMonth() + 1).padStart(2, '0');
             const day = String(now.getDate()).padStart(2, '0');
             return `${day}/${month}/${year}`;
+        },
+
+        formatarDataParaYMD(data) {
+            if (data) {
+                const d = new Date(data);
+                const day = String(d.getDate()).padStart(2, '0');
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const year = d.getFullYear();
+
+                return `${day}/${month}/${year}`;
+            } else {
+                return false;
+            }
+        },
+
+        // Metódo responsável por validar parcelas
+        validarParcelas() {
+            this.preloading = true;
+            this.parcelaService.validarParcelas(this.idPedido).then((data) => {
+                if (data.resposta == 'Validação de parcelas realizada com sucesso!') {
+                    this.showSuccess('Validação de parcelas realizada com sucesso!');
+                    this.buscaPedidosFinanceiro();
+                } else {
+                    this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
+                }
+                this.display = false;
+                this.preloading = false;
+            });
+        },
+
+        // Metódo responsável por reprovar parcelas
+        reprovarParcelas() {
+            this.preloading = true;
+            this.parcelaService.reprovarParcelasComprador(this.idPedido, this.novaMensagem).then((data) => {
+                if (data.resposta == 'Pedido reprovado com sucesso!') {
+                    this.showSuccess('Pedido reprovado com sucesso!');
+                    this.buscaPedidosFinanceiro;
+                } else {
+                    this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
+                }
+                this.display = false;
+                this.displayChat = false;
+                this.preloading = false;
+            });
         }
     }
 };
@@ -170,58 +171,41 @@ export default {
         <Dialog header="Pedido de Compra" v-model:visible="display" :modal="true" :style="{ width: '90%' }">
             <div class="grid">
                 <div class="col-6">
-                    <Button @click.prevent="abrirChat(fiscal)" style="width: 100%" label="Reprovar e Enviar para Fiscal" icon="pi pi-times" class="p-button-danger" />
+                    <Button @click.prevent="abrirChat()" style="width: 100%" label="Reprovar e Enviar para Comprador" icon="pi pi-times" class="p-button-danger" />
                 </div>
 
                 <div class="col-6">
-                    <Button @click.prevent="cadastarParcelas()" style="width: 100%" label="Salvar Parcelas" class="p-button-success" :disabled="!validarParcelas()" />
+                    <Button style="width: 100%" @click.prevent="validarParcelas()" label="Validar Parcelas" class="p-button-success" />
                 </div>
 
                 <Divider />
 
                 <div style="height: 900px" class="col-7 timeline-container">
-                    <Splitter layout="vertical">
-                        <SplitterPanel class="flex align-items-center justify-content-center splitter-panel">
-                            <iframe :src="pdfsrc" style="width: 100%; height: 650px; border: none"> Oops! ocorreu um erro. </iframe>
-                        </SplitterPanel>
-
-                        <SplitterPanel class="flex align-items-center justify-content-center splitter-panel">
-                            <iframe :src="pdfsrcboleto" style="width: 100%; height: 650px; border: none"> Oops! ocorreu um erro. </iframe>
-                        </SplitterPanel>
-                    </Splitter>
+                    <iframe :src="pdfsrcboleto" style="width: 100%; height: 650px; border: none"> Oops! ocorreu um erro. </iframe>
                 </div>
 
                 <div class="col-5">
-                    <div class="p-fluid formgrid grid mb-5 p-3">
-                        <div class="field col-4 md:col-4">
-                            <label for="firstname2">Quantidade de Parcelas: <span class="obrigatorio">*</span></label>
-                            <InputNumber v-model="qtd_parcelas" inputId="minmax-buttons" mode="decimal" showButtons :min="0" :max="100" />
-                        </div>
-                        <div class="field col-4 md:col-4">
-                            <label style="color: white" for="firstname2">.</label>
-                            <Button style="width: 100%" label="Gerar Parcelas" class="p-button-info" @click="gerarParcelas()" />
-                        </div>
-                    </div>
-
                     <div style="background-color: whitesmoke; padding: 5px; margin-bottom: 25px">
                         <h3 style="text-align: center">Parcelas</h3>
                     </div>
 
                     <div class="parcelas-container">
-                        <div v-for="(parcela, index) in parcelas" :key="index" class="p-fluid formgrid grid mb-5 px-5">
-                            <div class="col-12">
-                                <h5>Parcela de Nº {{ index + 1 }}</h5>
-                            </div>
-                            <div class="field col-6 md:col-6">
-                                <label :for="'data-vencimento-' + index">Data de Vencimento:</label>
-                                <Calendar v-model="parcela.dataVencimento" :inputId="'data-vencimento-' + index" />
-                            </div>
-                            <div class="field col-6 md:col-6">
-                                <label :for="'valor-parcela-' + index">Valor da Parcela:</label>
-                                <InputNumber v-model="parcela.valor" :inputId="'valor-parcela-' + index" mode="currency" currency="BRL" locale="pt-BR" />
-                            </div>
-                            <Divider />
-                        </div>
+                        <DataTable :value="parcelas">
+                            <Column field="id" header="ID"></Column>
+                            <Column field="Valor" header="VALOR" class="w-2">
+                                <template #body="slotProps">
+                                    <span class="p-column-title">CNPJ</span>
+                                    {{ slotProps.data.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
+                                </template>
+                            </Column>
+                            <Column field="dt_vencimento" header="DT. VENCIMENTO" class="w-3">
+                                <template #body="slotProps">
+                                    <span class="p-column-title">Descrição</span>
+                                    {{ this.formatarDataParaYMD(slotProps.data.dt_vencimento) }}
+                                </template>
+                            </Column>
+                            <Column field="status" header="STATUS"></Column>
+                        </DataTable>
                     </div>
                 </div>
             </div>
@@ -244,7 +228,7 @@ export default {
                                         {{ slotProps.item.id_usuario.name }}
                                     </template>
                                     <template #subtitle>
-                                        {{ this.formatarData(slotProps.item.data_mensagem) }}
+                                        {{ this.formatarDataParaYMD(slotProps.item.data_mensagem) }}
                                     </template>
                                     <template #content>
                                         <h6>
@@ -257,7 +241,7 @@ export default {
                     </div>
                     <hr />
                     <InputText class="col-12" type="text" v-model="novaMensagem" placeholder="Digite a mensagem..." />
-                    <Button @click.prevent="reprovarPedidoFiscal()" label="Enviar" class="mr-2 mt-3 p-button-success col-12" />
+                    <Button @click.prevent="reprovarParcelas()" label="Enviar" class="mr-2 mt-3 p-button-success col-12" />
                 </div>
             </div>
         </Dialog>

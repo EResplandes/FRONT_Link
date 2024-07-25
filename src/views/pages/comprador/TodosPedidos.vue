@@ -383,8 +383,8 @@ export default {
                     <Calendar dateFormat="yy-mm-dd" v-tooltip.left="'Selecione a data vencimento do pedido'" v-model="form.dt_vencimento" showIcon :showOnFocus="false" class="" />
                 </div>
                 <div class="field">
-                    <label for="descricao">Descrição: </label>
-                    <Textarea rows="3" cols="30" v-tooltip.left="'Digite a descrição do pedido'" v-model="form.descricao" id="descricao" placeholder="Digite..." />
+                    <label for="descricao">Fornecedor: </label>
+                    <Textarea rows="3" cols="30" v-tooltip.left="'Digite o fornecedor do pedido'" v-model="form.descricao" id="descricao" placeholder="Digite..." />
                 </div>
                 <div class="field">
                     <label for="firstname2">Somente se existir alguma alteração no PDF</label>

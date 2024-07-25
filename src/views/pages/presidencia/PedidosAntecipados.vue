@@ -17,9 +17,8 @@ export default {
             display: ref(false),
             totalPedidos: ref(500),
             totalValor: ref(null),
-            urlBase: 'https://link.gruporialma.com.br/storage',
-            sortOrder: 1, // 1 para ascendente, -1 para descendente
-            sortField: 'prioridade'
+            urlBase: 'https://link.gruporialma.com.br/storage'
+            // sortOrder: 1 // 1 para ascendente, -1 para descendente
         };
     },
 
@@ -116,6 +115,17 @@ export default {
             const month = String(now.getMonth() + 1).padStart(2, '0');
             const day = String(now.getDate()).padStart(2, '0');
             return `${day}/${month}/${year}`;
+        },
+
+        calcularDiferencaDias(dataEmissao, dataCriacao) {
+            if (dataEmissao == null || dataEmissao == undefined || dataCriacao == null || dataCriacao == undefined) {
+                return 'N/C';
+            }
+
+            const emissao = new Date(dataEmissao);
+            const criacao = new Date(dataCriacao);
+            const umDia = 24 * 60 * 60 * 1000; // Milissegundos em um dia
+            return Math.round((emissao - criacao) / umDia);
         }
     }
 };
@@ -187,10 +197,8 @@ export default {
                     dataKey="id"
                     :value="pedidos"
                     :paginator="true"
-                    :rows="500"
+                    :rows="100"
                     :rowClass="rowClass"
-                    :sort-order="sortOrder"
-                    :sort-field="sortField"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25, 50, 100, 200, 500]"
                     currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
@@ -222,13 +230,6 @@ export default {
                         </template>
                     </Column>
 
-                    <!-- <Column field="Local" header="Local" :sortable="true" class="w-1">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Local</span>
-                            {{ slotProps.data.local.local }}
-                        </template>
-                    </Column> -->
-
                     <Column field="Valor" header="Valor" :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">CNPJ</span>
@@ -236,10 +237,17 @@ export default {
                         </template>
                     </Column>
 
-                    <Column field="Dt. Inclusão" header="Dt. Inclusão" :sortable="true" class="w-2">
+                    <Column field="Dt. Inclusão" header="Dt. Inclusão Link" :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">Dt. Inclusão</span>
                             {{ formatarData(slotProps.data.dt_inclusao) }}
+                        </template>
+                    </Column>
+
+                    <Column field="Dt. Criação Protheus" header="Dt. Criação Protheus" :sortable="true" class="w-2">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Dt. Inclusão</span>
+                            {{ formatarDataSemHora(slotProps.data.dt_protheus) }}
                         </template>
                     </Column>
 
@@ -247,6 +255,13 @@ export default {
                         <template #body="slotProps">
                             <span class="p-column-title">Dt. Emissão Nota</span>
                             {{ formatarDataSemHora(slotProps.data.nota[0]?.dt_emissao) }}
+                        </template>
+                    </Column>
+
+                    <Column field="Dif. Dias" header="Dif. Dias" :sortable="true" class="w-1">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Dt. Emissão Nota</span>
+                            {{ calcularDiferencaDias(slotProps.data.nota[0]?.dt_emissao, slotProps.data.dt_protheus) }}
                         </template>
                     </Column>
 

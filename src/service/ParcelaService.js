@@ -43,6 +43,51 @@ export default class ParcelaService {
             });
     }
 
+    // Requisição responsável por validar parcelas
+    async validarParcelas(idPedido) {
+        return await fetch(`${API_URL}/parcelas/validar-parcelas/${idPedido}`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    // Requisição responsável por reprovar parcelas e enviar para comprador
+    async reprovarParcelasComprador(idPedido, novaMensagme) {
+        const idUsuario = localStorage.getItem('usuario_id');
+        return fetch(`${API_URL}/parcelas/reprovar-parcelas`, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                id_pedido: idPedido,
+                id_usuario: idUsuario,
+                mensagem: novaMensagme
+            })
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
     async buscaParcelasFiltradas(form) {
         return fetch(`${API_URL}/parcelas/listar-parcelas-filtradas/${this.formatarDataParaYMD(form.dt_inicio)}/${this.formatarDataParaYMD(form.dt_fim)}`, {
             method: 'GET',

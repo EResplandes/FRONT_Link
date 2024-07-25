@@ -22,6 +22,8 @@ export default {
             loading1: ref(null),
             links: ref(null),
             empresas: ref(null),
+            displayParcelas: ref(false),
+            parcelas: ref([]),
             gerentes: ref(null),
             diretores: ref(null),
             locais: ref(null),
@@ -84,7 +86,7 @@ export default {
         // Metódo responsável por cadastrar pedido
         cadastrarPedido() {
             // Array com os nomes dos campos obrigatórios
-            const camposObrigatorios = ['valor', 'dt_vencimento', 'link', 'empresa', 'descricao', 'fluxo', 'local', 'protheus'];
+            const camposObrigatorios = ['valor', 'dt_vencimento', 'link', 'empresa', 'descricao', 'fluxo', 'local', 'protheus', 'dt_criacao_pedido'];
 
             // Variável para verificar se todos os campos obrigatórios estão preenchidos
             let todosCamposPreenchidos = true;
@@ -101,6 +103,11 @@ export default {
                 }
             }
 
+            if (this.parcelas[0] == null || this.parcelas.length === 0) {
+                this.showError('Gere as parcelas!');
+                todosCamposPreenchidos = false;
+            }
+
             // Iterar sobre os campos obrigatórios
             for (const campo of camposObrigatorios) {
                 // Verificar se o campo está vazio
@@ -114,7 +121,7 @@ export default {
             // Verificar se todos os campos obrigatórios foram preenchidos antes de cadastrar o pedido
             if (todosCamposPreenchidos) {
                 this.preloading = true;
-                this.cadastrarPedidoService.comFluxo(this.form).then((data) => {
+                this.cadastrarPedidoService.comFluxo(this.form, this.parcelas).then((data) => {
                     if (data.resposta == 'Pedido cadastrado com sucesso!') {
                         this.preloading = false;
                         this.showSuccess('Pedido cadastrado com sucesso!');
@@ -125,6 +132,14 @@ export default {
                     }
                 });
             }
+        },
+
+        // Metódo responsável por gerar quantidade de parcelas
+        gerarParcelas() {
+            this.parcelas = Array.from({ length: this.qtd_parcelas }, () => ({
+                dataVencimento: null,
+                valor: null
+            }));
         },
 
         showSuccess(mensagem) {
@@ -159,6 +174,50 @@ export default {
         <ProgressSpinner />
     </div>
 
+    <!-- Geração de Parcelas -->
+    <Dialog v-model:visible="displayParcelas" header="PARCELAS" :style="{ width: '60%' }" maximizable modal :contentStyle="{ height: '80%' }">
+        <div class="grid">
+            <div class="col-12">
+                <Button @click.prevent="this.displayParcelas = false" style="width: 100%" label="Salvar Parcelas" class="p-button-success" />
+            </div>
+
+            <Divider />
+            <div class="col-12">
+                <div class="p-fluid formgrid grid mb-5 p-3">
+                    <div class="field col-4 md:col-6">
+                        <label for="firstname2">Quantidade de Parcelas: <span class="obrigatorio">*</span></label>
+                        <InputNumber v-model="qtd_parcelas" inputId="minmax-buttons" mode="decimal" showButtons :min="0" :max="100" />
+                    </div>
+                    <div class="field col-4 md:col-6">
+                        <label style="color: white" for="firstname2">.</label>
+                        <Button style="width: 100%" label="Gerar Parcelas" class="p-button-info" @click="gerarParcelas()" />
+                    </div>
+                </div>
+
+                <div style="background-color: whitesmoke; padding: 5px; margin-bottom: 25px">
+                    <h3 style="text-align: center">Parcelas</h3>
+                </div>
+
+                <div class="parcelas-container">
+                    <div v-for="(parcela, index) in parcelas" :key="index" class="p-fluid formgrid grid mb-5 px-5">
+                        <div class="col-12">
+                            <h5>Parcela de Nº {{ index + 1 }}</h5>
+                        </div>
+                        <div class="field col-6 md:col-6">
+                            <label :for="'data-vencimento-' + index">Data de Vencimento:</label>
+                            <Calendar v-model="parcela.dataVencimento" :inputId="'data-vencimento-' + index" />
+                        </div>
+                        <div class="field col-6 md:col-6">
+                            <label :for="'valor-parcela-' + index">Valor da Parcela:</label>
+                            <InputNumber v-model="parcela.valor" :inputId="'valor-parcela-' + index" mode="currency" currency="BRL" locale="pt-BR" />
+                        </div>
+                        <Divider />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </Dialog>
+
     <div class="grid">
         <div class="col-12">
             <div class="col-12 lg:col-6">
@@ -173,10 +232,12 @@ export default {
                                 <label for="firstname2">Urgente</label><br />
                                 <InputSwitch :trueValue="1" :falseValue="0" :modelValue="form.urgente" v-model="form.urgente" />
                             </div>
+
                             <div class="field col-12 md:col-2">
                                 <label for="firstname2">Valor <span class="obrigatorio">*</span></label>
                                 <InputNumber v-tooltip.top="'Digite o valor do pedido'" v-model="form.valor" inputId="minmaxfraction" :minFractionDigits="2" :maxFractionDigits="2" placeholder="R$..." />
                             </div>
+
                             <div class="field col-12 md:col-2">
                                 <label for="firstname2">Nº Pedido no Protheus <span class="obrigatorio">* </span></label>
                                 <InputText type="number" v-tooltip.top="'Digite o numero do pedido'" v-model="form.protheus" />
@@ -187,8 +248,13 @@ export default {
                                 <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de vencimento'" v-model="form.dt_vencimento" showIcon iconDisplay="input" />
                             </div>
 
-                            <div class="field col-1 md:col-2">
-                                <label for="firstname2">Pedido<span class="obrigatorio">*</span></label>
+                            <div class="field col-12 md:col-2">
+                                <label for="firstname2">Dt de Criação Pedido <span class="obrigatorio">*</span></label>
+                                <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de criação de pedido no Protheus'" v-model="form.dt_criacao_pedido" showIcon iconDisplay="input" />
+                            </div>
+
+                            <div class="field col-1 md:col-3">
+                                <label for="firstname2">PDF <span class="obrigatorio">*</span></label>
                                 <FileUpload chooseLabel="Selecionar Arquivo" @change="uploadPdf" mode="basic" type="file" ref="pdf" name="demo[]" accept=".pdf,.docx" :maxFileSize="999999999"></FileUpload>
                             </div>
 
@@ -227,6 +293,10 @@ export default {
                             <div class="field col-1 md:col-2">
                                 <label for="firstname2">Anexo</label>
                                 <FileUpload chooseLabel="Selecionar Arquivo" @change="uploadPdfBoleto" mode="basic" type="file" ref="pdfBoleto" name="demo[]" accept=".pdf,.docx" :maxFileSize="999999999"></FileUpload>
+                            </div>
+                            <div class="field col-1 md:col-2">
+                                <label class="mb-4" for="firstname2">Gerar Parcelas</label>
+                                <Button :disabled="!this.form.boleto" @click.prevent="this.displayParcelas = true" icon="pi pi-check" label="Gerar" class="mr-2 mb-2 p-button-info" />
                             </div>
                         </div>
                     </TabPanel>

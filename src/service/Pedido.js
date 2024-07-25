@@ -643,7 +643,7 @@ export default class PedidoService {
     }
 
     // Requisição responsável por buscar pedidos com status 15 - Enviado para financeiro
-    async buscaPedidosFinanceiro(id) {
+    async buscaPedidosFinanceiro() {
         return await fetch(`${API_URL}/pedidos/listar-pedidos-financeiro`, {
             method: 'GET',
             headers: {

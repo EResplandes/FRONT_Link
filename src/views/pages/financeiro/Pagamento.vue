@@ -120,9 +120,9 @@ export default {
 
         // Metódo responsável por visualizar pdf
         visualizar(id, data) {
+            this.display = true;
             this.idPedido = id;
             this.idParcela = data.id_parcela;
-            this.display = true;
             this.pdf = data.pedido.anexo;
             this.pdfsrc = `${this.urlBase}/${this.pdf}`;
             this.pdfsrcnota = `${this.urlBase}/${data.pedido.nota[0]?.nota}`;
@@ -233,10 +233,7 @@ export default {
                 <Button label="Fechar" icon="pi pi-check" @click="display = false" />
             </template>
         </Dialog>
-
-        <!-- Visualizar Pedido de Compra -->
-        <Dialog header="Pedido de Compra" v-model:visible="display" :modal="true" :style="{ width: '98%' }"> </Dialog>
-
+        
         <!-- Visualizar input para inserir diretório -->
         <Dialog header="Tem certeza dessa operação?" v-model:visible="displayDiretorio" :modal="true" :style="{ width: '20%' }">
             <div class="grid">

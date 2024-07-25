@@ -9,13 +9,15 @@ const headers = {
 };
 
 export default class CadastraPedidoService {
-    semFluxo(form) {
+    semFluxo(form, parcelas) {
         let idCriador = localStorage.getItem('usuario_id');
         const formData = new FormData();
         formData.append('descricao', form?.descricao ?? null);
         formData.append('valor', form?.valor ?? null);
         formData.append('urgente', form?.urgente) ?? 0;
+        formData.append('parcelas', JSON.stringify(parcelas) ?? null);
         formData.append('dt_vencimento', this.formatarDataParaYMD(form?.dt_vencimento));
+        formData.append('dt_criacao_pedido', this.formatarDataParaYMD(form?.dt_criacao_pedido));
         formData.append('anexo', form?.pdf ?? null);
         formData.append('id_link', form?.link?.id ?? null);
         formData.append('id_empresa', form?.empresa?.id ?? null);
@@ -41,12 +43,14 @@ export default class CadastraPedidoService {
             });
     }
 
-    comFluxo(form) {
+    comFluxo(form, parcelas) {
         const formData = new FormData();
         formData.append('descricao', form?.descricao ?? null);
         formData.append('valor', form?.valor ?? null);
+        formData.append('parcelas', JSON.stringify(parcelas) ?? null);
         formData.append('urgente', form?.urgente) ?? 0;
         formData.append('dt_vencimento', this.formatarDataParaYMD(form?.dt_vencimento));
+        formData.append('dt_criacao_pedido', this.formatarDataParaYMD(form?.dt_criacao_pedido));
         formData.append('anexo', form?.pdf ?? null);
         formData.append('id_link', form?.link?.id ?? null);
         formData.append('id_empresa', form?.empresa?.id ?? null);
