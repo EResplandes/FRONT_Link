@@ -290,7 +290,7 @@ export default {
                     <InputText type="number" v-tooltip.top="'Digite o numero da nota fiscal'" v-model="form.nota_fiscal" />
                 </div>
                 <div class="field col-4 md:col-4">
-                    <label for="firstname2">Nº Pedido no Protheus <span class="obrigatorio">* </span></label>
+                    <label for="firstname2">Dt. Emissão Nota <span class="obrigatorio">* </span></label>
                     <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de emissão da nota fiscal'" v-model="form.dt_emissao" showIcon iconDisplay="input" />
                 </div>
                 <div class="col-12">
