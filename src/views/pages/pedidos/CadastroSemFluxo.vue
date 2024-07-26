@@ -20,6 +20,8 @@ export default {
             loading1: ref(null),
             links: ref(null),
             empresas: ref(null),
+            displayParcelas: ref(false),
+            parcelas: ref([]),
             locais: ref(null),
             form: ref({
                 urgente: 0,
@@ -88,6 +90,11 @@ export default {
                 }
             }
 
+            if (this.parcelas[0] == null || this.parcelas.length === 0) {
+                this.showError('Gere as parcelas!');
+                todosCamposPreenchidos = false;
+            }
+
             // Iterar sobre os campos obrigatórios
             for (const campo of camposObrigatorios) {
                 // Verificar se o campo está vazio
@@ -101,7 +108,7 @@ export default {
             // Verificar se todos os campos obrigatórios foram preenchidos antes de cadastrar o pedido
             if (todosCamposPreenchidos) {
                 this.preloading = true;
-                this.cadastrarPedidoService.semFluxo(this.form).then((data) => {
+                this.cadastrarPedidoService.semFluxo(this.form, this.parcelas).then((data) => {
                     if (data.resposta == 'Pedido cadastrado com sucesso!') {
                         this.preloading = false;
                         this.showSuccess('Pedido cadastrado com sucesso!');
@@ -113,6 +120,14 @@ export default {
                     }
                 });
             }
+        },
+
+        // Metódo responsável por gerar quantidade de parcelas
+        gerarParcelas() {
+            this.parcelas = Array.from({ length: this.qtd_parcelas }, () => ({
+                dataVencimento: null,
+                valor: null
+            }));
         },
 
         showSuccess(mensagem) {
@@ -132,11 +147,11 @@ export default {
         },
 
         uploadPdfNota() {
-            this.form.pdfNota = this.$refs.pdfNota.files[0];
+            this.form.nota = this.$refs.pdfNota.files[0];
         },
 
         uploadPdfBoleto() {
-            this.form.pdfBoleto = this.$refs.pdfBoleto.files[0];
+            this.form.boleto = this.$refs.pdfBoleto.files[0];
         }
     }
 };
@@ -146,6 +161,50 @@ export default {
     <div style="z-index: 99" v-if="preloading" class="full-screen-spinner">
         <ProgressSpinner />
     </div>
+
+    <!-- Geração de Parcelas -->
+    <Dialog v-model:visible="displayParcelas" header="PARCELAS" :style="{ width: '60%' }" maximizable modal :contentStyle="{ height: '80%' }">
+        <div class="grid">
+            <div class="col-12">
+                <Button @click.prevent="this.displayParcelas = false" style="width: 100%" label="Salvar Parcelas" class="p-button-success" />
+            </div>
+
+            <Divider />
+            <div class="col-12">
+                <div class="p-fluid formgrid grid mb-5 p-3">
+                    <div class="field col-4 md:col-6">
+                        <label for="firstname2">Quantidade de Parcelas: <span class="obrigatorio">*</span></label>
+                        <InputNumber v-model="qtd_parcelas" inputId="minmax-buttons" mode="decimal" showButtons :min="0" :max="100" />
+                    </div>
+                    <div class="field col-4 md:col-6">
+                        <label style="color: white" for="firstname2">.</label>
+                        <Button style="width: 100%" label="Gerar Parcelas" class="p-button-info" @click="gerarParcelas()" />
+                    </div>
+                </div>
+
+                <div style="background-color: whitesmoke; padding: 5px; margin-bottom: 25px">
+                    <h3 style="text-align: center">Parcelas</h3>
+                </div>
+
+                <div class="parcelas-container">
+                    <div v-for="(parcela, index) in parcelas" :key="index" class="p-fluid formgrid grid mb-5 px-5">
+                        <div class="col-12">
+                            <h5>Parcela de Nº {{ index + 1 }}</h5>
+                        </div>
+                        <div class="field col-6 md:col-6">
+                            <label :for="'data-vencimento-' + index">Data de Vencimento:</label>
+                            <Calendar v-model="parcela.dataVencimento" :inputId="'data-vencimento-' + index" />
+                        </div>
+                        <div class="field col-6 md:col-6">
+                            <label :for="'valor-parcela-' + index">Valor da Parcela:</label>
+                            <InputNumber v-model="parcela.valor" :inputId="'valor-parcela-' + index" mode="currency" currency="BRL" locale="pt-BR" />
+                        </div>
+                        <Divider />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </Dialog>
 
     <div class="grid">
         <div class="col-12">
@@ -221,6 +280,10 @@ export default {
                             <div class="field col-1 md:col-2">
                                 <label for="firstname2">Anexo</label>
                                 <FileUpload chooseLabel="Selecionar Arquivo" @change="uploadPdfBoleto" mode="basic" type="file" ref="pdfBoleto" name="demo[]" accept=".pdf,.docx" :maxFileSize="999999999"></FileUpload>
+                            </div>
+                            <div class="field col-1 md:col-2">
+                                <label class="mb-2" for="firstname2">Gerar Parcelas</label>
+                                <Button :disabled="!this.form.boleto" @click.prevent="this.displayParcelas = true" icon="pi pi-check" label="Gerar" class="mr-2 mb-2 p-button-info" />
                             </div>
                         </div>
                         <br />

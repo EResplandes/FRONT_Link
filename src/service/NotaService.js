@@ -88,13 +88,20 @@ export default class NotaService {
     }
 
     // Requisição responsável por dar baixa em nota
-    async darBaixa(id, emissao) {
-        return await fetch(`${API_URL}/notas/dar-baixa/${id}/${this.formatarDataParaYMD(emissao)}`, {
-            method: 'GET',
+    async darBaixa(id, form) {
+        console.log(form);
+        return await fetch(`${API_URL}/notas/dar-baixa/${id}`, {
+            method: 'POST',
             headers: {
+                'Content-Type': 'application/json',
                 Accept: 'application/json',
                 Authorization: 'Bearer ' + token
-            }
+            },
+            body: JSON.stringify({
+                dt_emissao: this.formatarDataParaYMD(form.dt_emissao) ?? null,
+                valor: form.valor ?? null,
+                numero_nota: form.nota_fiscal ?? null
+            })
         })
             .then((res) => res.json())
             .then((d) => {

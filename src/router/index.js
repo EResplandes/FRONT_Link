@@ -84,6 +84,11 @@ const router = createRouter({
                     component: () => import('@/views/pages/financeiro/GeracaoParcelas.vue')
                 },
                 {
+                    path: '/relatorio-financeiro',
+                    name: 'relatorio-financeiro',
+                    component: () => import('@/views/pages/financeiro/Relatorio.vue')
+                },
+                {
                     path: '/pagamento-parcelas',
                     name: 'pagamento-parcelas',
                     component: () => import('@/views/pages/financeiro/Pagamento.vue')

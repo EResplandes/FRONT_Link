@@ -295,7 +295,7 @@ export default {
                                 <FileUpload chooseLabel="Selecionar Arquivo" @change="uploadPdfBoleto" mode="basic" type="file" ref="pdfBoleto" name="demo[]" accept=".pdf,.docx" :maxFileSize="999999999"></FileUpload>
                             </div>
                             <div class="field col-1 md:col-2">
-                                <label class="mb-4" for="firstname2">Gerar Parcelas</label>
+                                <label class="mb-2" for="firstname2">Gerar Parcelas</label>
                                 <Button :disabled="!this.form.boleto" @click.prevent="this.displayParcelas = true" icon="pi pi-check" label="Gerar" class="mr-2 mb-2 p-button-info" />
                             </div>
                         </div>

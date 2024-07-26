@@ -94,7 +94,7 @@ export default {
         // Metódo responsável por dar baixa na nota
         darBaixa() {
             this.preloading = true;
-            this.notasService.darBaixa(this.idPedido, this.form.dt_emissao).then((data) => {
+            this.notasService.darBaixa(this.idPedido, this.form).then((data) => {
                 if (data.resposta == 'Nota escriturada e enviada para o Financeiro com sucesso!') {
                     this.buscaPedidos();
                     this.showSuccess('Nota escriturada e enviada para o Financeiro com sucesso!');
@@ -108,7 +108,6 @@ export default {
 
         // Metódo responsável por visualizar pdf
         visualizar(id, data) {
-            console.log(data);
             this.idPedido = id;
             this.display = true;
             this.pdf = data.pedido.anexo;
@@ -211,7 +210,6 @@ export default {
                 } else {
                     this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
                 }
-                console.log(data);
             });
         }
     }
@@ -281,12 +279,21 @@ export default {
             </Splitter>
         </Dialog>
 
-        <Dialog header="Informe a Data de Emissão da Nota" v-model:visible="displayData" :modal="true" :style="{ width: '30%' }">
-            <div class="grid">
-                <div class="col-6 mt-2">
+        <Dialog header="FORMULÁRIO" v-model:visible="displayData" :modal="true" :style="{ width: '30%' }">
+            <div class="p-fluid formgrid grid">
+                <div class="field col-4 md:col-4">
+                    <label for="firstname2">Valor <span class="obrigatorio">*</span></label>
+                    <InputNumber v-tooltip.top="'Digite o valor da nota fiscal'" v-model="form.valor" inputId="minmaxfraction" :minFractionDigits="2" :maxFractionDigits="2" placeholder="R$..." />
+                </div>
+                <div class="field col-4 md:col-4">
+                    <label for="firstname2">Nº da Nota <span class="obrigatorio">* </span></label>
+                    <InputText type="number" v-tooltip.top="'Digite o numero da nota fiscal'" v-model="form.nota_fiscal" />
+                </div>
+                <div class="field col-4 md:col-4">
+                    <label for="firstname2">Nº Pedido no Protheus <span class="obrigatorio">* </span></label>
                     <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de emissão da nota fiscal'" v-model="form.dt_emissao" showIcon iconDisplay="input" />
                 </div>
-                <div class="col-6">
+                <div class="col-12">
                     <Button @click.prevent="darBaixa()" style="width: 100%" label="Escriturar e Enviar para Financeiro" icon="pi pi-check" class="p-button-success" />
                 </div>
             </div>
