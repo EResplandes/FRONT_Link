@@ -216,20 +216,6 @@ export default {
                         </template>
                     </Column>
 
-                    <Column field="Fornecedor" header="Fornecedor" :sortable="true" class="w-1">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Fornecedor</span>
-                            {{ slotProps.data.descricao }}
-                        </template>
-                    </Column>
-
-                    <Column field="Comprador" header="Comprador" :sortable="true" class="w-1">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Comprador</span>
-                            {{ slotProps.data.comprador }}
-                        </template>
-                    </Column>
-
                     <Column field="Valor" header="Valor" :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">CNPJ</span>
@@ -269,6 +255,20 @@ export default {
                         <template #body="slotProps">
                             <span class="p-column-title">Dt. Aprovação</span>
                             {{ formatarData(slotProps.data.dt_aprovacao) }}
+                        </template>
+                    </Column>
+
+                    <Column field="Fornecedor" header="Fornecedor" :sortable="true" class="w-1">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Fornecedor</span>
+                            {{ slotProps.data.descricao }}
+                        </template>
+                    </Column>
+
+                    <Column field="Comprador" header="Comprador" :sortable="true" class="w-1">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Comprador</span>
+                            {{ slotProps.data.comprador }}
                         </template>
                     </Column>
 

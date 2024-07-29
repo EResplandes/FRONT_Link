@@ -14,9 +14,11 @@ export default {
             chatService: new ChatService(),
             pedidos: ref(null),
             form: ref({}),
+            dadosAlterar: ref({}),
             destino: ref(null),
             parcelas: ref(null),
             caminhoComprovante: ref(null),
+            displayPedidoBoletoNota: ref(null),
             preloading: ref(true),
             displayChat: ref(false),
             novaMensagem: ref(null),
@@ -26,6 +28,7 @@ export default {
             pdf: ref(null),
             pdfsrc: ref(null),
             conversa: ref(null),
+            displayAlterar: ref(null),
             customers: null,
             loading: true
         };
@@ -65,7 +68,6 @@ export default {
 
         // Metódo responsável por visualizar pdf
         visualizar(id, data) {
-            console.log(data);
             this.parcelas = data.parcelas;
             this.idPedido = id;
             this.display = true;
@@ -155,6 +157,28 @@ export default {
                 this.displayChat = false;
                 this.preloading = false;
             });
+        },
+
+        // Metódo responsável por abrir modal para alterar valor da parcela
+        abrirModalAlterarParcelas(data) {
+            this.dadosAlterar = data;
+            this.displayAlterar = true;
+        },
+
+        // Metódo responsável pro alterar dados da parcela
+        alterarDados() {
+            this.preloading = true;
+            this.parcelaService.alterarDadosParcela(this.dadosAlterar).then((data) => {
+                this.showSuccess('Informações atualizadas com sucesso!');
+                this.preloading = false;
+                this.displayAlterar = false;
+                this.buscaPedidosFinanceiro();
+            });
+        },
+
+        // Metódo responsável por abrir modal
+        visualizarPdfs() {
+            this.displayPedidoBoletoNota = true;
         }
     }
 };
@@ -171,11 +195,15 @@ export default {
         <Dialog header="Pedido de Compra" v-model:visible="display" :modal="true" :style="{ width: '90%' }">
             <div class="grid">
                 <div class="col-6">
-                    <Button @click.prevent="abrirChat()" style="width: 100%" label="Reprovar e Enviar para Comprador" icon="pi pi-times" class="p-button-danger" />
+                    <Button @click.prevent="abrirChat()" style="width: 100%" label="REPROVAR E ENVIAR PARA COMRPADOR" icon="pi pi-times" class="p-button-danger" />
                 </div>
 
                 <div class="col-6">
-                    <Button style="width: 100%" @click.prevent="validarParcelas()" label="Validar Parcelas" class="p-button-success" />
+                    <Button style="width: 100%" @click.prevent="validarParcelas()" label="VALIDAR PARCELAS" class="p-button-success" />
+                </div>
+
+                <div class="col-12">
+                    <Button style="width: 100%" @click.prevent="visualizarPdfs()" label="VISUALIZAR PEDIDO, BOLETO E NOTA" class="p-button-info" />
                 </div>
 
                 <Divider />
@@ -201,10 +229,16 @@ export default {
                             <Column field="dt_vencimento" header="DT. VENCIMENTO" class="w-3">
                                 <template #body="slotProps">
                                     <span class="p-column-title">Descrição</span>
-                                    {{ this.formatarDataParaYMD(slotProps.data.dt_vencimento) }}
+                                    {{ this.formatarData(slotProps.data.dt_vencimento) }}
                                 </template>
                             </Column>
                             <Column field="status" header="STATUS"></Column>
+                            <Column field="..." header="..." class="w-3">
+                                <template #body="slotProps">
+                                    <span class="p-column-title">...</span>
+                                    <Button icon="pi pi-pencil" severity="secondary" @click.prevent="abrirModalAlterarParcelas(slotProps.data)" />
+                                </template>
+                            </Column>
                         </DataTable>
                     </div>
                 </div>
@@ -246,6 +280,42 @@ export default {
             </div>
         </Dialog>
 
+        <!-- Dialog para alterar dados de parcela -->
+        <Dialog header="ALTERAR DADOS PARCELA" v-model:visible="displayAlterar" :style="{ width: '40%' }" :modal="true">
+            <div class="grid">
+                <div class="field col-12 md:col-4">
+                    <label for="firstname2">ID PARCELA</label>
+                    <InputNumber v-model="dadosAlterar.id" inputId="minmaxfraction" disabled />
+                </div>
+                <div class="field col-12 md:col-4">
+                    <label for="firstname2">VALOR</label>
+                    <InputNumber v-tooltip.top="'Digite o valor da parcela'" v-model="dadosAlterar.valor" inputId="minmaxfraction" :minFractionDigits="2" :maxFractionDigits="2" placeholder="R$..." />
+                </div>
+                <div class="field col-12 md:col-4">
+                    <label for="firstname2">DT DE VENCIMENTO</label>
+                    <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de vencimento da parcela'" v-model="dadosAlterar.dt_vencimento" showIcon iconDisplay="input" />
+                </div>
+                <div class="field col-12 md:col-12">
+                    <Button @click.prevent="alterarDados()" style="width: 100%" label="ALTERAR DADOS" severity="success" />
+                </div>
+            </div>
+        </Dialog>
+
+        <!-- Dialog com todos pdf relacionados a um pedido -->
+        <Dialog v-model:visible="displayPedidoBoletoNota" maximizable modal header="Header" :style="{ width: '90%' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <Splitter>
+                <SplitterPanel class="flex align-items-center justify-content-center splitter-panel">
+                    <iframe :src="pdfsrc" style="width: 100%; height: 1200px; border: none"> Oops! ocorreu um erro. </iframe>
+                </SplitterPanel>
+                <SplitterPanel class="flex align-items-center justify-content-center splitter-panel">
+                    <iframe :src="pdfsrcnota" style="width: 100%; height: 1200px; border: none"> Oops! ocorreu um erro. </iframe>
+                </SplitterPanel>
+                <SplitterPanel class="flex align-items-center justify-content-center splitter-panel">
+                    <iframe :src="pdfsrcboleto" style="width: 100%; height: 1200px; border: none"> Oops! ocorreu um erro. </iframe>
+                </SplitterPanel>
+            </Splitter>
+        </Dialog>
+
         <div class="col-12">
             <div class="col-12 lg:col-6">
                 <Toast />
@@ -273,49 +343,56 @@ export default {
                     <template #empty> Nenhum pedido encontrado! </template>
                     <template #loading> Carregando informações... Por favor, aguarde! </template>
 
-                    <Column field="Dt. Venc" header="Dt. Venc" :sortable="true" class="w-1">
+                    <Column field="Nº Protheus" header="Nº Protheus" class="w-1">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Nº Protheus</span>
+                            {{ slotProps.data.protheus }}
+                        </template>
+                    </Column>
+
+                    <Column field="Dt. Venc" header="Dt. Venc" class="w-1">
                         <template #body="slotProps">
                             <span class="p-column-title">Dt. Venc</span>
                             {{ formatarData(slotProps.data.dt_vencimento) }}
                         </template>
                     </Column>
 
-                    <Column field="Empresa" header="Empresa" :sortable="true" class="w-1">
+                    <Column field="Empresa" header="Empresa" class="w-1">
                         <template #body="slotProps">
                             <span class="p-column-title">Empresa</span>
                             {{ slotProps.data.empresa }}
                         </template>
                     </Column>
 
-                    <Column field="Descrição" header="Fornecedor" :sortable="true" class="w-4">
+                    <Column field="Fornecedor" header="Fornecedor" class="w-3">
                         <template #body="slotProps">
-                            <span class="p-column-title">Descrição</span>
+                            <span class="p-column-title">Fornecedor</span>
                             {{ slotProps.data.descricao }}
                         </template>
                     </Column>
 
-                    <Column field="Valor" header="Valor" :sortable="true" class="w-2">
+                    <Column field="Valor" header="Valor" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">CNPJ</span>
                             {{ slotProps.data.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
                         </template>
                     </Column>
 
-                    <Column field="Comprador" header="Comprador" :sortable="true" class="w-1">
+                    <Column field="Comprador" header="Comprador" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">Comprador</span>
                             {{ slotProps.data.comprador }}
                         </template>
                     </Column>
 
-                    <Column field="Status" header="Status" :sortable="true" class="w-1">
+                    <Column field="Status" header="Status" class="w-1">
                         <template #body="slotProps">
                             <span class="p-column-title">Status</span>
                             {{ slotProps.data.status }}
                         </template>
                     </Column>
 
-                    <Column field="..." header="..." :sortable="true" class="w-3">
+                    <Column field="..." header="..." class="w-3">
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
                             <div class="grid">

@@ -205,6 +205,7 @@ export default {
     <div class="grid">
         <Toast />
 
+        <!-- Modal de Informações -->
         <Dialog v-model:visible="display" header="INFORMAÇÕES" :style="{ width: '90%' }" maximizable modal :contentStyle="{ height: '80%' }">
             <div class="grid">
                 <!-- <div class="col-4">
@@ -233,7 +234,7 @@ export default {
                 <Button label="Fechar" icon="pi pi-check" @click="display = false" />
             </template>
         </Dialog>
-        
+
         <!-- Visualizar input para inserir diretório -->
         <Dialog header="Tem certeza dessa operação?" v-model:visible="displayDiretorio" :modal="true" :style="{ width: '20%' }">
             <div class="grid">
