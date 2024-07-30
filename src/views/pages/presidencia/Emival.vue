@@ -998,9 +998,9 @@ export default {
                             <div class="col-4 md:col-4">
                                 <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-secondary" />
                             </div>
-                            <div class="col-4 md:col-4">
+                            <!-- <div class="col-4 md:col-4">
                                 <Button v-if="slotProps.data.compra_antecipada == 'Sim'" @click.prevent="auditoria(slotProps.data)" icon="pi pi-info" class="p-button-info" />
-                            </div>
+                            </div> -->
                         </template>
                     </Column>
                 </DataTable>
@@ -1074,9 +1074,9 @@ export default {
                             <div class="col-4 md:col-4">
                                 <Button @click.prevent="visualizarAcima(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-secondary" />
                             </div>
-                            <div v-if="slotProps.data.compra_antecipada == 'Sim'" class="col-4 md:col-4">
+                            <!-- <div v-if="slotProps.data.compra_antecipada == 'Sim'" class="col-4 md:col-4">
                                 <Button @click.prevent="auditoria(slotProps.data)" icon="pi pi-info" class="p-button-info" />
-                            </div>
+                            </div> -->
                         </template>
                     </Column>
                 </DataTable>

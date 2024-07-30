@@ -18,7 +18,6 @@ export default {
             totalPedidos: ref(500),
             totalValor: ref(null),
             urlBase: 'https://link.gruporialma.com.br/storage'
-            // sortOrder: 1 // 1 para ascendente, -1 para descendente
         };
     },
 
@@ -209,70 +208,70 @@ export default {
                     <template #empty> Nenhum pedido encontrado! </template>
                     <template #loading> Carregando informações... Por favor, aguarde! </template>
 
-                    <Column field="tipocompra" header="Tipo Compra" :sortable="true" class="w-1">
+                    <Column field="tipocompra" header="Tipo Compra" class="w-1">
                         <template #body="slotProps">
                             <span class="p-column-title">tipocompra</span>
                             {{ slotProps.data.compra_antecipada == 'Sim' ? 'ANTECIPADA' : 'NORMAL' }}
                         </template>
                     </Column>
 
-                    <Column field="Valor" header="Valor" :sortable="true" class="w-2">
+                    <Column field="Valor" header="Valor" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">CNPJ</span>
                             {{ slotProps.data.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
                         </template>
                     </Column>
 
-                    <Column field="Dt. Inclusão" header="Dt. Inclusão Link" :sortable="true" class="w-2">
+                    <Column field="Dt. Inclusão" header="Dt. Inclusão Link" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">Dt. Inclusão</span>
                             {{ formatarData(slotProps.data.dt_inclusao) }}
                         </template>
                     </Column>
 
-                    <Column field="Dt. Criação Protheus" header="Dt. Criação Protheus" :sortable="true" class="w-2">
+                    <Column field="Dt. Criação Protheus" header="Dt. Criação Protheus" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">Dt. Inclusão</span>
                             {{ formatarDataSemHora(slotProps.data.dt_protheus) }}
                         </template>
                     </Column>
 
-                    <Column field="Dt. Emissão Nota" header="Dt. Emissão Nota" :sortable="true" class="w-2">
+                    <Column field="Dt. Emissão Nota" header="Dt. Emissão Nota" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">Dt. Emissão Nota</span>
                             {{ formatarDataSemHora(slotProps.data.nota[0]?.dt_emissao) }}
                         </template>
                     </Column>
 
-                    <Column field="Dif. Dias" header="Dif. Dias" :sortable="true" class="w-1">
+                    <Column field="Dif. Dias" header="Dif. Dias" class="w-1">
                         <template #body="slotProps">
                             <span class="p-column-title">Dt. Emissão Nota</span>
                             {{ calcularDiferencaDias(slotProps.data.nota[0]?.dt_emissao, slotProps.data.dt_protheus) }}
                         </template>
                     </Column>
 
-                    <Column field="Dt. Aprovação" header="Dt. Aprovação" :sortable="true" class="w-2">
+                    <Column field="Dt. Aprovação" header="Dt. Aprovação" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">Dt. Aprovação</span>
                             {{ formatarData(slotProps.data.dt_aprovacao) }}
                         </template>
                     </Column>
 
-                    <Column field="Fornecedor" header="Fornecedor" :sortable="true" class="w-1">
+                    <Column field="Fornecedor" header="Fornecedor" class="w-1">
                         <template #body="slotProps">
                             <span class="p-column-title">Fornecedor</span>
                             {{ slotProps.data.descricao }}
                         </template>
                     </Column>
 
-                    <Column field="Comprador" header="Comprador" :sortable="true" class="w-1">
+                    <Column field="Comprador" header="Comprador" class="w-1">
                         <template #body="slotProps">
                             <span class="p-column-title">Comprador</span>
                             {{ slotProps.data.comprador }}
                         </template>
                     </Column>
 
-                    <Column field="..." header="..." :sortable="true" class="w-1">
+                    <Column field="..." header="..." class="w-1">
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
                             <div class="grid">
