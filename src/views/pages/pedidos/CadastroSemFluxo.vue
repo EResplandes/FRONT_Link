@@ -90,10 +90,10 @@ export default {
                 }
             }
 
-            if (this.parcelas[0] == null || this.parcelas.length === 0) {
-                this.showError('Gere as parcelas!');
-                todosCamposPreenchidos = false;
-            }
+            // if (this.parcelas[0] == null || this.parcelas.length === 0) {
+            //     this.showError('Gere as parcelas!');
+            //     todosCamposPreenchidos = false;
+            // }
 
             // Iterar sobre os campos obrigatórios
             for (const campo of camposObrigatorios) {

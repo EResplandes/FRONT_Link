@@ -103,10 +103,10 @@ export default {
                 }
             }
 
-            if (this.parcelas[0] == null || this.parcelas.length === 0) {
-                this.showError('Gere as parcelas!');
-                todosCamposPreenchidos = false;
-            }
+            // if (this.parcelas[0] == null || this.parcelas.length === 0) {
+            //     this.showError('Gere as parcelas!');
+            //     todosCamposPreenchidos = false;
+            // }
 
             // Iterar sobre os campos obrigatórios
             for (const campo of camposObrigatorios) {
@@ -123,7 +123,7 @@ export default {
                 this.preloading = true;
                 this.cadastrarPedidoService.comFluxo(this.form, this.parcelas).then((data) => {
                     if (data.resposta == 'Pedido cadastrado com sucesso!') {
-                        this.preloading = false;
+                        this.preloading = false;f
                         this.showSuccess('Pedido cadastrado com sucesso!');
                         this.form = {};
                         window.location.reload();
