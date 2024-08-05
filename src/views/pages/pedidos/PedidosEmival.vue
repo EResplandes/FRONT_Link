@@ -144,6 +144,34 @@ export default {
             this.buscaPedidos();
             this.showInfo('Filtro removidos com sucesso!');
             this.form = {};
+        },
+
+        // Metódo responsável por definir pedido como urgente
+        urgente(idPedido) {
+            this.preloading = true;
+            this.pedidoService.pedidoUrgente(idPedido).then((data) => {
+                if (data.resposta == 'Pedido foi definido como urgente com sucesso!') {
+                    this.buscaPedidos();
+                    this.showSuccess('Pedido definido como urgente com sucesso!');
+                    this.preloading = false;
+                } else {
+                    this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
+                }
+            });
+        },
+
+        // Metódo responsável por definir pedido como normal
+        normal(idPedido) {
+            this.preloading = true;
+            this.pedidoService.pedidoNormal(idPedido).then((data) => {
+                if (data.resposta == 'Pedido foi definido como normal com sucesso!') {
+                    this.buscaPedidos();
+                    this.showSuccess('Pedido foi definido como normal com sucesso!');
+                    this.preloading = false;
+                } else {
+                    this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
+                }
+            });
         }
     }
 };
@@ -197,51 +225,57 @@ export default {
                         </template>
                     </Column>
 
-                    <Column field="Dt. Inclusão" header="Dt. Inclusão" :sortable="true" class="w-2">
+                    <Column field="Dt. Inclusão" header="Dt. Inclusão" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">Dt. Inclusão</span>
                             {{ formatarData(slotProps.data.dt_inclusao) }}
                         </template>
                     </Column>
 
-                    <Column field="Protheus" header="Protheus" :sortable="true" class="w-2">
+                    <Column field="Protheus" header="Protheus" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">Protheus</span>
                             {{ slotProps.data.protheus }}
                         </template>
                     </Column>
 
-                    <Column field="Empresa" header="Empresa" :sortable="true" class="w-2">
+                    <Column field="Empresa" header="Empresa" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">Empresa</span>
                             {{ slotProps.data.empresa.nome_empresa }}
                         </template>
                     </Column>
 
-                    <Column field="Descrição" header="Fornecedor" :sortable="true" class="w-4">
+                    <Column field="Descrição" header="Fornecedor" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">Descrição</span>
                             {{ slotProps.data.descricao }}
                         </template>
                     </Column>
 
-                    <Column field="Valor" header="Valor" :sortable="true" class="w-2">
+                    <Column field="Valor" header="Valor" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">CNPJ</span>
                             {{ slotProps.data.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
                         </template>
                     </Column>
 
-                    <Column field="..." header="..." :sortable="true" class="w-2">
+                    <Column field="Urgência" header="Urgência" class="w-4">
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
-                            <div class="grid">
-                                <div class="col-4 md:col-4 mr-3">
-                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
-                                </div>
-                                <div class="col-6 md:col-4">
-                                    <Button v-if="this.validaExclusaoButton == 'Administrador'" @click.prevent="confirmDeletar(slotProps.data.id)" icon="pi pi-trash" class="p-button-danger" />
-                                </div>
+                            <div class="button-container">
+                                <Button v-if="slotProps.data.urgente == 0" @click.prevent="urgente(slotProps.data.id)" label="Urgente" class="p-button-danger" />
+                                <Button v-else @click.prevent="normal(slotProps.data.id)" label="Normal" class="p-button-info" />
+                            </div>
+                        </template>
+                    </Column>
+
+                    <Column field="..." header="..." class="w-2">
+                        <template #body="slotProps">
+                            <span class="p-column-title"></span>
+                            <div class="button-container">
+                                <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
+                                <Button v-if="this.validaExclusaoButton == 'Administrador'" @click.prevent="confirmDeletar(slotProps.data.id)" icon="pi pi-trash" class="p-button-danger" />
                             </div>
                         </template>
                     </Column>
@@ -287,5 +321,10 @@ export default {
     justify-content: center;
     align-items: center;
     backdrop-filter: blur(5px);
+}
+
+.button-container {
+    display: flex;
+    gap: 10px; /* ajusta o espaço entre os botões conforme necessário */
 }
 </style>

@@ -143,6 +143,34 @@ export default {
             this.buscaPedidos();
             this.showInfo('Filtro removidos com sucesso!');
             this.form = {};
+        },
+
+        // Metódo responsável por definir pedido como urgente
+        urgente(idPedido) {
+            this.preloading = true;
+            this.pedidoService.pedidoUrgente(idPedido).then((data) => {
+                if (data.resposta == 'Pedido foi definido como urgente com sucesso!') {
+                    this.buscaPedidos();
+                    this.showSuccess('Pedido definido como urgente com sucesso!');
+                    this.preloading = false;
+                } else {
+                    this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
+                }
+            });
+        },
+
+        // Metódo responsável por definir pedido como normal
+        normal(idPedido) {
+            this.preloading = true;
+            this.pedidoService.pedidoNormal(idPedido).then((data) => {
+                if (data.resposta == 'Pedido foi definido como normal com sucesso!') {
+                    this.buscaPedidos();
+                    this.showSuccess('Pedido foi definido como normal com sucesso!');
+                    this.preloading = false;
+                } else {
+                    this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
+                }
+            });
         }
     }
 };
@@ -259,16 +287,22 @@ export default {
                         </template>
                     </Column>
 
+                    <Column field="Urgência" header="Urgência" class="w-4">
+                        <template #body="slotProps">
+                            <span class="p-column-title"></span>
+                            <div class="button-container">
+                                <Button v-if="slotProps.data.urgente == 0" @click.prevent="urgente(slotProps.data.id)" label="Urgente" class="p-button-danger" />
+                                <Button v-else @click.prevent="normal(slotProps.data.id)" label="Normal" class="p-button-info" />
+                            </div>
+                        </template>
+                    </Column>
+
                     <Column field="..." header="..." :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
-                            <div class="grid">
-                                <div class="col-4 md:col-4 mr-3">
-                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
-                                </div>
-                                <div class="col-6 md:col-4">
-                                    <Button v-if="this.validaExclusaoButton == 'Administrador'" @click.prevent="confirmDeletar(slotProps.data.id)" icon="pi pi-trash" class="p-button-danger" />
-                                </div>
+                            <div class="button-container">
+                                <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
+                                <Button v-if="this.validaExclusaoButton == 'Administrador'" @click.prevent="confirmDeletar(slotProps.data.id)" icon="pi pi-trash" class="p-button-danger" />
                             </div>
                         </template>
                     </Column>
@@ -314,5 +348,10 @@ export default {
     justify-content: center;
     align-items: center;
     backdrop-filter: blur(5px);
+}
+
+.button-container {
+    display: flex;
+    gap: 10px; /* ajusta o espaço entre os botões conforme necessário */
 }
 </style>
