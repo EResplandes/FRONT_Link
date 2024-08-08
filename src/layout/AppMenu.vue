@@ -80,6 +80,7 @@ const model = ref([
         label: 'Presidência',
         items: [
             { label: 'Emival', icon: 'pi pi-fw pi-users', to: '/emival', requiredRole: ['Presidente', 'Administrador'] },
+            { label: 'Giovana', icon: 'pi pi-fw pi-users', to: '/giovana', requiredRole: ['Presidente', 'Administrador'], requiredNome: ['Giovana', 'Eduardo C. Resplandes'] },
             { label: 'Auditoria', icon: 'pi pi-fw pi-book', to: '/pedidos-antecipados', requiredRole: ['Presidente', 'Administrador'] },
             { label: 'Mônica', icon: 'pi pi-fw pi-users', to: '/monica', requiredRole: ['Presidente', 'Administrador'], requiredNome: ['Mônica Caiado', 'Eduardo C. Resplandes'] }
         ]

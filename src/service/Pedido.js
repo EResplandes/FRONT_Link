@@ -959,6 +959,68 @@ export default class PedidoService {
             });
     }
 
+    // Requisição responsável por listar todos pedidos com Giovana Caiado
+    async pedidosGiovana() {
+        return await fetch(`${API_URL}/pedidos/listar-giovana`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    // Requisição responsável aprovar pedido
+    async aprovarGiovana(id) {
+        return await fetch(`${API_URL}/pedidos/aprovar-giovana/${id}`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    // Requisição responsável por reprovar pedido Dr Giovana
+    reprovarGiovana(idPedido, mensagem) {
+        return fetch(`${API_URL}/pedidos/reprovar-giovana`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                id_pedido: idPedido,
+                mensagem: mensagem
+            })
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
     formatarDataParaYMD(data) {
         if (data) {
             const dia = String(data.getDate()).padStart(2, '0');

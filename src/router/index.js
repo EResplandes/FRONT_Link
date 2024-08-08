@@ -159,6 +159,11 @@ const router = createRouter({
                     component: () => import('@/views/pages/presidencia/Monica.vue')
                 },
                 {
+                    path: '/giovana',
+                    name: 'giovana',
+                    component: () => import('@/views/pages/presidencia/Giovana.vue')
+                },
+                {
                     path: '/relatorio-aprovados',
                     name: 'relatorio-aprovados',
                     component: () => import('@/views/pages/relatorios/Aprovados.vue')

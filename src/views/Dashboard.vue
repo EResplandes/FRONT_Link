@@ -24,9 +24,12 @@ export default {
         // Metódo responsável por buscar informações do dashboard
         this.dashboardService.buscaInformacoes(localStorage.getItem('usuario_id')).then((data) => {
             this.informacoes = data.informacoes;
-            console.log(data);
             this.preloading = false;
         });
+
+        const usuario = localStorage.getItem('nome');
+
+        this.showInfo(`Bem-vindo, ${usuario}!`);
 
         // if (localStorage.getItem('p_acesso') == 1 && localStorage.getItem('nome') != 'Emival Caiado') {
         //     this.display = true;
@@ -60,7 +63,7 @@ export default {
         },
 
         showInfo(mensagem) {
-            this.toast.add({ severity: 'info', summary: 'Aviso!', detail: mensagem, life: 3000 });
+            this.toast.add({ severity: 'info', summary: '', detail: mensagem, life: 3000 });
         },
 
         showError(mensagem) {
@@ -92,6 +95,8 @@ export default {
     <div style="z-index: 99" v-if="preloading" class="full-screen-spinner">
         <ProgressSpinner />
     </div>
+
+    <Toast position="bottom-center" />
 
     <Dialog header="ALTERAÇÃO DE SENHA" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
         <Card class="m-1" style="width: 100%; overflow: hidden; background-color: #f8f8ff">
@@ -196,11 +201,11 @@ export default {
 
         <div class="col-12 xl:col-4">
             <div class="card">
-                <Card style="width: 25rem; overflow: hidden">
+                <Card style="overflow: hidden">
                     <template #header>
-                        <img alt="imagem" width="330" src="https://www.gruporialma.com.br/wp-content/uploads/2024/02/wallpaper-Rialma.png" />
+                        <img alt="imagem" width="430" src="https://www.gruporialma.com.br/wp-content/uploads/2024/02/wallpaper-Rialma.png" />
                     </template>
-                    <template #title>COMUNICADOS</template>
+                    <template #title>COMUNICADO</template>
                     <template #subtitle>Eduardo C. Resplandes | Desenvolvedor</template>
                     <template #content>
                         <span class="text-900 line-height-3"

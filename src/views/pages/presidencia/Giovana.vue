@@ -2,64 +2,36 @@
 import { ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
-import EmpresaService from '../../../service/EmpresaService';
-import StatusService from '../../../service/StatusService';
-import FluxoService from '../../../service/FluxoService';
-import GerenteService from '../../../service/GerenteService';
+import PedidoService from '../../../service/Pedido';
+import ChatService from '../../../service/ChatService';
 
 export default {
     data() {
         return {
             toast: new useToast(),
-            displayConfirmation: ref(false),
-            gerenteService: new GerenteService(),
-            empresaService: new EmpresaService(),
-            statusService: new StatusService(),
-            fluxoService: new FluxoService(),
-            displayConfirmationActivation: ref(false),
-            visibleRight: ref(false),
+            pedidoService: new PedidoService(),
+            chatService: new ChatService(),
             confirm: new useConfirm(),
-            loading1: ref(null),
-            empresas: ref(null),
             pedidos: ref(null),
+            idPedido: ref(null),
             status: ref(null),
-            form: ref({
-                id_usuario: localStorage.getItem('usuario_id')
-            }),
             urgente: ref(0),
+            conversa: ref(null),
             displayChat: ref(false),
-            idFluxo: ref(null),
             preloading: ref(true),
             display: ref(false),
             novaMensagem: ref(null),
             urlBase: 'https://link.gruporialma.com.br/storage',
             pdf: ref(null),
-            pdfsrc: ref(null),
-            fluxoPedido: ref(null),
-            localGerente: localStorage.getItem('local_id')
+            pdfsrc: ref(null)
         };
     },
 
     mounted: function () {
-        // Metódo responsável por buscar todos pedidos relacionas a esse usuário que não foram aprovados por ele mesmo
-        this.gerenteService.buscaPedidos(localStorage.getItem('usuario_id')).then((data) => {
-            console.log(data);
+        // Metódo responsável por buscar todos pedidos com Giovana
+        this.pedidoService.pedidosGiovana().then((data) => {
             this.pedidos = data.pedidos;
             this.preloading = false;
-        });
-
-        // Metódo responsável por buscar todas empresas
-        this.empresaService.buscaEmpresas().then((data) => {
-            if (data.resposta == 'Empresas listados com sucesso!') {
-                this.empresas = data.empresas;
-            }
-        });
-
-        // Metódo responsável por buscar todos status
-        this.statusService.buscaStatus().then((data) => {
-            if (data.resposta == 'Status listados com sucesso!') {
-                this.status = data.itens;
-            }
         });
     },
 
@@ -67,77 +39,51 @@ export default {
         // Metódo responsável por buscar todos pedidos do usuário logado
         buscaPedidos() {
             this.preloading = true;
-            this.gerenteService.buscaPedidos(localStorage.getItem('usuario_id')).then((data) => {
+            this.pedidoService.pedidosGiovana().then((data) => {
                 this.pedidos = data.pedidos;
-                this.preloading = false;
             });
         },
 
-        // Metódo responsável por aprovar fluxo
         aprovarPedido() {
-            this.gerenteService.aprovar(this.idFluxo).then((data) => {
+            this.preloading = true;
+            this.pedidoService.aprovarGiovana(this.idPedido).then((data) => {
                 if (data.resposta == 'Pedido aprovado com sucesso!') {
-                    this.showSuccess('Pedido aprovado com suceso!');
+                    this.showSuccess('Pedido aprovado com sucesso!');
                     this.buscaPedidos();
-                    this.display = false;
                 } else {
-                    this.showError('Ocorreu algum problema, entre em contato com o Administrador!');
-                    this.display = false;
-                    this.buscaPedidos();
+                    this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
                 }
-            });
-        },
 
-        // Metódo responsável por diretor aprovar pedido
-        aprovarPedidoDiretor(idLink) {
-            this.gerenteService.aprovarPedidoDiretor(this.idFluxo, idLink, this.urgente).then((data) => {
                 this.display = false;
-                this.urgente = 0;
-                this.showSuccess('Pedido aprovado com sucesso!');
-                this.buscaPedidos();
+                this.preloading = false;
             });
         },
 
         // Metódo responsável por reprovar fluxo
         reprovarPedido() {
-            this.displayChat = true;
-        },
-
-        // Metódo responsável por gerar link
-        geraLink(data) {
-            let idPedido = data.pedido.id;
-            let link = `https://link.gruporialma.com.br/site/#/aprovacao-externa/${idPedido}`;
-            // http://localhost:5173/site/#/aprovacao-externa/47 -> Exemplo
-
-            // Cria um elemento de texto temporário
-            const tempInput = document.createElement('input');
-            tempInput.style.position = 'absolute';
-            tempInput.style.left = '-9999px';
-            tempInput.value = link;
-            document.body.appendChild(tempInput);
-
-            // Seleciona e copia o valor do input temporário
-            tempInput.select();
-            document.execCommand('copy');
-
-            // Remove o input temporário
-            document.body.removeChild(tempInput);
-
-            // Opcional: informar o usuário que o link foi copiado
-            alert('Link copiado para a área de transferência: ' + link);
-        },
-
-        // Metódo responsável por enviar mensagem para Dr Emival ou Dr. Monica
-        enviarMensagem() {
-            this.preloading = true;
-            this.gerenteService.reprovar(this.idFluxo, this.novaMensagem).then((data) => {
-                if (data.resposta == 'Pedido reprovado com sucesso!') {
-                    this.display = false;
-                    this.displayChat = false;
-                    this.showSuccess('Pedido reprovado com sucesso!');
+            this.pedidoService.reprovarGiovana(this.idPedido, this.novaMensagem).then((data) => {
+                if (data.resposta == 'Pedido aprovado com sucesso!') {
+                    this.showSuccess('Pedido aprovado com sucesso!');
+                    this.buscaPedidos();
+                } else {
+                    this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
                 }
-                this.buscaPedidos();
+
+                this.display = false;
+                this.displayChat = false;
                 this.preloading = false;
+            });
+        },
+
+        // Metódo responsável por reprovar fluxo
+        chat(id) {
+            this.displayChat = true;
+            this.chatService.buscaConversa(this.idPedido).then((data) => {
+                if (data.resposta == 'Chat listado com sucesso!') {
+                    this.conversa = data.conversa;
+                } else {
+                    this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
+                }
             });
         },
 
@@ -159,53 +105,19 @@ export default {
         },
 
         // Metódo responsável por visualizar pdf
-        visualizar(id, data) {
+        visualizar(data) {
             this.display = true;
-            if (data.pedido.status.status == 'Fluxo Reprovado') {
-                this.erroPedidoRepwrovado = true;
-            }
-            this.idFluxo = id;
-            this.pdf = data.pedido.anexo;
+            this.idPedido = data.id;
+            this.pdf = data.anexo;
             this.pdfsrc = `${this.urlBase}/${this.pdf}`;
-        },
-
-        filtrar() {
-            this.visibleRight = true;
-            this.editar = false;
         },
 
         showSuccess(mensagem) {
             this.toast.add({ severity: 'success', summary: 'Sucesso!', detail: mensagem, life: 3000 });
         },
 
-        showInfo(mensagem) {
-            this.toast.add({ severity: 'info', summary: 'Aviso!', detail: mensagem, life: 3000 });
-        },
-
         showError(mensagem) {
             this.toast.add({ severity: 'error', summary: 'Ocorreu um erro!', detail: mensagem, life: 3000 });
-        },
-
-        // Metódo responsável por buscar pedidos com filtros
-        buscaFiltros() {
-            this.preloading = true;
-            this.pedidoService.filtroPedidos(this.form).then((data) => {
-                if (data.resposta == 'Pedidos para o Dr. Emival Caiado!') {
-                    this.pedidos = data.pedidos;
-                    this.form = {};
-                    this.showInfo('Filtros aplicados com sucesso!');
-                    this.preloading = false;
-                } else {
-                    this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
-                }
-            });
-        },
-
-        // Metódo responsável por limpagem de filtros
-        limparFiltro() {
-            this.buscaPedidos();
-            this.showInfo('Filtro removidos com sucesso!');
-            this.form = {};
         }
     }
 };
@@ -220,23 +132,12 @@ export default {
 
         <!-- Visualizar -->
         <Dialog v-model:visible="display" maximizable modal header="Documento" :style="{ width: '80%' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <div style="text-align: center; align-items: center; justify-content: center" class="flex items-center m">
-                <InputSwitch :trueValue="1" :falseValue="0" :modelValue="urgente" v-model="urgente" />
-                <label class="p-3" for="firstname2"><b>URGENTE?</b></label>
-            </div>
-            <br />
             <div class="flex justify-content-center">
                 <div class="flex-1 m-1">
-                    <Button @click.prevent="aprovarPedidoDiretor(2)" icon="pi pi-check" label="Aprovar e Enviar Dr. Emival" class="p-button-success" style="width: 100%" />
+                    <Button @click.prevent="aprovarPedido()" icon="pi pi-check" label="Aprovar" class="p-button-success" style="width: 100%" />
                 </div>
                 <div class="flex-1 m-1">
-                    <Button @click.prevent="aprovarPedidoDiretor(1)" icon="pi pi-check" label="Aprovar e Enviar Dr. Mônica" class="p-button-warning" style="width: 100%" />
-                </div>
-                <div class="flex-1 m-1">
-                    <Button @click.prevent="aprovarPedidoDiretor(3)" icon="pi pi-check" label="Aprovar e Enviar Dr. Giovana" class="p-button-info" style="width: 100%" />
-                </div>
-                <div class="flex-1 m-1">
-                    <Button @click.prevent="reprovarPedido()" icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%" />
+                    <Button @click.prevent="chat()" icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%" />
                 </div>
             </div>
             <br />
@@ -275,7 +176,7 @@ export default {
                     </div>
                     <hr />
                     <InputText class="col-12" type="text" v-model="this.novaMensagem" placeholder="Digite a mensagem..." />
-                    <Button @click.prevent="enviarMensagem()" label="Reprovar e enviar mensagem" class="mr-2 mt-3 p-button-success col-12" />
+                    <Button @click.prevent="reprovarPedido()" label="Reprovar e enviar mensagem" class="mr-2 mt-3 p-button-success col-12" />
                 </div>
             </div>
         </Dialog>
@@ -300,7 +201,7 @@ export default {
                 >
                     <template #header>
                         <div class="flex justify-content-between">
-                            <h5 for="empresa">Pedidos Para Aprovação:</h5>
+                            <h5 for="empresa">PEDIDOS COM DR. GIOVANA</h5>
                         </div>
                     </template>
                     <template #empty> Nenhum pedido encontrado! </template>
@@ -317,42 +218,42 @@ export default {
                     <Column field="Dt. Inclusão" header="Dt. Inclusão" :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">Dt. Inclusão</span>
-                            {{ formatarData(slotProps.data.pedido.dt_inclusao) }}
+                            {{ formatarData(slotProps.data.dt_inclusao) }}
                         </template>
                     </Column>
 
                     <Column field="Nº Protheus" header="Nº Protheus" :sortable="true" class="w-1">
                         <template #body="slotProps">
                             <span class="p-column-title">Nº Protheus</span>
-                            {{ slotProps.data.pedido.protheus }}
+                            {{ slotProps.data.protheus }}
                         </template>
                     </Column>
 
                     <Column field="Empresa" header="Empresa" :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">Empresa</span>
-                            {{ slotProps.data.pedido.empresa?.nome_empresa }}
+                            {{ slotProps.data.empresa?.nome_empresa }}
                         </template>
                     </Column>
 
                     <Column field="Descrição" header="Fornecedor" :sortable="true" class="w-4">
                         <template #body="slotProps">
                             <span class="p-column-title">Descrição</span>
-                            {{ slotProps.data.pedido.descricao }}
+                            {{ slotProps.data.descricao }}
                         </template>
                     </Column>
 
                     <Column field="Valor" header="Valor" :sortable="true" class="w-1">
                         <template #body="slotProps">
                             <span class="p-column-title">CNPJ</span>
-                            {{ slotProps.data.pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
+                            {{ slotProps.data.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
                         </template>
                     </Column>
 
                     <Column field="Comprador" header="Comprador" :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">CNPJ</span>
-                            {{ slotProps.data.pedido.criador }}
+                            {{ slotProps.data.criador }}
                         </template>
                     </Column>
 
@@ -361,10 +262,7 @@ export default {
                             <span class="p-column-title"></span>
                             <div class="grid">
                                 <div class="col-4 md:col-4 mr-3">
-                                    <Button @click.prevent="visualizar(slotProps.data.id_fluxo, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
-                                </div>
-                                <div class="col-4 md:col-4 mr-3">
-                                    <Button @click.prevent="geraLink(slotProps.data)" icon="pi pi-link" class="p-button-secondary" />
+                                    <Button @click.prevent="visualizar(slotProps.data)" icon="pi pi-eye" class="p-button-info" />
                                 </div>
                             </div>
                         </template>
