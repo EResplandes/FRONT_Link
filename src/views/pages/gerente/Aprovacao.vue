@@ -32,7 +32,6 @@ export default {
             preloading: ref(true),
             display: ref(false),
             novaMensagem: ref(null),
-            // urlBase: 'http://localhost:8000/storage',
             urlBase: 'https://link.gruporialma.com.br/storage',
             pdf: ref(null),
             pdfsrc: ref(null),
@@ -220,7 +219,7 @@ export default {
         <Toast />
 
         <!-- Visualizar -->
-        <Dialog header="Documento" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
+        <Dialog v-model:visible="display" maximizable modal header="Documento" :style="{ width: '80%' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <div style="text-align: center; align-items: center; justify-content: center" class="flex items-center m">
                 <InputSwitch :trueValue="1" :falseValue="0" :modelValue="urgente" v-model="urgente" />
                 <label class="p-3" for="firstname2"><b>URGENTE?</b></label>
@@ -315,7 +314,14 @@ export default {
                     <Column field="Dt. Inclusão" header="Dt. Inclusão" :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">Dt. Inclusão</span>
-                            {{ formatarData(slotProps.data.data_criacao) }}
+                            {{ formatarData(slotProps.data.pedido.dt_inclusao) }}
+                        </template>
+                    </Column>
+
+                    <Column field="Nº Protheus" header="Nº Protheus" :sortable="true" class="w-1">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Nº Protheus</span>
+                            {{ slotProps.data.pedido.protheus }}
                         </template>
                     </Column>
 
@@ -340,10 +346,10 @@ export default {
                         </template>
                     </Column>
 
-                    <Column field="Status" header="Status" :sortable="true" class="w-2">
+                    <Column field="Comprador" header="Comprador" :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">CNPJ</span>
-                            {{ slotProps.data.pedido.status.status }}
+                            {{ slotProps.data.pedido.criador }}
                         </template>
                     </Column>
 
