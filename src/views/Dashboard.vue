@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import DashboardService from '../service/DashboardService';
 import AutenticacaoService from '../service/AutenticacaoService';
+import { useRouter } from 'vue-router';
 
 export default {
     data() {
@@ -11,6 +12,7 @@ export default {
             dashboardService: new DashboardService(),
             autenticacaoService: new AutenticacaoService(),
             informacoes: ref(null),
+            router: useRouter(),
             preloading: ref(true),
             display: ref(false),
             nova_senha: ref(null),
@@ -20,8 +22,9 @@ export default {
 
     mounted: function () {
         // Metódo responsável por buscar informações do dashboard
-        this.dashboardService.buscaInformacoes().then((data) => {
+        this.dashboardService.buscaInformacoes(localStorage.getItem('usuario_id')).then((data) => {
             this.informacoes = data.informacoes;
+            console.log(data);
             this.preloading = false;
         });
 
@@ -62,6 +65,24 @@ export default {
 
         showError(mensagem) {
             this.toast.add({ severity: 'error', summary: 'Ocorreu um erro!', detail: mensagem, life: 3000 });
+        },
+
+        // Metódo responsável por mandar para rotas
+        rota(id) {
+            switch (id) {
+                case 1:
+                    this.router.push('/pedidos-aprovados');
+                    break;
+                case 2:
+                    this.router.push('/pedidos-reprovados');
+                    break;
+                case 3:
+                    this.router.push('/reprovados-soleni');
+                    break;
+                default:
+                    this.router.push('/reprovados-gestor');
+                    break;
+            }
         }
     }
 };
@@ -98,76 +119,114 @@ export default {
     </Dialog>
 
     <div class="grid">
-        <Toast />
-        <div class="col-12 lg:col-6 xl:col-6">
+        <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
                 <div class="flex justify-content-between mb-3">
                     <div>
-                        <span class="block text-500 font-medium mb-3">CENTRAIS</span>
-                        <div class="text-900 font-medium text-xl">{{ this.informacoes?.qtd_centrais_total }}</div>
+                        <span class="block text-500 font-medium mb-3">Pedidos Aprovados</span>
+                        <div class="text-900 font-medium text-xl">{{ this.informacoes?.qtdPedidosAprovados }} pedido(s)</div>
                     </div>
-                    <div class="flex align-items-center justify-content-center bg-blue-100 border-round" style="width: 2.5rem; height: 2.5rem">
-                        <i class="pi pi-chart-bar text-blue-500 text-xl"></i>
+                    <div class="flex align-items-center justify-content-center bg-green-100 border-round" style="width: 2.5rem; height: 2.5rem">
+                        <i class="pi pi-shopping-cart text-green-500 text-xl"></i>
                     </div>
                 </div>
-                <span class="text-green-500 font-medium">{{ this.informacoes?.qtd_centrais_hoje }} NOVOS</span>
-                <span class="text-500"> PEDIDOS HOJE</span>
+                <span @click="rota(1)" class="text-blue-500 font-medium">Ver pedidos... </span>
             </div>
         </div>
-        <div class="col-12 lg:col-6 xl:col-6">
+        <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
                 <div class="flex justify-content-between mb-3">
                     <div>
-                        <span class="block text-500 font-medium mb-3">RT V</span>
-                        <div class="text-900 font-medium text-xl">{{ this.informacoes?.qtd_rtv_total }}</div>
+                        <span class="block text-500 font-medium mb-3">Reprovados por Emival</span>
+                        <div class="text-900 font-medium text-xl">{{ this.informacoes?.qtdPedidosReprovadosEmival }} pedido(s)</div>
                     </div>
-                    <div class="flex align-items-center justify-content-center bg-orange-100 border-round" style="width: 2.5rem; height: 2.5rem">
-                        <i class="pi pi-chart-bar text-orange-500 text-xl"></i>
+                    <div class="flex align-items-center justify-content-center bg-red-100 border-round" style="width: 2.5rem; height: 2.5rem">
+                        <i class="pi pi-map-marker text-red-500 text-xl"></i>
                     </div>
                 </div>
-                <span class="text-green-500 font-medium">{{ this.informacoes?.qtd_rtv_hoje }} NOVOS </span>
-                <span class="text-500"> PEDIDOS HOJE</span>
+                <span @click="rota(2)" class="text-blue-500 font-medium">Ver pedidos... </span>
+            </div>
+        </div>
+        <div class="col-12 lg:col-6 xl:col-3">
+            <div class="card mb-0">
+                <div class="flex justify-content-between mb-3">
+                    <div>
+                        <span class="block text-500 font-medium mb-3">Reprovados por Soleni</span>
+                        <div class="text-900 font-medium text-xl">{{ this.informacoes?.qtdPedidosReprovadosSoleni }} pedido(s)</div>
+                    </div>
+                    <div class="flex align-items-center justify-content-center bg-red-100 border-round" style="width: 2.5rem; height: 2.5rem">
+                        <i class="pi pi-inbox text-red-500 text-xl"></i>
+                    </div>
+                </div>
+                <span @click="rota(3)" class="text-blue-500 font-medium">Ver pedidos... </span>
+            </div>
+        </div>
+        <div class="col-12 lg:col-6 xl:col-3">
+            <div class="card mb-0">
+                <div class="flex justify-content-between mb-3">
+                    <div>
+                        <span class="block text-500 font-medium mb-3">Reprovados por Gerente</span>
+                        <div class="text-900 font-medium text-xl">{{ this.informacoes?.qtdPedidosReprovadosGerenteDiretor }} pedido(s)</div>
+                    </div>
+                    <div class="flex align-items-center justify-content-center bg-red-100 border-round" style="width: 2.5rem; height: 2.5rem">
+                        <i class="pi pi-comment text-red-500 text-xl"></i>
+                    </div>
+                </div>
+                <span @click="rota(4)" class="text-blue-500 font-medium">Ver pedidos... </span>
+            </div>
+        </div>
+
+        <div class="col-12 xl:col-8">
+            <div class="card">
+                <div class="flex justify-content-between align-items-center mb-5">
+                    <h5>PEDIDOS POR STATUS</h5>
+                </div>
+                <ul class="list-none p-0 m-0 custom-scroll">
+                    <li v-for="status in informacoes?.pedidosPorStatus" :key="status.status" class="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4">
+                        <div>
+                            <span class="text-900 font-medium mr-2 mb-1 md:mb-0">{{ status?.status }}</span>
+                        </div>
+                        <div class="mt-2 md:mt-0 flex align-items-center">
+                            <span class="text-blue-800 ml-3 font-medium">{{ status?.total }}</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-12 xl:col-4">
+            <div class="card">
+                <Card style="width: 25rem; overflow: hidden">
+                    <template #header>
+                        <img alt="imagem" width="330" src="https://www.gruporialma.com.br/wp-content/uploads/2024/02/wallpaper-Rialma.png" />
+                    </template>
+                    <template #title>COMUNICADOS</template>
+                    <template #subtitle>Eduardo C. Resplandes | Desenvolvedor</template>
+                    <template #content>
+                        <span class="text-900 line-height-3"
+                            >Para relatar erros ou enviar sugestões de melhoria, por favor, entre em contato conosco através dos seguintes meios:
+                            <span class="text-700 mt-3"
+                                ><span class="text-blue-500">
+                                    <p class="m-0">Telefone: +55 61 3298-8817</p>
+                                    <p class="m-0">E-mail: suporte@gruporialma.com.br</p></span
+                                ></span
+                            >
+                        </span>
+                    </template>
+                </Card>
             </div>
         </div>
     </div>
-
-    <Fieldset>
-        <template #legend>
-            <div class="flex align-items-center pl-2">
-                <Avatar image="https://media.licdn.com/dms/image/C4E03AQFgSYhROpDDDw/profile-displayphoto-shrink_200_200/0/1653436652339?e=1726704000&v=beta&t=F6AaKusCQubGdoQ8bjW0sIzlFPMXcDMYOfS0I8r5X4w" shape="circle" />
-                <span class="font-bold p-3">Eduardo C. Resplandes | Desenvolvedor FullStack</span>
-            </div>
-        </template>
-        <h6 class="">Bem-vindos ao Protheus Web 2.0 !</h6>
-        <hr />
-        <br />
-        <p class="m-0">
-            É com grande entusiasmo que damos as boas-vindas a todos os usuários ao Protheus Web 2.0, a mais recente evolução em nossa plataforma de aprovação de pedidos. Estamos empolgados em apresentar essa nova versão, repleta de recursos
-            aprimorados e uma interface ainda mais amigável, projetada para otimizar sua experiência de uso.
-        </p>
-        <br />
-        <p class="m-0">
-            Neste momento, gostaríamos de informar que o Protheus Web 2.0 está em fase de testes. Como resultado, é possível que você encontre alguns pequenos contratempos ou erros durante a sua navegação. Pedimos, por gentileza, que nos ajude a
-            aprimorar ainda mais essa ferramenta, reportando qualquer problema que encontrar.
-        </p>
-        <br />
-        <p class="m-0">Para relatar erros ou enviar sugestões de melhoria, por favor, entre em contato conosco através dos seguintes meios:</p>
-        <br />
-        <p class="m-0">Telefone: Ramal +55 61 3298-8817</p>
-        <p class="m-0">E-mail: ti@gruporialma.com.br</p>
-        <br />
-        <p class="m-0">
-            Sua colaboração é fundamental para garantir que o Protheus Web 2.0 atinja todo o seu potencial e ofereça a melhor experiência possível aos nossos usuários. Agradecemos antecipadamente pela sua ajuda e compreensão durante esta fase de
-            testes.
-        </p>
-        <br />
-        <p class="m-0">Estamos ansiosos para ouvir seus feedbacks e trabalhar juntos para tornar o Protheus Web 2.0 ainda melhor!</p>
-    </Fieldset>
 </template>
 
 <style scoped lang="scss">
 ::v-deep(.p-datatable-frozen-tbody) {
     font-weight: bold;
+}
+
+.custom-scroll {
+    max-height: 300px; /* Define a altura máxima da lista */
+    overflow-y: auto; /* Habilita o scroll vertical */
 }
 
 ::v-deep(.p-datatable-scrollable .p-frozen-column) {

@@ -3,8 +3,8 @@ import API_URL from './config.js';
 const token = localStorage.getItem('token');
 
 export default class DashboardService {
-    async buscaInformacoes() {
-        return await fetch(`${API_URL}/dashboard`, {
+    async buscaInformacoes(id) {
+        return await fetch(`${API_URL}/dashboard/${id}`, {
             method: 'GET',
             headers: {
                 Accept: 'application/json',

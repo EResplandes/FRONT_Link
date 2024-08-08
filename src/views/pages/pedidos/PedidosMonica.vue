@@ -266,14 +266,14 @@ export default {
                         </template>
                     </Column>
 
-                    <Column field="Empresa" header="Empresa" :sortable="true" class="w-2">
+                    <Column field="Empresa" header="Empresa" :sortable="true" class="w-1">
                         <template #body="slotProps">
                             <span class="p-column-title">Empresa</span>
                             {{ slotProps.data.empresa.nome_empresa }}
                         </template>
                     </Column>
 
-                    <Column field="Descrição" header="Fornecedor" :sortable="true" class="w-5">
+                    <Column field="Descrição" header="Fornecedor" :sortable="true" class="w-3">
                         <template #body="slotProps">
                             <span class="p-column-title">Descrição</span>
                             {{ slotProps.data.descricao }}
@@ -287,12 +287,12 @@ export default {
                         </template>
                     </Column>
 
-                    <Column field="Urgência" header="Urgência" class="w-4">
+                    <Column field="Urgência" header="Urgência" class="w-5">
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
                             <div class="button-container">
-                                <Button v-if="slotProps.data.urgente == 0" @click.prevent="urgente(slotProps.data.id)" label="Urgente" class="p-button-danger" />
-                                <Button v-else @click.prevent="normal(slotProps.data.id)" label="Normal" class="p-button-info" />
+                                <Button v-if="slotProps.data.urgente == 0" @click.prevent="urgente(slotProps.data.id)" label="Definir como Urgente" class="p-button-danger" />
+                                <Button v-else @click.prevent="normal(slotProps.data.id)" label="Definir como Normal" class="p-button-info" />
                             </div>
                         </template>
                     </Column>

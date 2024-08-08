@@ -123,7 +123,7 @@ export default {
                 this.preloading = true;
                 this.cadastrarPedidoService.comFluxo(this.form, this.parcelas).then((data) => {
                     if (data.resposta == 'Pedido cadastrado com sucesso!') {
-                        this.preloading = false;f
+                        this.preloading = false;
                         this.showSuccess('Pedido cadastrado com sucesso!');
                         this.form = {};
                         window.location.reload();

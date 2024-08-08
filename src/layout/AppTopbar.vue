@@ -130,15 +130,13 @@ const applyRowStyle = () => {
         </button>
 
         <div class="layout-topbar-menu" :class="topbarMenuClasses">
-            <button @click="showTemplate" class="p-link layout-topbar-button" label="Sair">
+            <!-- <button @click="showTemplate" class="p-link layout-topbar-button" label="Sair">
                 <i class="pi pi-bell m-1"></i>
-            </button>
-            <button @click="logout()" class="p-link layout-topbar-button" label="Sair">
-                <i class="pi pi-sign-out m-1"></i>
-            </button>
+            </button> -->
+            <button @click="logout()" class="p-link layout-topbar-button" label="Sair"><i class="pi pi-sign-out m-1"></i> Sair</button>
         </div>
 
-        <Toast position="bottom-right" group="bc" @close="onClose">
+        <!-- <Toast position="bottom-right" group="bc" @close="onClose">
             <template #message="slotProps">
                 <div class="flex flex-column align-items-start" style="flex: 1; max-height: 600px; overflow-y: auto">
                     <li>
@@ -148,7 +146,7 @@ const applyRowStyle = () => {
                     </li>
                 </div>
             </template>
-        </Toast>
+        </Toast> -->
     </div>
 </template>
 
