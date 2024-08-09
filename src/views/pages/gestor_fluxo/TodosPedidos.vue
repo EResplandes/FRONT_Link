@@ -415,24 +415,21 @@ export default {
                     <Column field="..." header="..." :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
-                            <div class="grid">
-                                <div class="col-3 md:col-3 mr-1">
-                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
-                                </div>
-                                <div class="col-3 md:col-3">
-                                    <Button @click.prevent="chat(slotProps.data.id, slotProps.data)" icon="pi pi-comments" class="p-button-secon" />
-                                </div>
-                                <div
-                                    v-if="
-                                        slotProps.data.status.status == 'Aprovado' ||
-                                        slotProps.data.status.status == 'Aprovado com Ressalva' ||
-                                        slotProps.data.status.status == 'Resposta do Pedido de Compra Aprovado com Ressalva' ||
-                                        slotProps.data.status.status == 'Retorno do Pedido de Compra Aprovado com Ressalva'
-                                    "
-                                    class="col-4 md:col-4 mr-3"
-                                >
-                                    <Button @click.prevent="buscaInformacoesPedido(slotProps.data.id)" icon="pi pi-print" class="p-button-secondary" />
-                                </div>
+                            <div class="flex gap-2">
+                                <!-- Usando Flexbox para alinhar os botões lado a lado -->
+                                <!-- Botão de Visualizar -->
+                                <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
+
+                                <!-- Botão de Chat -->
+                                <Button @click.prevent="chat(slotProps.data.id, slotProps.data)" icon="pi pi-comments" class="p-button-secon" />
+
+                                <!-- Botão de Imprimir (exibido condicionalmente) -->
+                                <Button
+                                    v-if="['Aprovado', 'Aprovado com Ressalva', 'Resposta do Pedido de Compra Aprovado com Ressalva', 'Retorno do Pedido de Compra Aprovado com Ressalva'].includes(slotProps.data.status.status)"
+                                    @click.prevent="buscaInformacoesPedido(slotProps.data.id)"
+                                    icon="pi pi-print"
+                                    class="p-button-secondary"
+                                />
                             </div>
                         </template>
                     </Column>
