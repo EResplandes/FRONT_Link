@@ -30,10 +30,6 @@ export default {
         const usuario = localStorage.getItem('nome');
 
         this.showInfo(`Bem-vindo, ${usuario}!`);
-
-        // if (localStorage.getItem('p_acesso') == 1 && localStorage.getItem('nome') != 'Emival Caiado') {
-        //     this.display = true;
-        // }
     },
 
     methods: {
