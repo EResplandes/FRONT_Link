@@ -53,7 +53,6 @@ export default {
     mounted: function () {
         // Metódo responsável por buscar todas os pedidos
         this.pedidoService.buscaTodosPedidos(localStorage.getItem('local_id')).then((data) => {
-            console.log(data);
             this.pedidos = data.pedidos.map((pedido) => ({
                 ...pedido,
                 dt_inclusao_formatada: this.formatarData(pedido.dt_inclusao),
@@ -96,12 +95,32 @@ export default {
                 this.imprimirAutorizacao(data);
             });
         },
+
         // Metódo responsável por buscar todos pedidos
         buscaPedidos() {
             this.preloading = true;
-            this.pedidoService.buscaPedidos().then((data) => {
-                this.pedidos = data.pedidos;
+            this.pedidoService.buscaTodosPedidos(localStorage.getItem('local_id')).then((data) => {
+                this.pedidos = data.pedidos.map((pedido) => ({
+                    ...pedido,
+                    dt_inclusao_formatada: this.formatarData(pedido.dt_inclusao),
+                    valor_formatado: pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                }));
                 this.preloading = false;
+                this.loading = false;
+            });
+        },
+
+        // Metódo responsável por buscar todos pedidos de acordo com filtro
+        filtrar() {
+            this.preloading = true;
+            this.pedidoService.buscaPedidosGestorFiltro(this.form).then((data) => {
+                this.pedidos = data.pedidos.map((pedido) => ({
+                    ...pedido,
+                    dt_inclusao_formatada: this.formatarData(pedido.dt_inclusao),
+                    valor_formatado: pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                }));
+                this.preloading = false;
+                this.showInfo('Filtro aplicado com sucesso!');
             });
         },
 
@@ -138,11 +157,6 @@ export default {
                     this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
                 }
             });
-        },
-
-        filtrar() {
-            this.visibleRight = true;
-            this.editar = false;
         },
 
         showSuccess(mensagem) {
@@ -292,6 +306,26 @@ export default {
             <div class="col-12 lg:col-6">
                 <Toast />
             </div>
+
+            <div class="p-fluid formgrid grid justify-content-center">
+                <div class="field col-2 md:col-2">
+                    <label for="firstname2">Dt de Início <span class="obrigatorio">*</span></label>
+                    <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de vencimento'" v-model="form.dt_inicio" showIcon iconDisplay="input" />
+                </div>
+                <div class="field col-2 md:col-2">
+                    <label for="firstname2">Dt Fim <span class="obrigatorio">*</span></label>
+                    <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de vencimento'" v-model="form.dt_fim" showIcon iconDisplay="input" />
+                </div>
+                <div class="field col-2 md:col-2">
+                    <label style="color: white" for="firstname2">.</label><br />
+                    <Button label="Pesquisar" @click.prevent="filtrar()" icon="pi pi-search" class="p-button-info" />
+                </div>
+                <div class="field col-2 md:col-2">
+                    <label style="color: white" for="firstname2">.</label><br />
+                    <Button label="Limpar Filtros" @click.prevent="buscaPedidos()" icon="pi pi-search" class="p-button-danger" />
+                </div>
+            </div>
+
             <div class="card">
                 <DataTable
                     v-model:filters="filters"
