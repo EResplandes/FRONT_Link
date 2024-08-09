@@ -18,7 +18,7 @@ const model = ref([
         label: 'Gestor de Fluxo',
         items: [
             { label: 'Pedidos com Emival', icon: 'pi pi-fw pi-book', to: '/pedidos-emival', requiredRole: ['Gestor de Fluxo', 'Administrador', 'Comprador Externo', 'Gerente'] },
-            { label: 'Pedidos com Monica', icon: 'pi pi-fw pi-book', to: '/pedidos-monica', requiredRole: ['Gestor de Fluxo', 'Administrador', 'Gerente'], requiredNome: ['DP', 'Soleni', 'Eduardo C. Resplandes'] },
+            { label: 'Pedidos com Monica', icon: 'pi pi-fw pi-book', to: '/pedidos-monica', requiredRole: ['Gestor de Fluxo', 'Administrador', 'Gerente', 'Comprador Externo'], requiredNome: ['DP', 'Soleni', 'Eduardo C. Resplandes'] },
             { label: 'Análise de Fluxo', icon: 'pi pi-fw pi-sitemap', to: '/gestor-fluxo', requiredRole: ['Gestor de Fluxo', 'Administrador'] },
             { label: 'Todos', icon: 'pi pi-fw pi-book', to: '/todos-pedidos-soleni', requiredRole: ['Gestor de Fluxo', 'Administrador'] }
         ]
