@@ -201,7 +201,7 @@ export default {
                 >
                     <template #header>
                         <div class="flex justify-content-between">
-                            <h5 for="empresa">PEDIDOS COM DR. GIOVANA</h5>
+                            <h5 for="empresa">Pedidos com Dr. Giovana</h5>
                         </div>
                     </template>
                     <template #empty> Nenhum pedido encontrado! </template>
