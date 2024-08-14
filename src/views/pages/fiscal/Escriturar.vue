@@ -35,7 +35,6 @@ export default {
             pdfsrc: ref(null),
             pdfsrcnota: ref(null),
             conversa: ref(null),
-            customers: null,
             filters: {
                 global: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 protheus: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -125,62 +124,6 @@ export default {
 
         showError(mensagem) {
             this.toast.add({ severity: 'error', summary: 'Ocorreu um erro!', detail: mensagem, life: 3000 });
-        },
-
-        getStatus(dados) {
-            function getnomes(dados) {
-                let nomes = '';
-                let qt = 0;
-                dados.forEach((element) => {
-                    if (qt > 0) {
-                        nomes += `-` + ' ';
-                    }
-
-                    nomes += `${element.nome_usuario} ${element.funcao}` + ' ';
-
-                    qt++;
-                });
-                return nomes.trim();
-            }
-
-            switch (dados.status.status) {
-                case 'Analisando':
-                    return `${dados.status.status} - SOLENI `;
-
-                case 'Em Fluxo':
-                    return `${dados.status.status} - ${getnomes(dados.pendentes)} `;
-
-                default:
-                    return dados.status.status;
-            }
-        },
-
-        getSeverity(status) {
-            switch (status) {
-                case 'Reprovado':
-                    return 'danger';
-
-                case 'Excluído':
-                    return 'danger';
-
-                case 'Enviado para Emival':
-                    return 'info';
-
-                case 'Aprovado':
-                    return 'success';
-
-                case 'Aprovado com Ressalva':
-                    return 'success';
-
-                case 'Enviado para Emival':
-                    return 'info';
-
-                case 'Enviado para Fiscal':
-                    return 'warning';
-
-                case 'renewal':
-                    return null;
-            }
         },
 
         chat(id) {
