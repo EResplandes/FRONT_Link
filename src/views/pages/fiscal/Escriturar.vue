@@ -259,7 +259,7 @@ export default {
         </Dialog>
 
         <!-- Visualizar Pedido de Compra -->
-        <Dialog header="Pedido de Compra" v-model:visible="display" :modal="true" :style="{ width: '90%' }">
+        <Dialog v-model:visible="display" maximizable modal header="Pedido de Compra" :style="{ width: '90%' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <div class="grid">
                 <div class="col-6">
                     <Button @click.prevent="abrirChat()" style="width: 100%" label="Reprovar e Enviar para Comprador" icon="pi pi-times" class="p-button-danger" />

@@ -614,11 +614,12 @@ export default {
             if (!this.display) {
                 this.pedidosAprovados = [];
             }
+            this.pedidoSelecionado = data;
+
             this.titleDocumento = `Pedidos Aprovados ${this.pedidosAprovados.length} de ${this.pedidos.length} Pedidos`;
 
             this.display = true;
             const dataAgora = new Date();
-            // this.pdfsrc = `${this.urlBase}/${data.anexo}?t=${dataAgora.getSeconds()}`;
 
             this.pedidoSelecionado = data;
 
