@@ -27,6 +27,8 @@ export default {
             urlBase: 'https://link.gruporialma.com.br/storage',
             pdf: ref(null),
             pdfsrc: ref(null),
+            pdfsrcboleto: ref(null),
+            pdfsrcnota: ref(null),
             conversa: ref(null),
             displayAlterar: ref(null),
             customers: null,
@@ -68,12 +70,14 @@ export default {
 
         // Metódo responsável por visualizar pdf
         visualizar(id, data) {
+            console.log(data);
             this.parcelas = data.parcelas;
             this.idPedido = id;
             this.display = true;
             this.pdf = data.anexo;
             this.pdfsrc = `${this.urlBase}/${this.pdf}`;
             this.pdfsrcboleto = `${this.urlBase}/${data.boleto[0].boleto}`;
+            this.pdfsrcnota = `${this.urlBase}/${data.nota[0].nota}`;
         },
 
         // Metódo responsável por abrir chat
@@ -385,14 +389,14 @@ export default {
                         </template>
                     </Column>
 
-                    <Column field="Status" header="Status" class="w-1">
+                    <Column field="Local" header="Local" class="w-1">
                         <template #body="slotProps">
-                            <span class="p-column-title">Status</span>
-                            {{ slotProps.data.status }}
+                            <span class="p-column-title">Local</span>
+                            {{ slotProps.data.local }}
                         </template>
                     </Column>
 
-                    <Column field="..." header="..." class="w-3">
+                    <Column field="..." header="..." class="w-1">
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
                             <div class="grid">

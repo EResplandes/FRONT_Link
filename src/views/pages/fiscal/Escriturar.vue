@@ -35,7 +35,6 @@ export default {
             pdfsrc: ref(null),
             pdfsrcnota: ref(null),
             conversa: ref(null),
-            customers: null,
             filters: {
                 global: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 protheus: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -127,62 +126,6 @@ export default {
             this.toast.add({ severity: 'error', summary: 'Ocorreu um erro!', detail: mensagem, life: 3000 });
         },
 
-        getStatus(dados) {
-            function getnomes(dados) {
-                let nomes = '';
-                let qt = 0;
-                dados.forEach((element) => {
-                    if (qt > 0) {
-                        nomes += `-` + ' ';
-                    }
-
-                    nomes += `${element.nome_usuario} ${element.funcao}` + ' ';
-
-                    qt++;
-                });
-                return nomes.trim();
-            }
-
-            switch (dados.status.status) {
-                case 'Analisando':
-                    return `${dados.status.status} - SOLENI `;
-
-                case 'Em Fluxo':
-                    return `${dados.status.status} - ${getnomes(dados.pendentes)} `;
-
-                default:
-                    return dados.status.status;
-            }
-        },
-
-        getSeverity(status) {
-            switch (status) {
-                case 'Reprovado':
-                    return 'danger';
-
-                case 'Excluído':
-                    return 'danger';
-
-                case 'Enviado para Emival':
-                    return 'info';
-
-                case 'Aprovado':
-                    return 'success';
-
-                case 'Aprovado com Ressalva':
-                    return 'success';
-
-                case 'Enviado para Emival':
-                    return 'info';
-
-                case 'Enviado para Fiscal':
-                    return 'warning';
-
-                case 'renewal':
-                    return null;
-            }
-        },
-
         chat(id) {
             this.displayChat = true;
             this.chatService.buscaConversa(id).then((data) => {
@@ -259,7 +202,7 @@ export default {
         </Dialog>
 
         <!-- Visualizar Pedido de Compra -->
-        <Dialog header="Pedido de Compra" v-model:visible="display" :modal="true" :style="{ width: '90%' }">
+        <Dialog v-model:visible="display" maximizable modal header="Pedido de Compra" :style="{ width: '90%' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <div class="grid">
                 <div class="col-6">
                     <Button @click.prevent="abrirChat()" style="width: 100%" label="Reprovar e Enviar para Comprador" icon="pi pi-times" class="p-button-danger" />

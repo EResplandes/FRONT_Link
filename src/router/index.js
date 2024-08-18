@@ -49,6 +49,11 @@ const router = createRouter({
                     component: () => import('@/views/pages/comprador/TodosPedidos.vue')
                 },
                 {
+                    path: '/cadastro-fiscal',
+                    name: 'cadastrar-fiscal',
+                    component: () => import('@/views/pages/fiscal/Cadastro.vue')
+                },
+                {
                     path: '/pedidos-escriturar',
                     name: 'pedidos-escriturar',
                     component: () => import('@/views/pages/fiscal/Escriturar.vue')
