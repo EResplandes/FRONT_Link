@@ -106,8 +106,8 @@ export default class ParcelaService {
             });
     }
 
-    async darBaixa(idParcela) {
-        return fetch(`${API_URL}/parcelas/dar-baiixa/${idParcela}`, {
+    async darBaixa(idParcela, form) {
+        return fetch(`${API_URL}/parcelas/dar-baixa/${idParcela}/${form.banco.id}`, {
             method: 'GET',
             headers: {
                 Accept: 'application/json',
