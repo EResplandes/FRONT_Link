@@ -403,6 +403,7 @@ export default {
             <div class="col-12 lg:col-6">
                 <Toast />
             </div>
+            
             <div class="card">
                 <DataTable
                     v-model:filters="filters"

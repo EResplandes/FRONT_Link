@@ -897,6 +897,30 @@ export default class PedidoService {
             });
     }
 
+    // Requisição responsável por buscar todos pedidos para comprador externo
+    buscaTodosPedidosExternosComFiltro(form) {
+        return fetch(`${API_URL}/pedidos/listar-pedidos-filtro-comprador-externo`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                dt_inicio: this.formatarDataParaYMD(form.dt_inicio),
+                dt_fim: this.formatarDataParaYMD(form.dt_fim)
+            })
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
     // Requisição responsável pagar pedido alterando status para 17 ou 18
     pagarPedido(comprovante, id_pedido) {
         return fetch(`${API_URL}/pedidos/pagar-pedido/` + id_pedido, {
