@@ -1003,8 +1003,8 @@ export default class PedidoService {
     }
 
     // Requisição responsável aprovar pedido
-    async aprovarGiovana(id) {
-        return await fetch(`${API_URL}/pedidos/aprovar-giovana/${id}`, {
+    async aprovarGiovana(id, idDestino) {
+        return await fetch(`${API_URL}/pedidos/aprovar-giovana/${id}/${idDestino}`, {
             method: 'GET',
             headers: {
                 Accept: 'application/json',
