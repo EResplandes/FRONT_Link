@@ -99,6 +99,11 @@ const router = createRouter({
                     component: () => import('@/views/pages/financeiro/Pagamento.vue')
                 },
                 {
+                    path: '/pagamentos-por-banco',
+                    name: 'pagamentos-por-banco',
+                    component: () => import('@/views/pages/financeiro/PagamentosPorBanco.vue')
+                },
+                {
                     path: '/pedidos-justificar',
                     name: 'pedidos-justificar',
                     component: () => import('@/views/pages/pedidos/Justificar.vue')

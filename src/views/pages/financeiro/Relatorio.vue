@@ -171,31 +171,6 @@ export default {
     <div class="grid">
         <Toast />
 
-        <!-- <div class="col-12">
-            <div class="col-12 lg:col-6">
-                <Toast />
-            </div>
-
-            <div class="p-fluid formgrid grid justify-content-center">
-                <div class="field col-2 md:col-2">
-                    <label for="firstname2">Dt de Início <span class="obrigatorio">*</span></label>
-                    <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de vencimento'" v-model="form.dt_inicio" showIcon iconDisplay="input" />
-                </div>
-                <div class="field col-2 md:col-2">
-                    <label for="firstname2">Dt Fim <span class="obrigatorio">*</span></label>
-                    <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de vencimento'" v-model="form.dt_fim" showIcon iconDisplay="input" />
-                </div>
-                <div class="field col-2 md:col-2">
-                    <label style="color: white" for="firstname2">.</label><br />
-                    <Button label="Pesquisar" @click.prevent="filtrar()" icon="pi pi-search" class="p-button-info" />
-                </div>
-                <div class="field col-2 md:col-2">
-                    <label style="color: white" for="firstname2">.</label><br />
-                    <Button label="Limpar Filtros" @click.prevent="buscaPedidos()" icon="pi pi-search" class="p-button-danger" />
-                </div>
-            </div>
-        </div> -->
-
         <!-- Visualizar Pedido de Compra -->
         <Dialog header="Pedido de Compra" v-model:visible="display" :modal="true" :style="{ width: '70%' }">
             <div class="grid">

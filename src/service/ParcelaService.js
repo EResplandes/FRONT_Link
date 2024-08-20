@@ -143,6 +143,44 @@ export default class ParcelaService {
             });
     }
 
+    // Requisição responsável por buscar parcelas de acordo com banco
+    async buscarParcelasPorBanco(idBanco) {
+        return fetch(`${API_URL}/parcelas/listar-parcelas-por-banco/${idBanco}`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    // Requisição responsável por buscar parcelas de acordo com id do pedido
+    async buscarParcelasPorPedido(idPedido) {
+        return fetch(`${API_URL}/parcelas/listar-parcelas-por-pedido/${idPedido}`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
     // Requisição responsável por alterar dados de parcela de acordo com id
     async alterarDadosParcela(form) {
         return fetch(`${API_URL}/parcelas/alterar-dados-parcela`, {

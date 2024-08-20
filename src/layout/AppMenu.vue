@@ -48,8 +48,9 @@ const model = ref([
         items: [
             { label: 'Pedidos', icon: 'pi pi-fw pi-book', to: '/pedidos-financeiro', requiredRole: ['Financeiro', 'Administrador', 'Gestor de Fluxo'] },
             { label: 'Pagamentos', icon: 'pi pi-fw pi-book', to: '/pagamento-parcelas', requiredRole: ['Financeiro', 'Administrador'] },
-            { label: 'Controle', icon: 'pi pi-fw pi-book', to: '/pedidos-controle', requiredRole: ['Financeiro', 'Administrador'] },
-            { label: 'Auditória', icon: 'pi pi-fw pi-book', to: '/relatorio-financeiro', requiredRole: ['Financeiro', 'Administrador', 'Gestor de Fluxo'] }
+            // { label: 'Controle', icon: 'pi pi-fw pi-book', to: '/pedidos-controle', requiredRole: ['Financeiro', 'Administrador'] },
+            { label: 'Auditória', icon: 'pi pi-fw pi-book', to: '/relatorio-financeiro', requiredRole: ['Financeiro', 'Administrador', 'Gestor de Fluxo'] },
+            { label: 'Pagamentos por Banco', icon: 'pi pi-fw pi-book', to: '/pagamentos-por-banco', requiredRole: ['Financeiro', 'Administrador'] }
         ]
     },
     {
