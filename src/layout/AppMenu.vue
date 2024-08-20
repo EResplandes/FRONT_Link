@@ -5,7 +5,6 @@ import AppMenuItem from './AppMenuItem.vue';
 const userRole = localStorage.getItem('funcao');
 const nome = localStorage.getItem('nome');
 
-// Adicionando a propriedade `requiredRole` aos itens do menu
 const model = ref([
     {
         label: 'Home',

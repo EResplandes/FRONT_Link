@@ -124,6 +124,25 @@ export default class ParcelaService {
             });
     }
 
+    // Requisição responsável por deletar parcela
+    async deletarParcela(idParcela) {
+        return fetch(`${API_URL}/parcelas/deletar-parcela/${idParcela}`, {
+            method: 'DELETE',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
     // Requisição responsável por alterar dados de parcela de acordo com id
     async alterarDadosParcela(form) {
         return fetch(`${API_URL}/parcelas/alterar-dados-parcela`, {
