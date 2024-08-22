@@ -403,7 +403,7 @@ export default {
             <div class="col-12 lg:col-6">
                 <Toast />
             </div>
-            
+
             <div class="card">
                 <DataTable
                     v-model:filters="filters"
@@ -451,12 +451,12 @@ export default {
                             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pela Descrição" />
                         </template>
                     </Column>
-                    <Column field="empresa.nome_empresa" header="Empresa" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
+                    <Column field="empresa.nome_empresa" header="Empresa" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 8rem">
                         <template #body="{ data }">
                             {{ data.empresa.nome_empresa }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="empresas" placeholder="Selecione uma Empresa" class="p-column-filter" style="min-width: 12rem" :showClear="true">
+                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="empresas" placeholder="Selecione" class="p-column-filter" style="min-width: 10rem" :showClear="true">
                                 <template #option="slotProps">
                                     {{ slotProps.option }}
                                 </template>
@@ -464,14 +464,14 @@ export default {
                         </template>
                     </Column>
 
-                    <Column header="Status" filterField="status" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 16rem">
+                    <Column header="Status" filterField="status" :showFilterMenu="false" :filterMenuStyle="{ width: '10rem' }" style="min-width: 10rem">
                         <template #body="{ data }">
                             <div class="flex align-items-center gap-2">
                                 <Tag :value="getStatus(data)" :severity="getSeverity(data.status.status)" />
                             </div>
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <MultiSelect v-model="filterModel.value" @change="filterCallback()" :options="status" optionLabel="status" placeholder="Todos" class="p-column-filter" style="min-width: 16rem" :maxSelectedLabels="1">
+                            <MultiSelect v-model="filterModel.value" @change="filterCallback()" :options="status" optionLabel="status" placeholder="Todos" class="p-column-filter" style="min-width: 10rem" :showClear="true">
                                 <template #option="slotProps">
                                     <div class="flex align-items-center gap-2">
                                         <span>{{ slotProps.option.status }}</span>
@@ -520,7 +520,7 @@ export default {
 
                                 <!-- Botão de Imprimir -->
                                 <Button
-                                    v-if="['Aprovado', 'Aprovado com Ressalva', 'Resposta do Pedido de Compra Aprovado com Ressalva', 'Retorno do Pedido de Compra Aprovado com Ressalva', 'Enviado para Fiscal'].includes(slotProps.data.status.status)"
+                                    v-if="['Aprovado', 'Aprovado com Ressalva', 'Resposta do Pedido de Compra Aprovado com Ressalva', 'Retorno do Pedido de Compra Aprovado com Ressalva', 'Enviado para Fiscal', 'Enviado para Financeiro'].includes(slotProps.data.status.status)"
                                     @click.prevent="buscaInformacoesPedido(slotProps.data.id)"
                                     icon="pi pi-print"
                                     class="p-button-secondary"
