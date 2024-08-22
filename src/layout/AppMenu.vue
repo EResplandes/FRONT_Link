@@ -24,6 +24,7 @@ const model = ref([
                 requiredRole: ['Gestor de Fluxo', 'Administrador', 'Gerente', 'Comprador Externo'],
                 requiredNome: ['DP', 'Soleni', 'Eduardo C. Resplandes', 'Ana Paulino', 'Neide']
             },
+            { label: 'Pedidos com Giovana', icon: 'pi pi-fw pi-book', to: '/pedidos-giovana', requiredRole: ['Gestor de Fluxo', 'Administrador', 'Gerente'] },
             { label: 'Análise de Fluxo', icon: 'pi pi-fw pi-sitemap', to: '/gestor-fluxo', requiredRole: ['Gestor de Fluxo', 'Administrador'] },
             { label: 'Todos', icon: 'pi pi-fw pi-book', to: '/todos-pedidos-soleni', requiredRole: ['Gestor de Fluxo', 'Administrador'] }
         ]

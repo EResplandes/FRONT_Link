@@ -29,6 +29,11 @@ const router = createRouter({
                     component: () => import('@/views/pages/pedidos/PedidosMonica.vue')
                 },
                 {
+                    path: '/pedidos-giovana',
+                    name: 'pedidos-giovana',
+                    component: () => import('@/views/pages/pedidos/PedidoGiovana.vue')
+                },
+                {
                     path: '/todos-pedidos-soleni',
                     name: 'todos-pedidos-soleni',
                     component: () => import('@/views/pages/gestor_fluxo/TodosPedidos.vue')
