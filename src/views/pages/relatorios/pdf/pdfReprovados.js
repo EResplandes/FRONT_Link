@@ -61,7 +61,7 @@ export function generatePDF(data) {
         const dt_vencimento = pedido.dt_vencimento;
         const dt_reprovacao = pedido.dt_reprovacao;
 
-        return [index + 1, local, descricao, valor, status, motivo, `${presidente} @`, dt_vencimento, dt_reprovacao];
+        return [index + 1, local, descricao, valor, status, motivo, `${presidente} @`, dt_reprovacao];
     });
 
     // Adiciona a tabela ao documento PDF
@@ -84,7 +84,7 @@ export function generatePDF(data) {
             4: { halign: 'center', columnWidth: 20 },
             5: { halign: 'center', columnWidth: 20 },
             6: { halign: 'center', columnWidth: 25 },
-            7: { halign: 'center', columnWidth: 30 }
+            7: { halign: 'center', columnWidth: 30 },
         },
         bodyStyles: { halign: 'center', fontSize: 7 }
     });
