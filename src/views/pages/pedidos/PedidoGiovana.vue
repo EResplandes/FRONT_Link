@@ -187,42 +187,12 @@ export default {
     </Dialog>
 
     <div class="grid">
-        <Toast />
         <ConfirmDialog></ConfirmDialog>
-        <!-- Modal Filtros -->
-        <Sidebar style="width: 500px" v-model:visible="visibleRight" :baseZIndex="1000" position="right">
-            <h3 v-if="this.editar == false" class="titleForm">Filtros</h3>
-
-            <div class="card p-fluid">
-                <div class="field">
-                    <label for="empresa">Empresa:</label>
-                    <Dropdown v-model="form.empresa" :options="empresas" showClear optionLabel="nome_empresa" placeholder="Selecione..." class="w-full" />
-                </div>
-                <div class="field">
-                    <label for="cpf">Descrição: </label>
-                    <InputText v-tooltip.left="'Digite a descrição do pedido'" v-model="form.descricao" id="cnpj" placeholder="Digite..." />
-                </div>
-                <div class="field">
-                    <label for="cpf">Valor: </label>
-                    <InputNumber v-tooltip.left="'Digite o valor do pedido'" v-model="form.valor" inputId="minmaxfraction" :minFractionDigits="2" :maxFractionDigits="2" placeholder="Digite..." />
-                </div>
-                <div class="field">
-                    <label for="cpf">Dt. In clusão:</label>
-                    <Calendar dateFormat="dd/mm/yy" v-tooltip.left="'Selecione a data de inclusão'" v-model="form.dt_inclusao" showIcon :showOnFocus="false" class="" />
-                </div>
-                <hr />
-                <div class="field">
-                    <Button @click.prevent="buscaFiltros()" label="Filtrar" class="mr-2 mb-2 p-button-secondary" />
-                    <Button @click.prevent="limparFiltro()" label="Limpar Filtros" class="mr-2 mb-2 p-button-danger" />
-                </div>
-            </div>
-        </Sidebar>
 
         <!-- Tabela com todos pedidos com Dr(a) Mônica -->
         <div class="col-12">
-            <div class="col-12 lg:col-6">
-                <Toast />
-            </div>
+            <div class="header-padrao">PEDIDOS COM GIOVANA</div>
+
             <div class="card">
                 <DataTable
                     dataKey="id"
@@ -309,6 +279,9 @@ export default {
                 </DataTable>
             </div>
         </div>
+        <div class="col-12 lg:col-6">
+            <Toast />
+        </div>
     </div>
 </template>
 
@@ -353,5 +326,15 @@ export default {
 .button-container {
     display: flex;
     gap: 10px; /* ajusta o espaço entre os botões conforme necessário */
+}
+
+.header-padrao {
+    background-color: #3b82f6;
+    color: white;
+    font-weight: 600;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    text-align: center;
 }
 </style>

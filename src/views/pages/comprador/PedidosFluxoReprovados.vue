@@ -215,9 +215,8 @@ export default {
 
         <!-- Tabela com todos pedidos -->
         <div class="col-12">
-            <div class="col-12 lg:col-6">
-                <Toast />
-            </div>
+            <div class="header-padrao">PEDIDOS REPROVADOS POR GERENTE OU DIRETOR</div>
+
             <div class="card">
                 <DataTable
                     dataKey="id"
@@ -231,11 +230,6 @@ export default {
                     filterDisplay="menu"
                     stripedRows
                 >
-                    <template #header>
-                        <div class="flex justify-content-between">
-                            <h5 for="empresa">Pedidos Reprovados por Gerente ou Diretor:</h5>
-                        </div>
-                    </template>
                     <template #empty> Nenhum pedido encontrado! </template>
                     <template #loading> Carregando informações... Por favor, aguarde! </template>
 
@@ -298,6 +292,9 @@ export default {
                 </DataTable>
             </div>
         </div>
+        <div class="col-12 lg:col-6">
+            <Toast />
+        </div>
     </div>
 </template>
 
@@ -342,5 +339,15 @@ export default {
 .timeline-container {
     max-height: 300px; /* Defina a altura máxima desejada */
     overflow-y: auto; /* Adiciona uma barra de rolagem vertical quando o conteúdo excede a altura máxima */
+}
+
+.header-padrao {
+    background-color: #3b82f6;
+    color: white;
+    font-weight: 600;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    text-align: center;
 }
 </style>

@@ -67,7 +67,7 @@ export default {
                 <Toast />
             </div>
             <div class="card">
-                <h5>Gerar Relatório de Pedidos Reprovados</h5> 
+                <h5>Gerar Relatório de Pedidos Reprovados</h5>
                 <hr />
                 <br />
                 <div class="p-fluid formgrid grid">

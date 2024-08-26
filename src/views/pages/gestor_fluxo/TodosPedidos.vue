@@ -303,9 +303,8 @@ export default {
 
         <!-- Tabela com todos pedidos -->
         <div class="col-12">
-            <div class="col-12 lg:col-6">
-                <Toast />
-            </div>
+            <div class="header-padrao">FILTROS</div>
+            <br />
 
             <div class="p-fluid formgrid grid justify-content-center">
                 <div class="field col-2 md:col-2">
@@ -325,6 +324,9 @@ export default {
                     <Button label="Limpar Filtros" @click.prevent="buscaPedidos()" icon="pi pi-search" class="p-button-danger" />
                 </div>
             </div>
+            <Divider></Divider>
+            <div style="margin-top: 10px" class="header-padrao">LISTAGEM DE TODOS PEDIDOS <br /><span style="font-size: 10px">( Limitado a os últimos 500 pedidos )</span></div>
+            <br />
 
             <div class="card">
                 <DataTable
@@ -425,7 +427,11 @@ export default {
 
                                 <!-- Botão de Imprimir (exibido condicionalmente) -->
                                 <Button
-                                    v-if="['Aprovado', 'Aprovado com Ressalva', 'Resposta do Pedido de Compra Aprovado com Ressalva', 'Retorno do Pedido de Compra Aprovado com Ressalva'].includes(slotProps.data.status.status)"
+                                    v-if="
+                                        ['Aprovado', 'Aprovado com Ressalva', 'Resposta do Pedido de Compra Aprovado com Ressalva', 'Retorno do Pedido de Compra Aprovado com Ressalva', 'Enviado para Financeiro', 'Enviado para Fiscal'].includes(
+                                            slotProps.data.status.status
+                                        )
+                                    "
                                     @click.prevent="buscaInformacoesPedido(slotProps.data.id)"
                                     icon="pi pi-print"
                                     class="p-button-secondary"
@@ -435,6 +441,9 @@ export default {
                     </Column>
                 </DataTable>
             </div>
+        </div>
+        <div class="col-12 lg:col-6">
+            <Toast />
         </div>
     </div>
 </template>
@@ -482,5 +491,15 @@ export default {
     /* Defina a altura máxima desejada */
     overflow-y: auto;
     /* Adiciona uma barra de rolagem vertical quando o conteúdo excede a altura máxima */
+}
+
+.header-padrao {
+    background-color: #3b82f6;
+    color: white;
+    font-weight: 600;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    text-align: center;
 }
 </style>

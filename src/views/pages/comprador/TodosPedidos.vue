@@ -400,9 +400,7 @@ export default {
 
         <!-- Tabela com todos pedidos -->
         <div class="col-12">
-            <div class="col-12 lg:col-6">
-                <Toast />
-            </div>
+            <div style="margin-top: 10px" class="header-padrao">LISTAGEM DE TODOS MEUS PEDIDOS <br /><span style="font-size: 10px">( Limitado a os últimos 500 pedidos )</span></div>
 
             <div class="card">
                 <DataTable
@@ -520,7 +518,11 @@ export default {
 
                                 <!-- Botão de Imprimir -->
                                 <Button
-                                    v-if="['Aprovado', 'Aprovado com Ressalva', 'Resposta do Pedido de Compra Aprovado com Ressalva', 'Retorno do Pedido de Compra Aprovado com Ressalva', 'Enviado para Fiscal', 'Enviado para Financeiro'].includes(slotProps.data.status.status)"
+                                    v-if="
+                                        ['Aprovado', 'Aprovado com Ressalva', 'Resposta do Pedido de Compra Aprovado com Ressalva', 'Retorno do Pedido de Compra Aprovado com Ressalva', 'Enviado para Fiscal', 'Enviado para Financeiro'].includes(
+                                            slotProps.data.status.status
+                                        )
+                                    "
                                     @click.prevent="buscaInformacoesPedido(slotProps.data.id)"
                                     icon="pi pi-print"
                                     class="p-button-secondary"
@@ -552,6 +554,9 @@ export default {
                     </Column>
                 </DataTable>
             </div>
+        </div>
+        <div class="col-12 lg:col-6">
+            <Toast />
         </div>
     </div>
 </template>
@@ -599,5 +604,15 @@ export default {
     /* Defina a altura máxima desejada */
     overflow-y: auto;
     /* Adiciona uma barra de rolagem vertical quando o conteúdo excede a altura máxima */
+}
+
+.header-padrao {
+    background-color: #3b82f6;
+    color: white;
+    font-weight: 600;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    text-align: center;
 }
 </style>

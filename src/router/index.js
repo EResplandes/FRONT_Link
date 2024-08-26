@@ -194,6 +194,11 @@ const router = createRouter({
                     component: () => import('@/views/pages/relatorios/Graficos.vue')
                 },
                 {
+                    path: '/info-pedido',
+                    name: 'info-pedido',
+                    component: () => import('@/views/pages/relatorios/Graficos.vue')
+                },
+                {
                     path: '/uikit/formlayout',
                     name: 'formlayout',
                     component: () => import('@/views/uikit/FormLayout.vue')
