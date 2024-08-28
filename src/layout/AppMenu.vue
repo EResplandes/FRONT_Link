@@ -95,6 +95,10 @@ const model = ref([
         ]
     },
     {
+        label: 'Controle de Caixa',
+        items: [{ label: 'Controle', icon: 'pi pi-fw pi-users', to: '/controle-caixa', requiredRole: ['Gestor de Fluxo', 'Administrador'], requiredNome: ['Soleni', 'Eduardo C. Resplandes'] }]
+    },
+    {
         label: 'Pages',
         icon: 'pi pi-fw pi-briefcase',
         to: '/pages',

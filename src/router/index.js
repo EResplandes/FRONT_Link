@@ -199,6 +199,11 @@ const router = createRouter({
                     component: () => import('@/views/pages/relatorios/Graficos.vue')
                 },
                 {
+                    path: '/controle-caixa',
+                    name: 'controle-caixa',
+                    component: () => import('@/views/pages/caixa/Controle.vue')
+                },
+                {
                     path: '/uikit/formlayout',
                     name: 'formlayout',
                     component: () => import('@/views/uikit/FormLayout.vue')
