@@ -78,6 +78,33 @@ export default {
             });
         },
 
+        cadastrarFluxoDeCaixa() {
+            if (this.form.debito && this.form.credito) {
+                this.showError('Não pode adicionar fluxo de caixa de entrada e saída!');
+            } else {
+                this.preloading = true;
+                this.caixaService.cadastraFluxoDeCaixa(this.form, this.idCaixa).then((data) => {
+                    if (data.resposta == 'Controle de caixa inserido com sucesso!') {
+                        this.showSuccess('Fluxo de caixa inserido com sucesso!');
+                        this.form = {};
+                        this.displaCadastroControleCaixa = false;
+                        this.visualizarHistoricoCaixa(this.idCaixa);
+                    } else if (data.errors) {
+                        // Percorre cada erro no objeto "errors" e exibe utilizando "showError"
+                        for (const [field, messages] of Object.entries(data.errors)) {
+                            messages.forEach((message) => {
+                                this.showError(message);
+                            });
+                        }
+                    } else {
+                        this.showError('Ocorreu um erro, entre em contato com o Administrador!');
+                    }
+
+                    this.preloading = false;
+                });
+            }
+        },
+
         visualizarHistoricoCaixa(id) {
             this.idCaixa = id;
             this.preloading = true;
@@ -200,7 +227,7 @@ export default {
     </Dialog>
 
     <!-- Dialog de Cadastro de Fluxo de Caixa -->
-    <Dialog v-model:visible="displaCadastroControleCaixa" maximizable modal header="CADASTRO DE CAIXA" :style="{ width: '70rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+    <Dialog v-model:visible="displaCadastroControleCaixa" maximizable modal header="CADASTRO DE FLUXO DE CAIXA" :style="{ width: '70rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
         <div class="grid">
             <div class="card p-fluid">
                 <div class="formgrid grid">
@@ -210,7 +237,7 @@ export default {
                     </div>
                     <div class="field col-6">
                         <label for="discriminacao">Discriminação <span class="obrigatorio">*</span></label>
-                        <InputNumber v-model="form.discriminacao" id="discriminacao" type="text" />
+                        <InputText v-model="form.discriminacao" id="discriminacao" type="text" />
                     </div>
                     <Divider />
                     <div class="field col">
@@ -227,7 +254,7 @@ export default {
                     </div>
                     <Divider />
                     <div class="field col">
-                        <Button @click.prevent="cadastrarCaixa()" label="Cadastrar" icon="pi pi-plus" severity="success" />
+                        <Button @click.prevent="cadastrarFluxoDeCaixa()" label="Cadastrar" icon="pi pi-plus" severity="success" />
                     </div>
                 </div>
             </div>
@@ -235,7 +262,7 @@ export default {
     </Dialog>
 
     <!-- Dialog de Histórico de entrada e saida de caixa -->
-    <Dialog v-model:visible="displayHistoricoCaixa" maximizable modal header="CADASTRO DE CAIXA" :style="{ width: '70rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+    <Dialog v-model:visible="displayHistoricoCaixa" maximizable modal header="FLUXO DE CAIXA" :style="{ width: '70rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
         <div class="grid">
             <DataTable
                 dataKey="id"
@@ -297,21 +324,7 @@ export default {
                 <Column field="observacao" header="Obs." class="w-2">
                     <template #body="slotProps">
                         <span class="p-column-title">observacao</span>
-                        {{ slotProps.data?.observacao }}
-                    </template>
-                </Column>
-
-                <Column field="..." header="..." :sortable="true" class="w-2">
-                    <template #body="slotProps">
-                        <span class="p-column-title"></span>
-                        <div class="flex gap-2">
-                            <div>
-                                <Button @click.prevent="visualizarHistoricoCaixa(slotProps.data.id)" icon="pi pi-eye" class="p-button-info" />
-                            </div>
-                            <div>
-                                <Button @click.prevent="confirmDeletar(slotProps.data.id)" icon="pi pi-trash" class="p-button-danger" />
-                            </div>
-                        </div>
+                        {{ slotProps.data?.observacao != null ? slotProps.data.observacao : 'N/C' }}
                     </template>
                 </Column>
             </DataTable>

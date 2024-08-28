@@ -107,4 +107,45 @@ export default class CaixaService {
                 throw error;
             });
     }
+
+    async cadastraFluxoDeCaixa(form, idCaixa) {
+        return fetch(`${API_URL}/caixas/cadastrar-fluxo-de-caixa`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                id_caixa: idCaixa,
+                dt_lancamento: this.formatarDataParaYMD(form.dt_lancamento),
+                discriminacao: form.discriminacao,
+                debito: form.debito,
+                credito: form?.credito,
+                observacao: form?.observacao,
+                tipo_caixa: 'Ajuda de Custo'
+            })
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                console.log(d);
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    formatarDataParaYMD(data) {
+        if (data) {
+            const dia = String(data.getDate()).padStart(2, '0');
+            const mes = String(data.getMonth() + 1).padStart(2, '0'); // Mês começa do zero, então somamos 1
+            const ano = data.getFullYear();
+
+            return `${ano}-${mes}-${dia}`;
+        } else {
+            return false;
+        }
+    }
 }
