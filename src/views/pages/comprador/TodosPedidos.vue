@@ -87,6 +87,7 @@ export default {
 
     methods: {
         imprimirAutorizacao(data) {
+            console.log(data);
             try {
                 generatePDF(data);
                 this.preloading = false;

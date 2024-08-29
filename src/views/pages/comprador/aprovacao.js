@@ -24,7 +24,8 @@ const dataHoraFormatada = `${dia}/${mes}/${ano} às ${horas}:${minutos}:${segund
 export function generatePDF(data) {
     // Verifica o status do pedido
     const statusDoPedido = data.pedido[0].status;
-    console.log(data);
+
+    const informacoes = data.informacoes; // Supondo que você tenha o array 'informacoes' dentro de 'data'
 
     // Cria um novo documento PDF com orientação paisagem (horizontal)
     const doc = new jsPDF();
@@ -65,7 +66,7 @@ export function generatePDF(data) {
     doc.text('PRESIDENTE', 107, 130, null, null, 'center');
 
     // Define o título da tabela
-    const headers = [['', 'Local', 'Nº Ped.', 'Fornecedor', 'Valor', 'Status', 'Autorização', 'Criação', 'Aprovação']];
+    const headers = [['', 'Local', 'Nº Ped.', 'Fornecedor', 'Valor', 'Status', 'Autorização', 'Criação', 'Aprovação', 'Assinaturas']];
 
     // Formatação dos dados da tabela
     const tableData = data.pedido.map((pedido) => {
@@ -87,7 +88,24 @@ export function generatePDF(data) {
         const minutoAprovacao = pad(dataAprovacao.getMinutes());
         const dataFormatadaAprovacao = `${diaAprovacao}/${mesAprovacao}/${anoAprovacao} ${horaAprovacao}:${minutoAprovacao}`;
 
-        return ['1', pedido.local, pedido.protheus, pedido.descricao, pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }), pedido.status, `${pedido.link} @`, dataFormatadaInclusao, dataFormatadaAprovacao];
+        let informacoesUsuarios = '';
+
+        // Itera sobre o array 'informacoes' e concatena os nomes dos usuários
+        informacoes.forEach((info) => {
+            informacoesUsuarios += `${info.usuario.name}, ${info.data_assinatura ? new Date(info.data_assinatura).toLocaleString() : 'N/A'}\n`;
+        });
+        return [
+            '1',
+            pedido.local,
+            pedido.protheus,
+            pedido.descricao,
+            pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+            pedido.status,
+            `${pedido.link} @`,
+            dataFormatadaInclusao,
+            dataFormatadaAprovacao,
+            informacoesUsuarios // Adiciona as informações dos usuários na tabela
+        ];
     });
 
     // Adiciona a tabela ao documento PDF
@@ -107,11 +125,12 @@ export function generatePDF(data) {
             1: { halign: 'center', columnWidth: 15 },
             2: { halign: 'center', columnWidth: 15 },
             3: { halign: 'center', columnWidth: 35 },
-            4: { halign: 'center', columnWidth: 30 },
-            5: { halign: 'center', columnWidth: 15 },
+            4: { halign: 'center', columnWidth: 20 },
+            5: { halign: 'center', columnWidth: 17 },
             6: { halign: 'center', columnWidth: 20 },
             7: { halign: 'center', columnWidth: 22 },
-            8: { halign: 'center', columnWidth: 22 }
+            8: { halign: 'center', columnWidth: 15 },
+            9: { halign: 'left', columnWidth: 20 } // Nova coluna para informações dos usuários
         },
         bodyStyles: { halign: 'center', fontSize: 8 }
     });
