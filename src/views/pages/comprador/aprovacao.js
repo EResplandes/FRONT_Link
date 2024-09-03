@@ -140,6 +140,9 @@ export function generatePDF(data) {
             halign: 'center',
             textColor: [0, 0, 0]
         },
+        columnStyles: {
+            4: { cellWidth: 25 } // Define a largura da coluna "Valor" (índice 4) como 50 unidades
+        },
         alternateRowStyles: { fillColor: [255, 255, 255] }, // Cor de fundo das linhas alternadas da tabela
         bodyStyles: { halign: 'center', fontSize: 8 }
     });
