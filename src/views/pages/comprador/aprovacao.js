@@ -82,10 +82,12 @@ export function generatePDF(data) {
         // Formatação da data de aprovação
         const dataAprovacao = new Date(pedido.dt_assinatura);
         const diaAprovacao = pad(dataAprovacao.getDate());
-        const mesAprovacao = pad(dataAprovacao.getMonth() + 1);
+        const mesAprovacao = pad(dataAprovacao.getMonth() + 1); // Mês começa em 0, por isso soma-se 1
         const anoAprovacao = dataAprovacao.getFullYear();
         const horaAprovacao = pad(dataAprovacao.getHours());
         const minutoAprovacao = pad(dataAprovacao.getMinutes());
+
+        // Data formatada no padrão brasileiro: DD/MM/YYYY HH:MM
         const dataFormatadaAprovacao = `${diaAprovacao}/${mesAprovacao}/${anoAprovacao} ${horaAprovacao}:${minutoAprovacao}`;
 
         let informacoesUsuarios = '';
@@ -120,18 +122,6 @@ export function generatePDF(data) {
             textColor: [0, 0, 0]
         },
         alternateRowStyles: { fillColor: [255, 255, 255] }, // Cor de fundo das linhas alternadas da tabela
-        columnStyles: {
-            0: { halign: 'center', columnWidth: 5 },
-            1: { halign: 'center', columnWidth: 15 },
-            2: { halign: 'center', columnWidth: 15 },
-            3: { halign: 'center', columnWidth: 35 },
-            4: { halign: 'center', columnWidth: 20 },
-            5: { halign: 'center', columnWidth: 17 },
-            6: { halign: 'center', columnWidth: 20 },
-            7: { halign: 'center', columnWidth: 22 },
-            8: { halign: 'center', columnWidth: 15 },
-            9: { halign: 'left', columnWidth: 20 } // Nova coluna para informações dos usuários
-        },
         bodyStyles: { halign: 'center', fontSize: 8 }
     });
 
