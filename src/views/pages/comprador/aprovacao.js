@@ -9,6 +9,25 @@ function pad(valor) {
     return valor < 10 ? '0' + valor : valor;
 }
 
+function formatDate(dateString) {
+    const date = new Date(dateString);
+
+    // Extrair dia, mês e ano
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Meses começam do zero
+    const year = date.getUTCFullYear();
+
+    // Extrair hora e minuto
+    const hours = String(date.getUTCHours()).padStart(2, '0');
+    const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+
+    // Formatar data e hora
+    const formattedDate = `${day}/${month}/${year}`;
+    const formattedTime = `${hours}:${minutes}`;
+
+    return formattedDate + ' ' + formattedTime;
+}
+
 // Obtém a data e hora atual
 const dataAtual = new Date();
 const dia = pad(dataAtual.getDate());
@@ -70,19 +89,19 @@ export function generatePDF(data) {
 
     // Formatação dos dados da tabela
     const tableData = data.pedido.map((pedido) => {
-        // Formatação da data de inclusão
-        const dataInclusao = new Date(pedido.dt_inclusao);
-        const diaInclusao = pad(dataInclusao.getDate());
-        const mesInclusao = pad(dataInclusao.getMonth() + 1);
-        const anoInclusao = dataInclusao.getFullYear();
-        const horaInclusao = pad(dataInclusao.getHours());
-        const minutoInclusao = pad(dataInclusao.getMinutes());
-        const dataFormatadaInclusao = `${diaInclusao}/${mesInclusao}/${anoInclusao} ${horaInclusao}:${minutoInclusao}`;
+        // // Formatação da data de inclusão
+        // const dataInclusao = new Date(pedido.dt_inclusao);
+        // const diaInclusao = pad(dataInclusao.getDate());
+        // const mesInclusao = pad(dataInclusao.getMonth() + 1);
+        // const anoInclusao = dataInclusao.getFullYear();
+        // const horaInclusao = pad(dataInclusao.getHours());
+        // const minutoInclusao = pad(dataInclusao.getMinutes());
+        // const dataFormatadaInclusao = `${diaInclusao}/${mesInclusao}/${anoInclusao} ${horaInclusao}:${minutoInclusao}`;
 
         // Formatação da data de aprovação
         const dataAprovacao = new Date(pedido.dt_assinatura);
         const diaAprovacao = pad(dataAprovacao.getDate());
-        const mesAprovacao = pad(dataAprovacao.getMonth() + 1); // Mês começa em 0, por isso soma-se 1
+        const mesAprovacao = pad(dataAprovacao.getMonth() + 1);
         const anoAprovacao = dataAprovacao.getFullYear();
         const horaAprovacao = pad(dataAprovacao.getHours());
         const minutoAprovacao = pad(dataAprovacao.getMinutes());
@@ -104,7 +123,7 @@ export function generatePDF(data) {
             pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
             pedido.status,
             `${pedido.link} @`,
-            dataFormatadaInclusao,
+            formatDate(pedido.dt_inclusao),
             dataFormatadaAprovacao,
             informacoesUsuarios // Adiciona as informações dos usuários na tabela
         ];
