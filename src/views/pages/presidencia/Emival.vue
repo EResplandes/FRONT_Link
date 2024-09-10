@@ -108,7 +108,6 @@ export default {
         },
 
         auditoria(data) {
-            console.log(data);
             this.form.emissao = this.formatarData(data.nota[0].dt_emissao);
             this.form.dt_inclusao = this.formatarData(data.dt_inclusao);
             this.form.comprador = data.criador;
@@ -425,8 +424,6 @@ export default {
 
         // Abaixo de 1000
         salvaMensagemPedido(status) {
-            // this.chat(this.proximoPedido);
-
             switch (status) {
                 case 0: // REPROVAR PEDIDO ABAIXO DE MIL
                     this.pedidoService.aprovarEmival([{ id: this.pedidos[this.currentIndex].id, status: 3, mensagem: this.mensagemEmival }]).then((data) => {
@@ -511,8 +508,10 @@ export default {
                     });
                     break;
                 case 3:
+                    this.displayChat2 = false;
                     this.pedidoService.aprovarEmival([{ id: this.pedidos[this.currentIndex].id, status: 5, mensagem: this.mensagemEmival }]).then((data) => {
                         this.showSuccess('Pedidos Aprovado com Ressalva com Sucesso!');
+                        this.displayChat = false;
                         this.pedidosReprovados = [];
                         this.pedidos.splice(this.currentIndex, 1);
                         this.mensagemEmival = '';
@@ -524,7 +523,6 @@ export default {
                         } else {
                             this.displayAcima = false;
                             this.displayChat = false;
-
                             this.listarEmivalMaiorMil();
                         }
 
