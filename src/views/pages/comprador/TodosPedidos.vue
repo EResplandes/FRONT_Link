@@ -46,7 +46,7 @@ export default {
                 descricao: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 dt_inclusao_formatada: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 'empresa.nome_empresa': { value: null, matchMode: FilterMatchMode.CONTAINS },
-                status: { value: null, matchMode: FilterMatchMode.IN },
+                status: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 valor_formatado: { value: null, matchMode: FilterMatchMode.CONTAINS }
             },
             loading: true
@@ -82,7 +82,7 @@ export default {
         // Metódo responsável por buscar todos status
         this.statusService.buscaStatus().then((data) => {
             if (data.resposta == 'Status listados com sucesso!') {
-                this.status = data.itens;
+                this.status = data.itens.map((status) => status.status);
             }
         });
     },
@@ -460,7 +460,7 @@ export default {
 
         <!-- Tabela com todos pedidos -->
         <div class="col-12">
-            <div style="margin-top: 10px" class="header-padrao">LISTAGEM DE TODOS MEUS PEDIDOS <br /><span style="font-size: 10px">( Limitado a os últimos 500 pedidos )</span></div>
+            <div style="margin-top: 10px" class="header-padrao">TODOS MEUS PEDIDOS <br /><span style="font-size: 10px">( Limitado a os últimos 500 pedidos )</span></div>
 
             <div class="card">
                 <DataTable
@@ -473,7 +473,7 @@ export default {
                     currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
                     filterDisplay="row"
                     :loading="loading"
-                    :globalFilterFields="['descricao', 'empresa.nome_empresa', 'country.name', 'representative.name', 'status']"
+                    :globalFilterFields="['descricao', 'empresa.nome_empresa', 'country.name', 'representative.name', 'status.status']"
                 >
                     <template #empty> Nenhum Pedido Encontrado. </template>
                     <template #loading> Loading customers data. Please wait. </template>
@@ -482,15 +482,15 @@ export default {
                             {{ data.dt_inclusao_formatada }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pela Dt. de Inclusão" />
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Filtrar pela Dt. de Inclusão" />
                         </template>
                     </Column>
-                    <Column field="protheus" header="Nº Protheus" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
+                    <Column field="protheus" header="Nº Protheus" :showFilterMenu="false">
                         <template #body="{ data }">
                             {{ data.protheus }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pela Dt. de Inclusão" />
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Filtrar pelo Nº Pedido Protheus" />
                         </template>
                     </Column>
                     <Column field="valor_formatado" header="Valor" style="min-width: 12rem">
@@ -506,7 +506,7 @@ export default {
                             {{ data.descricao }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pela Descrição" />
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Filtrar pela descrição" />
                         </template>
                     </Column>
                     <Column field="empresa.nome_empresa" header="Empresa" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 8rem">
@@ -529,21 +529,17 @@ export default {
                             </div>
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <MultiSelect v-model="filterModel.value" @change="filterCallback()" :options="status" optionLabel="status" placeholder="Todos" class="p-column-filter" style="min-width: 10rem" :showClear="true">
+                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="status" placeholder="Selecione" class="p-column-filter" style="min-width: 10rem" :showClear="true">
                                 <template #option="slotProps">
-                                    <div class="flex align-items-center gap-2">
-                                        <span>{{ slotProps.option.status }}</span>
-                                    </div>
+                                    {{ slotProps.option }}
                                 </template>
-                            </MultiSelect>
+                            </Dropdown>
                         </template>
                     </Column>
                     <Column field="..." header="..." :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
                             <div class="flex gap-2">
-                                <!-- Usando Flexbox para alinhar os botões lado a lado -->
-                                <!-- Botão de Visualizar -->
                                 <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
 
                                 <!-- Botão de Editar -->

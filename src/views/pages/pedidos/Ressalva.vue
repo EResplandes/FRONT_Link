@@ -108,7 +108,6 @@ export default {
         // Metódo responsável por enviar mensagem para Dr Emival ou Dr. Monica
         enviarMensagem() {
             this.preloading = true;
-            console.log(this.id_pedido);
             this.pedidoService.respondePedidoRessalva(this.novaMensagem, this.id_pedido).then((data) => {
                 console.log(data);
                 if (data.resposta == 'Pedido respondido com sucesso!') {
