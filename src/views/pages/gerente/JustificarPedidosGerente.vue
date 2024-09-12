@@ -20,7 +20,6 @@ export default {
             gerenteService: new GerenteService(),
             chatService: new ChatService(),
             confirm: new useConfirm(),
-            loading1: ref(null),
             idPedido: ref(null),
             empresas: ref([]),
             empresa: ref([]),
