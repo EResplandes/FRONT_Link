@@ -6,20 +6,17 @@ import EmpresaService from '../../../service/EmpresaService';
 import StatusService from '../../../service/StatusService';
 import FluxoService from '../../../service/FluxoService';
 import GerenteService from '../../../service/GerenteService';
+import { FilterMatchMode } from 'primevue/api';
 
 export default {
     data() {
         return {
             toast: new useToast(),
-            displayConfirmation: ref(false),
             gerenteService: new GerenteService(),
             empresaService: new EmpresaService(),
             statusService: new StatusService(),
             fluxoService: new FluxoService(),
-            displayConfirmationActivation: ref(false),
-            visibleRight: ref(false),
             confirm: new useConfirm(),
-            loading1: ref(null),
             empresas: ref(null),
             pedidos: ref(null),
             status: ref(null),
@@ -36,29 +33,38 @@ export default {
             pdf: ref(null),
             pdfsrc: ref(null),
             fluxoPedido: ref(null),
-            localGerente: localStorage.getItem('local_id')
+            localGerente: localStorage.getItem('local_id'),
+            filters: {
+                global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                protheus: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                descricao: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                dt_inclusao_formatada: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                'empresa.nome_empresa': { value: null, matchMode: FilterMatchMode.CONTAINS },
+                status: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                valor_formatado: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                criador: { value: null, matchMode: FilterMatchMode.CONTAINS }
+            }
         };
     },
 
     mounted: function () {
         // Metódo responsável por buscar todos pedidos relacionas a esse usuário que não foram aprovados por ele mesmo
         this.gerenteService.buscaPedidos(localStorage.getItem('usuario_id')).then((data) => {
-            console.log(data);
-            this.pedidos = data.pedidos;
+            this.pedidos = data.pedidos.map((pedido) => ({
+                ...pedido,
+                criador: pedido.pedido.criador,
+                descricao: pedido.pedido.descricao,
+                protheus: pedido.pedido.protheus,
+                dt_inclusao_formatada: this.formatarData(pedido.pedido.dt_inclusao),
+                valor_formatado: pedido.pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+            }));
             this.preloading = false;
         });
 
         // Metódo responsável por buscar todas empresas
         this.empresaService.buscaEmpresas().then((data) => {
             if (data.resposta == 'Empresas listados com sucesso!') {
-                this.empresas = data.empresas;
-            }
-        });
-
-        // Metódo responsável por buscar todos status
-        this.statusService.buscaStatus().then((data) => {
-            if (data.resposta == 'Status listados com sucesso!') {
-                this.status = data.itens;
+                this.empresas = data.empresas.map((empresa) => empresa.nome_empresa);
             }
         });
     },
@@ -160,6 +166,9 @@ export default {
 
         // Metódo responsável por visualizar pdf
         visualizar(id, data) {
+            console.log(id);
+            console.log(data);
+            this.idPedido = id;
             this.display = true;
             if (data.pedido.status.status == 'Fluxo Reprovado') {
                 this.erroPedidoRepwrovado = true;
@@ -184,28 +193,6 @@ export default {
 
         showError(mensagem) {
             this.toast.add({ severity: 'error', summary: 'Ocorreu um erro!', detail: mensagem, life: 3000 });
-        },
-
-        // Metódo responsável por buscar pedidos com filtros
-        buscaFiltros() {
-            this.preloading = true;
-            this.pedidoService.filtroPedidos(this.form).then((data) => {
-                if (data.resposta == 'Pedidos para o Dr. Emival Caiado!') {
-                    this.pedidos = data.pedidos;
-                    this.form = {};
-                    this.showInfo('Filtros aplicados com sucesso!');
-                    this.preloading = false;
-                } else {
-                    this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
-                }
-            });
-        },
-
-        // Metódo responsável por limpagem de filtros
-        limparFiltro() {
-            this.buscaPedidos();
-            this.showInfo('Filtro removidos com sucesso!');
-            this.form = {};
         }
     }
 };
@@ -286,80 +273,77 @@ export default {
 
             <div class="card">
                 <DataTable
-                    dataKey="id"
+                    v-model:filters="filters"
                     :value="pedidos"
-                    :paginator="true"
+                    paginator
                     :rows="10"
-                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                    dataKey="id"
                     :rowsPerPageOptions="[5, 10, 25, 50, 100]"
                     currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
-                    responsiveLayout="scroll"
-                    filterDisplay="menu"
-                    stripedRows
+                    filterDisplay="row"
+                    :loading="loading"
+                    :globalFilterFields="['descricao', 'empresa.nome_empresa', 'country.name', 'representative.name', 'status.status']"
                 >
-                    <template #empty> Nenhum pedido encontrado! </template>
-                    <template #loading> Carregando informações... Por favor, aguarde! </template>
-
-                    <Column field="" header="" class="w-1">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Dt. Inclusão</span>
-                            <Tag v-if="slotProps.data.urgente == 1" class="mr-2" severity="danger" value="Urgente"></Tag>
-                            <Tag v-else class="mr-2" severity="info" value="Normal"></Tag>
+                    <template #empty> Nenhum pedido encontrado. </template>
+                    <template #loading> Loading customers data. Please wait. </template>
+                    <Column field="dt_inclusao_formatada" header="Dt. Inclusão" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
+                        <template #body="{ data }">
+                            {{ this.formatarData(data.pedido.dt_inclusao) }}
+                        </template>
+                        <template #filter="{ filterModel, filterCallback }">
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Filtrar pela Dt. de Inclusão" />
                         </template>
                     </Column>
-
-                    <Column field="Dt. Inclusão" header="Dt. Inclusão" :sortable="true" class="w-2">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Dt. Inclusão</span>
-                            {{ formatarData(slotProps.data.pedido.dt_inclusao) }}
+                    <Column field="protheus" header="Nº Protheus" :showFilterMenu="false">
+                        <template #body="{ data }">
+                            {{ data.pedido.protheus }}
+                        </template>
+                        <template #filter="{ filterModel, filterCallback }">
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Filtrar pelo Nº Pedido Protheus" />
                         </template>
                     </Column>
-
-                    <Column field="Nº Protheus" header="Nº Protheus" :sortable="true" class="w-1">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Nº Protheus</span>
-                            {{ slotProps.data.pedido.protheus }}
+                    <Column field="valor_formatado" header="Valor" style="min-width: 12rem">
+                        <template #body="{ data }">
+                            {{ data.valor_formatado }}
+                        </template>
+                        <template #filter="{ filterModel, filterCallback }">
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pelo Valor" />
                         </template>
                     </Column>
-
-                    <Column field="Empresa" header="Empresa" :sortable="true" class="w-2">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Empresa</span>
-                            {{ slotProps.data.pedido.empresa?.nome_empresa }}
+                    <Column field="descricao" header="Fornecedor" style="min-width: 12rem">
+                        <template #body="{ data }">
+                            {{ data.pedido.descricao }}
+                        </template>
+                        <template #filter="{ filterModel, filterCallback }">
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Filtrar pela descrição" />
                         </template>
                     </Column>
-
-                    <Column field="Descrição" header="Fornecedor" :sortable="true" class="w-4">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Descrição</span>
-                            {{ slotProps.data.pedido.descricao }}
+                    <Column field="empresa.nome_empresa" header="Empresa" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 8rem">
+                        <template #body="{ data }">
+                            {{ data.pedido.empresa.nome_empresa }}
+                        </template>
+                        <template #filter="{ filterModel, filterCallback }">
+                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="empresas" placeholder="Selecione" class="p-column-filter" style="min-width: 10rem" :showClear="true">
+                                <template #option="slotProps">
+                                    {{ slotProps.option }}
+                                </template>
+                            </Dropdown>
                         </template>
                     </Column>
-
-                    <Column field="Valor" header="Valor" :sortable="true" class="w-1">
-                        <template #body="slotProps">
-                            <span class="p-column-title">CNPJ</span>
-                            {{ slotProps.data.pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
+                    <Column field="criador" header="Comprador" style="min-width: 12rem">
+                        <template #body="{ data }">
+                            {{ data.pedido.criador }}
                         </template>
-                    </Column>
-
-                    <Column field="Comprador" header="Comprador" :sortable="true" class="w-2">
-                        <template #body="slotProps">
-                            <span class="p-column-title">CNPJ</span>
-                            {{ slotProps.data.pedido.criador }}
+                        <template #filter="{ filterModel, filterCallback }">
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Filtrar por comprador" />
                         </template>
                     </Column>
 
                     <Column field="..." header="..." :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
-                            <div class="grid">
-                                <div class="col-4 md:col-4 mr-3">
-                                    <Button @click.prevent="visualizar(slotProps.data.id_fluxo, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
-                                </div>
-                                <div class="col-4 md:col-4 mr-3">
-                                    <Button @click.prevent="geraLink(slotProps.data)" icon="pi pi-link" class="p-button-secondary" />
-                                </div>
+                            <div class="flex gap-2">
+                                <Button @click.prevent="visualizar(slotProps.data.id_fluxo, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
                             </div>
                         </template>
                     </Column>
