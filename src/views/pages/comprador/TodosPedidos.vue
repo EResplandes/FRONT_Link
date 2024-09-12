@@ -26,6 +26,8 @@ export default {
             empresas: ref([]),
             empresa: ref([]),
             pedidos: ref(null),
+            dadosPedidos: ref(null),
+            novaMensagem: ref(null),
             status: ref(null),
             displayAlteracao: ref(false),
             form: ref({}),
@@ -87,7 +89,6 @@ export default {
 
     methods: {
         imprimirAutorizacao(data) {
-            console.log(data);
             try {
                 generatePDF(data);
                 this.preloading = false;
@@ -208,6 +209,8 @@ export default {
         },
 
         chat(id, data) {
+            this.dadosPedidos = data;
+            this.idPedido = id;
             this.displayChat = true;
             this.chatService.buscaConversa(id).then((data) => {
                 if (data.resposta == 'Chat listado com sucesso!') {
@@ -308,6 +311,59 @@ export default {
 
         uploadPdf() {
             this.form.pdf = this.$refs.pdf.files[0];
+        },
+
+        enviarMensagem() {
+            // Caso pedido tenha sido reprovado por Emival e esteja com status Reprovado
+            if (this.dadosPedidos.status.status == 'Reprovado') {
+                this.preloading = true;
+                this.pedidoService.respondePedidoReprovado(this.pdf, this.novaMensagem, this.idPedido).then((data) => {
+                    if (data.resposta == 'Mensagem enviada com sucesso!') {
+                        this.showSuccess('Mensagem enviada com sucesso!');
+                        this.displayChat = false;
+                        this.buscaPedidos();
+                        this.novaMensagem = '';
+                    } else {
+                        this.showError('Ocorreu algum problema, entre em contato com o Administrador');
+                    }
+                });
+            } else if (this.dadosPedidos.status.status == 'Aprovado com Ressalva') {
+                this.preloading = true;
+                this.pedidoService.respondePedidoRessalva(this.novaMensagem, this.idPedido).then((data) => {
+                    if (data.resposta == 'Pedido respondido com sucesso!') {
+                        this.showSuccess('Mensagem enviada com sucesso!');
+                        this.displayChat = false;
+                        this.buscaPedidos();
+                        this.novaMensagem = '';
+                    } else {
+                        this.showError('Ocorreu algum problema, entre em contato com o Administrador');
+                    }
+                });
+            } else if (this.dadosPedidos.status.status == 'Reprovado por Soleni') {
+                this.preloading = true;
+                this.pedidoService.respondePedidoReprovadoSoleni(this.pdf, this.novaMensagem, this.idPedido).then((data) => {
+                    if (data.resposta == 'Mensagem enviada com sucesso!') {
+                        this.showSuccess('Mensagem enviada com sucesso!');
+                        this.displayChat = false;
+                        this.buscaPedidos();
+                        this.novaMensagem = '';
+                    } else {
+                        this.showError('Ocorreu algum problema, entre em contato com o Administrador');
+                    }
+                });
+            } else if (this.dadosPedidos.status.status == 'Fluxo Reprovado') {
+                this.preloading = true;
+                this.pedidoService.respondePedidoReprovadoFluxo(this.pdf, this.novaMensagem, this.idPedido).then((data) => {
+                    if (data.resposta == 'Mensagem enviada com sucesso!') {
+                        this.showSuccess('Mensagem enviada com sucesso!');
+                        this.displayChat = false;
+                        this.buscaPedidos();
+                        this.novaMensagem = '';
+                    } else {
+                        this.showError('Ocorreu algum problema, entre em contato com o Administrador');
+                    }
+                });
+            }
         }
     }
 };
@@ -355,6 +411,9 @@ export default {
                         </Timeline>
                     </div>
                     <hr />
+                    <InputText class="col-12" type="text" v-model="novaMensagem" placeholder="Digite a mensagem..." />
+                    <Button @click.prevent="enviarMensagem()" label="Enviar" class="mr-2 mt-3 p-button-success col-12" />
+                    <Button @click.prevent="this.displayAnexo = true" label="Alterar Pedido" class="mr-2 mt-3 p-button-secondary col-12" />
                 </div>
             </div>
         </Dialog>
@@ -511,7 +570,7 @@ export default {
 
                                 <!-- Botão de Chat -->
                                 <Button
-                                    v-if="['Reprovado', 'Aprovado com Ressalva', 'Resposta do Pedido de Compra Aprovado com Ressalva'].includes(slotProps.data.status.status)"
+                                    v-if="['Reprovado', 'Aprovado com Ressalva', 'Reprovado por Soleni', 'Fluxo Reprovado'].includes(slotProps.data.status.status)"
                                     @click.prevent="chat(slotProps.data.id, slotProps.data)"
                                     icon="pi pi-comments"
                                     class="p-button-secondary"
