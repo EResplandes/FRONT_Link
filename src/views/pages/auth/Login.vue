@@ -20,32 +20,45 @@ export default {
     },
     methods: {
         login() {
-            this.autenticacaoService.login(this.form).then((data) => {
-                if (data.resposta != 'Autenticação realizada com sucesso!') {
-                    this.addMessage('error');
-                } else {
-                    // Salva no localStorage os dados do usuário
-                    console.log(data.usuario[0].id);
-                    localStorage.clear();
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('usuario_id', data.usuario[0].id);
-                    localStorage.setItem('usuario_email', data.usuario[0].email);
-                    localStorage.setItem('nome', data.usuario[0].nome);
-                    localStorage.setItem('funcao', data.usuario[0].funcao.funcao);
-                    localStorage.setItem('grupo', data.usuario[0].grupo.grupo);
-                    localStorage.setItem('local_id', data.usuario[0]?.local?.id);
-                    localStorage.setItem('p_acesso', data.usuario[0].p_acesso);
-                    localStorage.setItem('status_usuario', data.usuario[0].status);
+            const camposObrigatorios = ['email', 'senha'];
 
-                    if (data.usuario[0].id == '1') {
-                        this.router.push('/emival');
-                    } else if (data.usuario[0].id == '3') {
-                        this.router.push('/monica');
-                    } else {
-                        this.router.push('/');
-                    }
+            let todosCamposPreenchidos = true;
+
+            for (const campo of camposObrigatorios) {
+                if (!this.form[campo]) {
+                    this.showError(`O campo ${campo.toUpperCase()} é obrigatório!`);
+                    todosCamposPreenchidos = false;
                 }
-            });
+            }
+
+            if (todosCamposPreenchidos) {
+                this.autenticacaoService.login(this.form).then((data) => {
+                    if (data.resposta != 'Autenticação realizada com sucesso!') {
+                        this.addMessage('error');
+                    } else {
+                        // Salva no localStorage os dados do usuário
+                        console.log(data.usuario[0].id);
+                        localStorage.clear();
+                        localStorage.setItem('token', data.token);
+                        localStorage.setItem('usuario_id', data.usuario[0].id);
+                        localStorage.setItem('usuario_email', data.usuario[0].email);
+                        localStorage.setItem('nome', data.usuario[0].nome);
+                        localStorage.setItem('funcao', data.usuario[0].funcao.funcao);
+                        localStorage.setItem('grupo', data.usuario[0].grupo.grupo);
+                        localStorage.setItem('local_id', data.usuario[0]?.local?.id);
+                        localStorage.setItem('p_acesso', data.usuario[0].p_acesso);
+                        localStorage.setItem('status_usuario', data.usuario[0].status);
+
+                        if (data.usuario[0].id == '1') {
+                            this.router.push('/emival');
+                        } else if (data.usuario[0].id == '3') {
+                            this.router.push('/monica');
+                        } else {
+                            this.router.push('/');
+                        }
+                    }
+                });
+            }
         },
 
         addMessage(type) {
@@ -54,12 +67,19 @@ export default {
             } else if (type === 'error') {
                 this.message = [{ severity: 'error', detail: 'Mensagem de erro!', content: 'Usuário ou senha inválidos!', id: this.count++ }];
             }
+        },
+
+        showError(mensagem) {
+            this.toast.add({ severity: 'error', summary: 'Ocorreu um erro!', detail: mensagem, life: 3000 });
         }
     }
 };
 </script>
 
 <template>
+    <div class="col-12 lg:col-6">
+        <Toast />
+    </div>
     <div class="surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden">
         <div class="flex flex-column align-items-center justify-content-center">
             <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--surface-600) 10%, rgba(999, 999, 999, 0) 30%)">
