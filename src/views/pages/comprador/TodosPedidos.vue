@@ -566,7 +566,7 @@ export default {
 
                                 <!-- Botão de Chat -->
                                 <Button
-                                    v-if="['Reprovado', 'Aprovado com Ressalva', 'Reprovado por Soleni', 'Fluxo Reprovado'].includes(slotProps.data.status.status)"
+                                    v-if="['Aprovado com Ressalva', 'Reprovado por Soleni', 'Fluxo Reprovado'].includes(slotProps.data.status.status)"
                                     @click.prevent="chat(slotProps.data.id, slotProps.data)"
                                     icon="pi pi-comments"
                                     class="p-button-secondary"

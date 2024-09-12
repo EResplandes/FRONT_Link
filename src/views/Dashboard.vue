@@ -131,7 +131,7 @@ export default {
                         <i class="pi pi-shopping-cart text-green-500 text-xl"></i>
                     </div>
                 </div>
-                <span @click="rota(1)" class="text-blue-500 font-medium cursor-ver-pedidos">Ver pedidos... </span>
+                <!-- <span @click="rota(1)" class="text-blue-500 font-medium cursor-ver-pedidos">Ver pedidos... </span> -->
             </div>
         </div>
         <div class="col-12 lg:col-6 xl:col-3">
@@ -145,7 +145,7 @@ export default {
                         <i class="pi pi-map-marker text-red-500 text-xl"></i>
                     </div>
                 </div>
-                <span @click="rota(2)" class="text-blue-500 font-medium cursor-ver-pedidos">Ver pedidos... </span>
+                <!-- <span @click="rota(2)" class="text-blue-500 font-medium cursor-ver-pedidos">Ver pedidos... </span> -->
             </div>
         </div>
         <div class="col-12 lg:col-6 xl:col-3">
@@ -159,7 +159,7 @@ export default {
                         <i class="pi pi-inbox text-red-500 text-xl"></i>
                     </div>
                 </div>
-                <span @click="rota(3)" class="text-blue-500 font-medium cursor-ver-pedidos">Ver pedidos... </span>
+                <!-- <span @click="rota(3)" class="text-blue-500 font-medium cursor-ver-pedidos">Ver pedidos... </span> -->
             </div>
         </div>
         <div class="col-12 lg:col-6 xl:col-3">
@@ -173,7 +173,7 @@ export default {
                         <i class="pi pi-comment text-red-500 text-xl"></i>
                     </div>
                 </div>
-                <span @click="rota(4)" class="text-blue-500 font-medium cursor-ver-pedidos">Ver pedidos... </span>
+                <!-- <span @click="rota(4)" class="text-blue-500 font-medium cursor-ver-pedidos">Ver pedidos... </span> -->
             </div>
         </div>
 
