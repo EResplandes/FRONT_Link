@@ -65,8 +65,8 @@ const model = ref([
     {
         label: 'Pedidos',
         items: [
-            { label: 'Todos', icon: 'pi pi-fw pi-book', to: '/pedidos-todos', requiredRole: ['Administrador', 'Gerente'] },
-            { label: 'Todos - Comprador Externo', icon: 'pi pi-fw pi-book', to: '/pedidos-todos-externo', requiredRole: ['Administrador', 'Gerente'] },
+            // { label: 'Todos', icon: 'pi pi-fw pi-book', to: '/pedidos-todos', requiredRole: ['Administrador', 'Gerente'] },
+            // { label: 'Todos - Comprador Externo', icon: 'pi pi-fw pi-book', to: '/pedidos-todos-externo', requiredRole: ['Administrador', 'Gerente'] },
             { label: 'Pedidos Aprovados', icon: 'pi pi-fw pi-check-circle', to: '/pedidos-aprovados', requiredRole: ['Gerente', 'Administrador', 'Comprador', 'Comprador Externo'] },
             // { label: 'Para Aprovação de Fluxo', icon: 'pi pi-fw pi-reply', to: '/aprovacao-gerentes', requiredRole: ['Diretor', 'Gerente', 'Administrador'] },
             // { label: 'Justificar Pedidos Reprovados por Gestor | Diretor', icon: 'pi pi-fw pi-pencil', to: '/reprovados-gestor', requiredRole: ['Comprador', 'Administrador', 'Comprador Externo', 'Fiscal'] },
@@ -80,8 +80,8 @@ const model = ref([
         label: 'Administração',
         items: [
             { label: 'Usuários', icon: 'pi pi-fw pi-users', to: '/usuarios', requiredRole: ['Administrador'] },
-            { label: 'Empresas', icon: 'pi pi-fw pi-building', to: '/empresas', requiredRole: ['Administrador'] },
-            { label: 'Link Externo de Aprovação', icon: 'pi pi-fw pi-users', to: '/aprovacao-externa/:id_pedido', requiredRole: ['Administrador'] }
+            { label: 'Empresas', icon: 'pi pi-fw pi-building', to: '/empresas', requiredRole: ['Administrador'] }
+            // { label: 'Link Externo de Aprovação', icon: 'pi pi-fw pi-users', to: '/aprovacao-externa/:id_pedido', requiredRole: ['Administrador'] }
         ]
     },
     {
@@ -89,8 +89,8 @@ const model = ref([
         items: [
             { label: 'Pedidos Aprovados', icon: 'pi pi-fw pi-chart-bar', to: '/relatorio-aprovados', requiredRole: ['Administrador', 'Gestor de Fluxo'] },
             { label: 'Pedidos Reprovados', icon: 'pi pi-fw pi-chart-bar', to: '/relatorio-reprovados', requiredRole: ['Administrador', 'Gestor de Fluxo'] },
-            { label: 'Informações', icon: 'pi pi-fw pi-chart-bar', to: '/graficos', requiredRole: ['Administrador', 'Gestor de Fluxo'] },
-            { label: 'Informações de Pedido', icon: 'pi pi-fw pi-building', to: '/info-pedido/:id', requiredRole: ['Administrador'] }
+            { label: 'Informações', icon: 'pi pi-fw pi-chart-bar', to: '/graficos', requiredRole: ['Administrador', 'Gestor de Fluxo'] }
+            // { label: 'Informações de Pedido', icon: 'pi pi-fw pi-building', to: '/info-pedido/:id', requiredRole: ['Administrador'] }
         ]
     },
     {
@@ -107,13 +107,13 @@ const model = ref([
         items: [{ label: 'Controle', icon: 'pi pi-fw pi-users', to: '/controle-caixa', requiredRole: ['Gestor de Fluxo', 'Administrador'], requiredNome: ['Soleni', 'Eduardo C. Resplandes'] }]
     },
     {
-        label: 'Pages',
+        // label: 'Pages',
         icon: 'pi pi-fw pi-briefcase',
         to: '/pages',
         items: [
             {
-                label: 'Landing',
-                icon: 'pi pi-fw pi-globe',
+                // label: 'Landing',
+                // icon: 'pi pi-fw pi-globe',
                 to: '/landing/:id_pedido',
                 requiredRole: ['Administrador']
             }
