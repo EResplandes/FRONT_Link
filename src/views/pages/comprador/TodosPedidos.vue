@@ -4,6 +4,7 @@ import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
 import PedidoService from '../../../service/Pedido';
 import EmpresaService from '../../../service/EmpresaService';
+import DashboardService from '../../../service/DashboardService';
 import StatusService from '../../../service/StatusService';
 import ChatService from '../../../service/ChatService';
 import { generatePDF } from '../comprador/aprovacao';
@@ -17,6 +18,8 @@ export default {
             pedidoService: new PedidoService(),
             empresaService: new EmpresaService(),
             statusService: new StatusService(),
+            dashboardService: new DashboardService(),
+            informacoes: ref(null),
             chatService: new ChatService(),
             displayConfirmationActivation: ref(false),
             visibleRight: ref(false),
@@ -85,6 +88,11 @@ export default {
                 this.status = data.itens.map((status) => status.status);
             }
         });
+
+        this.dashboardService.buscaInformacoes(localStorage.getItem('usuario_id')).then((data) => {
+            this.informacoes = data.informacoes;
+            this.preloading = false;
+        });
     },
 
     methods: {
@@ -143,6 +151,7 @@ export default {
                 if (data.resposta == 'Pedido excluído com sucesso!') {
                     this.showSuccess('Pedido excluído com sucesso!');
                     this.buscaPedidos();
+                    this.buscaInformacoes();
                     this.preloading = false;
                 } else {
                     this.showError('Ocorreu um erro, entre em contato com o Administrador!');
@@ -181,6 +190,14 @@ export default {
                 }));
                 this.preloading = false;
                 this.loading = false;
+            });
+        },
+
+        // Metódo responsável por alimentar dados topo
+        buscaInformacoes() {
+            this.dashboardService.buscaInformacoes(localStorage.getItem('usuario_id')).then((data) => {
+                this.informacoes = data.informacoes;
+                this.preloading = false;
             });
         },
 
@@ -322,6 +339,7 @@ export default {
                         this.showSuccess('Mensagem enviada com sucesso!');
                         this.displayChat = false;
                         this.buscaPedidos();
+                        this.buscaInformacoes();
                         this.novaMensagem = '';
                     } else {
                         this.showError('Ocorreu algum problema, entre em contato com o Administrador');
@@ -334,6 +352,7 @@ export default {
                         this.showSuccess('Mensagem enviada com sucesso!');
                         this.displayChat = false;
                         this.buscaPedidos();
+                        this.buscaInformacoes();
                         this.novaMensagem = '';
                     } else {
                         this.showError('Ocorreu algum problema, entre em contato com o Administrador');
@@ -346,6 +365,7 @@ export default {
                         this.showSuccess('Mensagem enviada com sucesso!');
                         this.displayChat = false;
                         this.buscaPedidos();
+                        this.buscaInformacoes();
                         this.novaMensagem = '';
                     } else {
                         this.showError('Ocorreu algum problema, entre em contato com o Administrador');
@@ -358,6 +378,7 @@ export default {
                         this.showSuccess('Mensagem enviada com sucesso!');
                         this.displayChat = false;
                         this.buscaPedidos();
+                        this.buscaInformacoes();
                         this.novaMensagem = '';
                     } else {
                         this.showError('Ocorreu algum problema, entre em contato com o Administrador');
@@ -460,6 +481,61 @@ export default {
 
         <!-- Tabela com todos pedidos -->
         <div class="col-12">
+            <div class="grid">
+                <div class="col-12 lg:col-6 xl:col-3">
+                    <div class="card mb-0">
+                        <div class="flex justify-content-between mb-3">
+                            <div>
+                                <span class="block text-500 font-medium mb-3">Pedidos Aprovados</span>
+                                <div class="text-900 font-medium text-xl">{{ this.informacoes?.qtdPedidosAprovados }} pedido(s)</div>
+                            </div>
+                            <div class="flex align-items-center justify-content-center bg-green-100 border-round" style="width: 2.5rem; height: 2.5rem">
+                                <i class="pi pi-shopping-cart text-green-500 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 lg:col-6 xl:col-3">
+                    <div class="card mb-0">
+                        <div class="flex justify-content-between mb-3">
+                            <div>
+                                <span class="block text-500 font-medium mb-3">Reprovados por Emival</span>
+                                <div class="text-900 font-medium text-xl">{{ this.informacoes?.qtdPedidosReprovadosEmival }} pedido(s)</div>
+                            </div>
+                            <div class="flex align-items-center justify-content-center bg-red-100 border-round" style="width: 2.5rem; height: 2.5rem">
+                                <i class="pi pi-map-marker text-red-500 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 lg:col-6 xl:col-3">
+                    <div class="card mb-0">
+                        <div class="flex justify-content-between mb-3">
+                            <div>
+                                <span class="block text-500 font-medium mb-3">Reprovados por Soleni</span>
+                                <div class="text-900 font-medium text-xl">{{ this.informacoes?.qtdPedidosReprovadosSoleni }} pedido(s)</div>
+                            </div>
+                            <div class="flex align-items-center justify-content-center bg-red-100 border-round" style="width: 2.5rem; height: 2.5rem">
+                                <i class="pi pi-inbox text-red-500 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 lg:col-6 xl:col-3">
+                    <div class="card mb-0">
+                        <div class="flex justify-content-between mb-3">
+                            <div>
+                                <span class="block text-500 font-medium mb-3">Reprovados por Gerente</span>
+                                <div class="text-900 font-medium text-xl">{{ this.informacoes?.qtdPedidosReprovadosGerenteDiretor }} pedido(s)</div>
+                            </div>
+                            <div class="flex align-items-center justify-content-center bg-red-100 border-round" style="width: 2.5rem; height: 2.5rem">
+                                <i class="pi pi-comment text-red-500 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
             <div style="margin-top: 10px" class="header-padrao">TODOS MEUS PEDIDOS <br /><span style="font-size: 10px">( Limitado a os últimos 500 pedidos )</span></div>
 
             <div class="card">
