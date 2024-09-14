@@ -16,7 +16,7 @@ const model = ref([
     {
         label: 'Gestor de Fluxo',
         items: [
-            { label: 'Pedidos com Emival', icon: 'pi pi-fw pi-book', to: '/pedidos-emival', requiredRole: ['Gestor de Fluxo', 'Administrador', 'Comprador Externo', 'Gerente'] },
+            { label: 'Pedidos com Emival', icon: 'pi pi-fw pi-book', to: '/pedidos-emival', requiredRole: ['Gestor de Fluxo', 'Administrador'] },
             {
                 label: 'Pedidos com Monica',
                 icon: 'pi pi-fw pi-book',
@@ -24,7 +24,7 @@ const model = ref([
                 requiredRole: ['Gestor de Fluxo', 'Administrador', 'Gerente', 'Comprador Externo'],
                 requiredNome: ['DP', 'Soleni', 'Eduardo C. Resplandes', 'Ana Paulino', 'Neide']
             },
-            { label: 'Pedidos com Giovana', icon: 'pi pi-fw pi-book', to: '/pedidos-giovana', requiredRole: ['Gestor de Fluxo', 'Administrador', 'Gerente'] },
+            { label: 'Pedidos com Giovana', icon: 'pi pi-fw pi-book', to: '/pedidos-giovana', requiredRole: ['Gestor de Fluxo', 'Administrador'] },
             { label: 'Análise de Fluxo', icon: 'pi pi-fw pi-sitemap', to: '/gestor-fluxo', requiredRole: ['Gestor de Fluxo', 'Administrador'] },
             { label: 'Todos', icon: 'pi pi-fw pi-book', to: '/todos-pedidos-soleni', requiredRole: ['Gestor de Fluxo', 'Administrador'] }
         ]
@@ -34,7 +34,9 @@ const model = ref([
         items: [
             { label: 'Para Aprovação', icon: 'pi pi-fw pi-reply', to: '/aprovacao-gerentes', requiredRole: ['Diretor', 'Gerente', 'Administrador'] },
             { label: 'Justificar Pedidos', icon: 'pi pi-fw pi-book', to: '/justificar-pedidos-gerente', requiredRole: ['Administrador', 'Diretor', 'Gerente'] },
-            { label: 'Todos', icon: 'pi pi-fw pi-book', to: '/todos-pedidos-soleni', requiredRole: ['Gerente', 'Administrador'] }
+            { label: 'Todos', icon: 'pi pi-fw pi-book', to: '/todos-pedidos-soleni', requiredRole: ['Gerente', 'Administrador'] },
+            { label: 'Pedidos com Emival', icon: 'pi pi-fw pi-book', to: '/pedidos-emival', requiredRole: ['Administrador', 'Comprador Externo', 'Gerente'] },
+            { label: 'Pedidos com Giovana', icon: 'pi pi-fw pi-book', to: '/pedidos-giovana', requiredRole: ['Administrador', 'Gerente'] }
         ]
     },
     {
