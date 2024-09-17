@@ -182,6 +182,7 @@ export default {
 
         // Metódo responsável por buscar todos pedidos
         buscaPedidos() {
+            this.preloading = true;
             this.pedidoService.buscaPedidosPorComprador(localStorage.getItem('usuario_id')).then((data) => {
                 this.pedidos = data.pedidos.map((pedido) => ({
                     ...pedido,
@@ -190,6 +191,25 @@ export default {
                 }));
                 this.preloading = false;
                 this.loading = false;
+            });
+        },
+
+        // Metódo responsável por buscar meus pedidos de acordo com filtro
+        filtrar(id) {
+            this.preloading = true;
+            this.pedidoService.buscaPedidosPorCompradorStatus(localStorage.getItem('usuario_id'), id).then((data) => {
+                if (data.resposta == 'Pedidos listados com sucesso!') {
+                    this.showInfo('Filtro aplicado com sucesso!');
+                    this.preloading = false;
+                    this.pedidos = data.pedidos.map((pedido) => ({
+                        ...pedido,
+                        dt_inclusao_formatada: this.formatarData(pedido.dt_inclusao),
+                        valor_formatado: pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                    }));
+                } else {
+                    this.preloading = false;
+                    this.showError('Ocorreu um erro, entre em contato com o Administrador!');
+                }
             });
         },
 
@@ -493,6 +513,7 @@ export default {
                                 <i class="pi pi-shopping-cart text-green-500 text-xl"></i>
                             </div>
                         </div>
+                        <span @click="filtrar(4)" class="text-blue-500 font-medium cursor-ver-pedidos">Ver pedidos... </span>
                     </div>
                 </div>
                 <div class="col-12 lg:col-6 xl:col-3">
@@ -506,6 +527,7 @@ export default {
                                 <i class="pi pi-map-marker text-red-500 text-xl"></i>
                             </div>
                         </div>
+                        <span @click="filtrar(3)" class="text-blue-500 font-medium cursor-ver-pedidos">Ver pedidos... </span>
                     </div>
                 </div>
                 <div class="col-12 lg:col-6 xl:col-3">
@@ -519,6 +541,7 @@ export default {
                                 <i class="pi pi-inbox text-red-500 text-xl"></i>
                             </div>
                         </div>
+                        <span @click="filtrar(11)" class="text-blue-500 font-medium cursor-ver-pedidos">Ver pedidos... </span>
                     </div>
                 </div>
                 <div class="col-12 lg:col-6 xl:col-3">
@@ -532,9 +555,9 @@ export default {
                                 <i class="pi pi-comment text-red-500 text-xl"></i>
                             </div>
                         </div>
+                        <span @click="filtrar(10)" class="text-blue-500 font-medium cursor-ver-pedidos">Ver pedidos... </span>
                     </div>
                 </div>
-                
             </div>
             <div style="margin-top: 10px" class="header-padrao">TODOS MEUS PEDIDOS <br /><span style="font-size: 10px">( Limitado a os últimos 500 pedidos )</span></div>
 
@@ -551,6 +574,12 @@ export default {
                     :loading="loading"
                     :globalFilterFields="['descricao', 'empresa.nome_empresa', 'country.name', 'representative.name', 'status.status']"
                 >
+                    <template #header>
+                        <div class="text-right">
+                            <Button @click.prevent="buscaPedidos()" label="Limpar Filtros" severity="danger" icon="pi pi-trash" />
+                        </div>
+                    </template>
+
                     <template #empty> Nenhum Pedido Encontrado. </template>
                     <template #loading> Loading customers data. Please wait. </template>
                     <Column field="dt_inclusao_formatada" header="Dt. Inclusão" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">

@@ -580,6 +580,25 @@ export default class PedidoService {
             });
     }
 
+    // Requisição responsável por buscar pedidos com base em status e id do usuário local
+    async buscaPedidosPorCompradorStatus(id_criador, id_status) {
+        return await fetch(`${API_URL}/pedidos/listar-pedidos-por-comprador-status/${id_criador}/${id_status}`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
     // Requisição responsável por responder pedido com status Pedido aprovado com ressalva
     respondePedidoRessalva(novaMensagem, id_pedido) {
         return fetch(`${API_URL}/pedidos/responde-ressalva/` + id_pedido, {
