@@ -31,7 +31,7 @@ const model = ref([
     },
     {
         label: 'Consulta',
-        items: [{ label: 'Todos', icon: 'pi pi-fw pi-book', to: '/todos-pedidos-soleni', requiredRole: ['Administrador', 'Consultante'] }]
+        items: [{ label: 'Todos', icon: 'pi pi-fw pi-book', to: '/todos-pedidos-soleni', requiredRole: ['Administrador', 'Consultante', 'Fiscal'] }]
     },
     {
         label: 'Gerente | Diretor',
