@@ -424,6 +424,7 @@ export default {
 
         // Abaixo de 1000
         salvaMensagemPedido(status) {
+            console.log(status);
             switch (status) {
                 case 0: // REPROVAR PEDIDO ABAIXO DE MIL
                     this.pedidoService.aprovarEmival([{ id: this.pedidos[this.currentIndex].id, status: 3, mensagem: this.mensagemEmival }]).then((data) => {
@@ -627,6 +628,7 @@ export default {
         },
 
         visualizarAcima(id, data) {
+            console.log(data);
             this.pedidoSelecionado = data;
             this.titleDocumento = `Visualizando Pedido ${this.currentIndex + 1} de ${this.pedidos.length} Pedidos`;
             this.pedidoAcima = data;

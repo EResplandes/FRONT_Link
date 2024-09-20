@@ -129,6 +129,16 @@ const router = createRouter({
                     component: () => import('@/views/pages/pedidos/CadastroSemFluxo.vue')
                 },
                 {
+                    path: '/buscar-precos',
+                    name: 'buscar-precos',
+                    component: () => import('@/views/pages/comprador/Cotacao.vue')
+                },
+                {
+                    path: '/consulta-precos',
+                    name: 'consulta-precos',
+                    component: () => import('@/views/pages/comprador/Consulta.vue')
+                },
+                {
                     path: '/aprovacao-gerentes',
                     name: 'aprovacao-gerentes',
                     component: () => import('@/views/pages/gerente/Aprovacao.vue')

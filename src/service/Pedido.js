@@ -660,7 +660,7 @@ export default class PedidoService {
                 throw error;
             });
     }
-
+    
     // Requisição responsável por buscar pedidos com status 15 - Enviado para financeiro
     async buscaPedidosFinanceiro() {
         return await fetch(`${API_URL}/pedidos/listar-pedidos-financeiro`, {
