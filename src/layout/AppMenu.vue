@@ -30,6 +30,10 @@ const model = ref([
         ]
     },
     {
+        label: 'Comparação de Preços',
+        items: [{ label: 'Consulta', icon: 'pi pi-fw pi-book', to: '/consulta-precos', requiredRole: ['Apresentação'] }]
+    },
+    {
         label: 'Consulta',
         items: [{ label: 'Todos', icon: 'pi pi-fw pi-book', to: '/todos-pedidos-soleni', requiredRole: ['Administrador', 'Consultante', 'Fiscal'] }]
     },
