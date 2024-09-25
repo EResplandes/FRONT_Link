@@ -98,6 +98,7 @@ export default {
     methods: {
         imprimirAutorizacao(data) {
             try {
+                console.log(data);
                 generatePDF(data);
                 this.preloading = false;
             } catch (error) {
@@ -321,6 +322,12 @@ export default {
         getSeverity(status) {
             switch (status) {
                 case 'Reprovado':
+                    return 'danger';
+
+                case 'Reprovado por Soleni':
+                    return 'danger';
+
+                case 'Fluxo Reprovado':
                     return 'danger';
 
                 case 'Excluído':

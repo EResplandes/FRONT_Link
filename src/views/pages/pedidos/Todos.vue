@@ -241,6 +241,12 @@ export default {
                 case 'Reprovado':
                     return 'danger';
 
+                case 'Reprovado por Soleni':
+                    return 'danger';
+
+                case 'Fluxo Reprovado':
+                    return 'danger';
+
                 case 'Excluído':
                     return 'danger';
 
@@ -256,7 +262,7 @@ export default {
                 case 'Enviado para Emival':
                     return 'info';
 
-                case 'negotiation':
+                case 'Enviado para Fiscal':
                     return 'warning';
 
                 case 'renewal':
