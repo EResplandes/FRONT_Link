@@ -7,6 +7,7 @@ import EmpresaService from '../../../service/EmpresaService';
 import StatusService from '../../../service/StatusService';
 import ChatService from '../../../service/ChatService';
 import GerenteService from '../../../service/GerenteService';
+import LocalService from '../../../service/LocalService';
 import { generatePDF } from '../comprador/aprovacao';
 import { FilterMatchMode } from 'primevue/api';
 
@@ -18,11 +19,13 @@ export default {
             empresaService: new EmpresaService(),
             statusService: new StatusService(),
             gerenteService: new GerenteService(),
+            localService: new LocalService(),
             chatService: new ChatService(),
             confirm: new useConfirm(),
             idPedido: ref(null),
             empresas: ref([]),
             empresa: ref([]),
+            local: ref([]),
             pedidos: ref(null),
             pedidosSemFluxo: ref(null),
             novaMensagem: ref(null),
@@ -43,7 +46,8 @@ export default {
                 dt_inclusao_formatada: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 'empresa.nome_empresa': { value: null, matchMode: FilterMatchMode.CONTAINS },
                 status: { value: null, matchMode: FilterMatchMode.CONTAINS },
-                valor_formatado: { value: null, matchMode: FilterMatchMode.CONTAINS }
+                valor_formatado: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                'local.local': { value: null, matchMode: FilterMatchMode.CONTAINS }
             },
             loading: true
         };
@@ -85,6 +89,21 @@ export default {
         this.statusService.buscaStatus().then((data) => {
             if (data.resposta == 'Status listados com sucesso!') {
                 this.status = data.itens.map((status) => status.status);
+            }
+        });
+
+        // Metódo responsável por buscar todos os locais
+        this.localService.buscaLocais().then((data) => {
+            console.log(data);
+            if (data.resposta == 'Locais listados com sucesso!') {
+                const locais = data.locais || []; // Garante que locais é um array
+
+                // Mapeia o array pegando apenas o nome do campo "local"
+                const nomesLocais = locais.map((local) => local.local);
+
+                // Atribui o array de nomes à propriedade local
+                this.local = nomesLocais;
+                this.preloading = false;
             }
         });
     },
@@ -263,9 +282,9 @@ export default {
 </script>
 
 <template>
-    <div style="z-index: 99" v-if="preloading" class="full-screen-spinner">
+    <!-- <div style="z-index: 99" v-if="preloading" class="full-screen-spinner">
         <ProgressSpinner />
-    </div>
+    </div> -->
     <div class="grid">
         <Toast />
         <!-- Visualizar -->
@@ -374,7 +393,18 @@ export default {
                             </Dropdown>
                         </template>
                     </Column>
-
+                    <Column field="local.local" header="Local" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 8rem">
+                        <template #body="{ data }">
+                            {{ data.local.local }}
+                        </template>
+                        <template #filter="{ filterModel, filterCallback }">
+                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="local" placeholder="Selecione" class="p-column-filter" style="min-width: 10rem" :showClear="true">
+                                <template #option="slotProps">
+                                    {{ slotProps.option }}
+                                </template>
+                            </Dropdown>
+                        </template>
+                    </Column>
                     <Column header="Status" filterField="status" :showFilterMenu="false" :filterMenuStyle="{ width: '10rem' }" style="min-width: 10rem">
                         <template #body="{ data }">
                             <div class="flex align-items-center gap-2">
@@ -475,7 +505,18 @@ export default {
                             </Dropdown>
                         </template>
                     </Column>
-
+                    <Column field="local.local" header="Local" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 8rem">
+                        <template #body="{ data }">
+                            {{ data.local.local }}
+                        </template>
+                        <template #filter="{ filterModel, filterCallback }">
+                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="local" placeholder="Selecione" class="p-column-filter" style="min-width: 10rem" :showClear="true">
+                                <template #option="slotProps">
+                                    {{ slotProps.option }}
+                                </template>
+                            </Dropdown>
+                        </template>
+                    </Column>
                     <Column header="Status" filterField="status" :showFilterMenu="false" :filterMenuStyle="{ width: '10rem' }" style="min-width: 10rem">
                         <template #body="{ data }">
                             <div class="flex align-items-center gap-2">
