@@ -422,14 +422,10 @@ export default {
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
                             <div class="flex gap-2">
-                                <!-- Usando Flexbox para alinhar os botões lado a lado -->
-                                <!-- Botão de Visualizar -->
                                 <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
 
-                                <!-- Botão de Chat (exibido condicionalmente) -->
                                 <Button v-if="['Reprovado', 'Aprovado com Ressalva'].includes(slotProps.data.status.status)" @click.prevent="chat(slotProps.data.id, slotProps.data)" icon="pi pi-comments" class="p-button-secon" />
 
-                                <!-- Botão de Imprimir (exibido condicionalmente) -->
                                 <Button
                                     v-if="['Aprovado', 'Aprovado com Ressalva', 'Resposta do Pedido de Compra Aprovado com Ressalva', 'Retorno do Pedido de Compra Aprovado com Ressalva'].includes(slotProps.data.status.status)"
                                     @click.prevent="buscaInformacoesPedido(slotProps.data.id)"

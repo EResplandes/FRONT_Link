@@ -119,6 +119,11 @@ const router = createRouter({
                     component: () => import('@/views/pages/pedidos/GestorFluxo.vue')
                 },
                 {
+                    path: '/resposta-reprovados',
+                    name: 'resposta-reprovados',
+                    component: () => import('@/views/pages/gestor_fluxo/RespostaReprovados.vue')
+                },
+                {
                     path: '/cadastro-pedido',
                     name: 'cadastro-pedido',
                     component: () => import('@/views/pages/pedidos/Cadastro.vue')

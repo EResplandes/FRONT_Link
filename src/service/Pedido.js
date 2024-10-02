@@ -1088,6 +1088,25 @@ export default class PedidoService {
             });
     }
 
+    // Metódo responsável por buscar pedidos que ja foram reprovados e seu chat
+    async buscarRespostaPedidosReprovados() {
+        return await fetch(`${API_URL}/pedidos/listar-pedidos-respondidos-para-emival`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
     formatarDataParaYMD(data) {
         if (data) {
             const dia = String(data.getDate()).padStart(2, '0');
