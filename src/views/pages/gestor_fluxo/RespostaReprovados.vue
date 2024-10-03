@@ -74,7 +74,7 @@ export default {
         // Metódo responsável por visualizar pdf
         visualizar(id, data) {
             this.display = true;
-            this.pdf = data.anexo;
+            this.pdf = data.pedido.anexo;
             this.pdfsrc = `${this.urlBase}/${this.pdf}`;
         },
 
@@ -265,7 +265,7 @@ export default {
                     <Column field="Valor" header="Valor" :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">CNPJ</span>
-                            {{ slotProps.data.pedido.status}}
+                            {{ slotProps.data.pedido.status }}
                         </template>
                     </Column>
 
