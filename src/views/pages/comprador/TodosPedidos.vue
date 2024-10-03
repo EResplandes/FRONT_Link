@@ -668,7 +668,10 @@ export default {
                                             'Pago',
                                             'Reprovado por Financeiro - Fiscal',
                                             'Resposta do Pedido de Compra Aprovado com Ressalva',
-                                            'Enviado para Pagamento'
+                                            'Enviado para Pagamento',
+                                            'Enviado para Emival',
+                                            'Enviado para Giovana',
+                                            'Enviado para Monica'
                                         ].includes(slotProps.data.status.status)
                                     "
                                     @click.prevent="alterar(slotProps.data.id)"
