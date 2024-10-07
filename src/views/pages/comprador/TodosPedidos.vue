@@ -98,7 +98,6 @@ export default {
     methods: {
         imprimirAutorizacao(data) {
             try {
-                console.log(data);
                 generatePDF(data);
                 this.preloading = false;
             } catch (error) {
@@ -126,7 +125,7 @@ export default {
         },
 
         // Metóido responsável por buscar dados do pedido para inserir no formulário
-        alterar(id) {
+        alterar(id, status) {
             // 1º Passo - Buscar informações do pedido
             this.idPedido = id;
             this.pedidoService.buscaInformacoesPedidoAlterar(id).then((data) => {
@@ -329,6 +328,9 @@ export default {
 
                 case 'Fluxo Reprovado':
                     return 'danger';
+
+                case 'Correção Pendente':
+                    return 'warning';
 
                 case 'Excluído':
                     return 'danger';
@@ -674,14 +676,14 @@ export default {
                                             'Enviado para Monica'
                                         ].includes(slotProps.data.status.status)
                                     "
-                                    @click.prevent="alterar(slotProps.data.id)"
+                                    @click.prevent="alterar(slotProps.data.id, slotProps.data.status)"
                                     icon="pi pi-pencil"
                                     class="p-button-warning"
                                 />
 
                                 <!-- Botão de Chat -->
                                 <Button
-                                    v-if="['Aprovado com Ressalva', 'Reprovado por Soleni', 'Fluxo Reprovado'].includes(slotProps.data.status.status)"
+                                    v-if="['Reprovado por Soleni', 'Fluxo Reprovado'].includes(slotProps.data.status.status)"
                                     @click.prevent="chat(slotProps.data.id, slotProps.data)"
                                     icon="pi pi-comments"
                                     class="p-button-secondary"

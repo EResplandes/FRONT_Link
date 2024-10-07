@@ -1107,6 +1107,25 @@ export default class PedidoService {
             });
     }
 
+        // Requisição responsável por enviar pedido para comprador justificar
+        async enviarPedidoComprador(id) {
+            return await fetch(`${API_URL}/pedidos/enviar-pedido-comprador/${id}`, {
+                method: 'GET',
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: 'Bearer ' + token
+                }
+            })
+                .then((res) => res.json())
+                .then((d) => {
+                    return d;
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    throw error;
+                });
+        }
+
     formatarDataParaYMD(data) {
         if (data) {
             const dia = String(data.getDate()).padStart(2, '0');

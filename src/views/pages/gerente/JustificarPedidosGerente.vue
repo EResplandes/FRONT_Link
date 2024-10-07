@@ -43,6 +43,7 @@ export default {
                 global: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 protheus: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 descricao: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                criador: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 dt_inclusao_formatada: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 'empresa.nome_empresa': { value: null, matchMode: FilterMatchMode.CONTAINS },
                 status: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -94,7 +95,6 @@ export default {
 
         // Metódo responsável por buscar todos os locais
         this.localService.buscaLocais().then((data) => {
-            console.log(data);
             if (data.resposta == 'Locais listados com sucesso!') {
                 const locais = data.locais || []; // Garante que locais é um array
 
@@ -276,6 +276,35 @@ export default {
                     }
                 });
             }
+        },
+
+        // Modal de confirmação para envio de pedido
+        confirmEnvio(id_pedido, comprador) {
+            this.confirm.require({
+                message: `Tem certeza de que deseja enviar o pedido de compra para o comprador: ${comprador}?`,
+                header: 'Envio de Pedido',
+                icon: 'pi pi-info-circle',
+                rejectLabel: 'Cancelar',
+                acceptLabel: 'Enviar',
+                rejectClass: 'p-button-secondary p-button-outlined',
+                acceptClass: 'p-button-warning',
+                accept: () => {
+                    this.enviarPedidoComprador(id_pedido);
+                },
+                reject: () => {}
+            });
+        },
+
+        // Metódo responsável por enviar pedido
+        enviarPedidoComprador(id_pedido) {
+            this.pedidoService.enviarPedidoComprador(id_pedido).then((data) => {
+                if (data.resposta == 'Pedido enviado para comprador com sucesso!') {
+                    this.showSuccess(data.resposta);
+                    this.buscaPedidos();
+                } else {
+                    this.showError(data.resposta);
+                }
+            });
         }
     }
 };
@@ -373,6 +402,14 @@ export default {
                             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pelo Valor" />
                         </template>
                     </Column>
+                    <Column field="criador" header="Comprador" style="min-width: 12rem">
+                        <template #body="{ data }">
+                            {{ data.criador }}
+                        </template>
+                        <template #filter="{ filterModel, filterCallback }">
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pelo comprador" />
+                        </template>
+                    </Column>
                     <Column field="descricao" header="Fornecedor" style="min-width: 12rem">
                         <template #body="{ data }">
                             {{ data.descricao }}
@@ -439,6 +476,9 @@ export default {
                                     icon="pi pi-print"
                                     class="p-button-secondary"
                                 />
+
+                                <!-- Botão de Envio -->
+                                <Button @click.prevent="confirmEnvio(slotProps.data.id, slotProps.data.criador)" icon="pi pi-pencil" class="p-button-warning" />
                             </div>
                         </template>
                     </Column>
@@ -482,7 +522,15 @@ export default {
                             {{ data.valor_formatado }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pelo Valor" />
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pelo valor" />
+                        </template>
+                    </Column>
+                    <Column field="criador" header="Comprador" style="min-width: 12rem">
+                        <template #body="{ data }">
+                            {{ data.criador }}
+                        </template>
+                        <template #filter="{ filterModel, filterCallback }">
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pelo comprador" />
                         </template>
                     </Column>
                     <Column field="descricao" header="Fornecedor" style="min-width: 12rem">
@@ -551,6 +599,9 @@ export default {
                                     icon="pi pi-print"
                                     class="p-button-secondary"
                                 />
+
+                                <!-- Botão de Envio -->
+                                <Button @click.prevent="confirmEnvio(slotProps.data.id, slotProps.data.criador)" icon="pi pi-pencil" class="p-button-warning" />
                             </div>
                         </template>
                     </Column>
