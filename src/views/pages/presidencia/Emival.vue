@@ -212,7 +212,7 @@ export default {
             this.$refs.pdfContainerAcima.appendChild(vieweracima);
             let adobeDCView = new AdobeDC.View({
                 clientId: 'e8c98881c48049bbb03b3c5d5db05129',
-                divId: 'vieweracima'
+                divId: 'vieweracima',
             });
             this.previewFilePromise = adobeDCView.previewFile(
                 {
@@ -845,13 +845,13 @@ export default {
         </div> -->
         <div class="assinatura" style="position: absolute; top: 680px; left: 40px; z-index: 10; display: flex; flex-wrap: wrap">
             <!-- Aqui você pode adicionar o componente ou imagem da assinatura -->
-            <div v-for="(message, index) in this.pedidoSelecionado.assinados" :key="index" style="margin-right: 20px">
+            <!-- <div v-for="(message, index) in this.pedidoSelecionado.assinados" :key="index" style="margin-right: 20px">
                 <span>
                     Documento Assinado Digitalmente por:
                     <br />
                     <b>@ {{ formattedMessage(message) }}</b>
                 </span>
-            </div>
+            </div> -->
         </div>
         <div class="grid flex justify-content-center">
             <div class="col-12 md:col-12">
@@ -913,13 +913,13 @@ export default {
                 <!-- Container para a assinatura -->
                 <div class="assinatura" style="position: absolute; top: 680px; left: 40px; z-index: 10; display: flex; flex-wrap: wrap">
                     <!-- Aqui você pode adicionar o componente ou imagem da assinatura -->
-                    <div v-for="(message, index) in this.pedidoSelecionado.assinados" :key="index" style="margin-right: 20px">
+                    <!-- <div v-for="(message, index) in this.pedidoSelecionado.assinados" :key="index" style="margin-right: 20px">
                         <span>
                             Documento Assinado Digitalmente por:
                             <br />
                             <b>@ {{ formattedMessage(message) }}</b>
                         </span>
-                    </div>
+                    </div> -->
                 </div>
 
                 <!-- Iframe para o PDF -->
