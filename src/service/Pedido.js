@@ -32,6 +32,25 @@ export default class PedidoService {
             });
     }
 
+    async enviarMensagem(id, mensagem) {
+        return fetch(`${API_URL}/app/enviar-mensagem/${id}/${mensagem}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
     async aprovarMonica(pedidos) {
         const pedidosJSON = JSON.stringify(pedidos); // Convertendo pedidos para JSON
         return fetch(`${API_URL}/app/aprovar-monica`, {
