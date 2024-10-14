@@ -212,7 +212,7 @@ export default {
             this.$refs.pdfContainerAcima.appendChild(vieweracima);
             let adobeDCView = new AdobeDC.View({
                 clientId: 'e8c98881c48049bbb03b3c5d5db05129',
-                divId: 'vieweracima'
+                divId: 'vieweracima',
             });
             this.previewFilePromise = adobeDCView.previewFile(
                 {
@@ -695,7 +695,7 @@ export default {
                   })
                 : 'Data não disponível';
 
-            const res = `${nomeUsuario} ${funcao} - ${dataAssinatura}`;
+            const res = `${nomeUsuario} | Data: ${dataAssinatura}`;
             return res;
         }
     }
@@ -835,13 +835,23 @@ export default {
         <div v-if="this.pedidoSelecionado.verifica_chat && this.pedidoSelecionado.status.id == 12" class="flex align-items-center justify-content-center">
             <InlineMessage class="mb-3 msg-aviso" severity="success"> RESPOSTA DO PEDIDO DE COMPRA APROVADO COM RESSALVA </InlineMessage>
         </div>
-        <div class="flex align-items-center justify-content-start" v-if="this.pedidoSelecionado.assinados.length > 0">
+        <!-- <div class="flex align-items-center justify-content-start" v-if="this.pedidoSelecionado.assinados.length > 0">
             <label for="buttondisplay" class="font-bold block mb-2">Autorizações: </label>
             <div v-for="(message, index) in this.pedidoSelecionado.assinados" :key="index">
                 <InlineMessage class="m-2" severity="success">
                     {{ formattedMessage(message) }}
                 </InlineMessage>
             </div>
+        </div> -->
+        <div class="assinatura" style="position: absolute; top: 680px; left: 40px; z-index: 10; display: flex; flex-wrap: wrap">
+            <!-- Aqui você pode adicionar o componente ou imagem da assinatura -->
+            <!-- <div v-for="(message, index) in this.pedidoSelecionado.assinados" :key="index" style="margin-right: 20px">
+                <span>
+                    Documento Assinado Digitalmente por:
+                    <br />
+                    <b>@ {{ formattedMessage(message) }}</b>
+                </span>
+            </div> -->
         </div>
         <div class="grid flex justify-content-center">
             <div class="col-12 md:col-12">
@@ -889,19 +899,33 @@ export default {
         <div v-if="this.pedidoSelecionado.verifica_chat && this.pedidoSelecionado.status.id == 12" class="flex align-items-center justify-content-center">
             <InlineMessage class="mb-3 msg-aviso" severity="success"> RESPOSTA DO PEDIDO DE COMPRA APROVADO COM RESSALVA </InlineMessage>
         </div>
-        <div class="flex align-items-center justify-content-start" v-if="this.pedidoSelecionado.assinados.length > 0">
+        <!-- <div class="flex align-items-center justify-content-start" v-if="this.pedidoSelecionado.assinados.length > 0">
             <label for="buttondisplay" class="font-bold block mb-2">Autorizações: </label>
             <div v-for="(message, index) in this.pedidoSelecionado.assinados" :key="index">
                 <InlineMessage class="m-2" severity="success">
                     {{ formattedMessage(message) }}
                 </InlineMessage>
             </div>
-        </div>
+        </div> -->
 
         <div class="grid justify-content-center">
-            <div class="col-12 md:col-12">
+            <div class="col-12 md:col-12" style="position: relative">
+                <!-- Container para a assinatura -->
+                <div class="assinatura" style="position: absolute; top: 680px; left: 40px; z-index: 10; display: flex; flex-wrap: wrap">
+                    <!-- Aqui você pode adicionar o componente ou imagem da assinatura -->
+                    <!-- <div v-for="(message, index) in this.pedidoSelecionado.assinados" :key="index" style="margin-right: 20px">
+                        <span>
+                            Documento Assinado Digitalmente por:
+                            <br />
+                            <b>@ {{ formattedMessage(message) }}</b>
+                        </span>
+                    </div> -->
+                </div>
+
+                <!-- Iframe para o PDF -->
                 <div ref="pdfContainerAcima" style="width: 100%; height: 750px; border: none"></div>
             </div>
+
             <div class="col-4 md:col-3">
                 <Button icon="pi pi-times" label="Pedido Anterior" class="p-button-secondary" style="width: 100%; height: 50px" @click.prevent="voltarAcima()" :disabled="this.currentIndex == 0" />
             </div>

@@ -474,7 +474,7 @@ export default {
                 <h6 class="titleForm">Formulário de Edição</h6>
                 <!-- <div class="field">
                     <label for="descricao">Urgente: </label><br />
-                    <InputSwitch :trueValue="1" :falseValue="0" :modelValue="form.urgente" v-model="form.urgente" />
+                    <InputSwitch :trueValue="1" :frealseValue="0" :modelValue="form.urgente" v-model="form.urgente" />
                 </div> -->
                 <div class="field">
                     <label for="empresa">Empresa:</label>
