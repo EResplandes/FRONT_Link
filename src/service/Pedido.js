@@ -1164,6 +1164,30 @@ export default class PedidoService {
             });
     }
 
+    aprovarGiovanaPdf(id_pedido, id_destino, anexo) {
+        const formData = new FormData();
+        formData.append('idPedido', id_pedido ?? null);
+        formData.append('idDestino', id_destino ?? null);
+        formData.append('anexo', anexo, 'arquivo.pdf'); // 'arquivo.pdf' é o nome que você deseja dar ao arquivo no servidor
+
+        return fetch(`${API_URL}/pedidos/aprovar-giovana-pdf/`, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            },
+            body: formData
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
     formatarDataParaYMD(data) {
         if (data) {
             const dia = String(data.getDate()).padStart(2, '0');

@@ -7,6 +7,7 @@ import StatusService from '../../../service/StatusService';
 import FluxoService from '../../../service/FluxoService';
 import GerenteService from '../../../service/GerenteService';
 import { FilterMatchMode } from 'primevue/api';
+import { PDFDocument, rgb } from 'pdf-lib';
 
 export default {
     data() {
@@ -20,12 +21,14 @@ export default {
             empresas: ref(null),
             pedidos: ref(null),
             status: ref(null),
+            pdfData: null,
             form: ref({
                 id_usuario: localStorage.getItem('usuario_id')
             }),
             urgente: ref(0),
             displayChat: ref(false),
             idFluxo: ref(null),
+            pedidoSelecionado: ref(null),
             preloading: ref(true),
             display: ref(false),
             novaMensagem: ref(null),
@@ -95,13 +98,65 @@ export default {
         },
 
         // Metódo responsável por diretor aprovar pedido
-        aprovarPedidoDiretor(idLink) {
-            this.gerenteService.aprovarPedidoDiretor(this.idFluxo, idLink, this.urgente).then((data) => {
-                this.display = false;
-                this.urgente = 0;
-                this.showSuccess('Pedido aprovado com sucesso!');
-                this.buscaPedidos();
-            });
+        async aprovarPedidoDiretor(idLink) {
+
+            // const pdfUrl = `http://127.0.0.1:8000/api/pdf/${this.pedidoSelecionado.id}`;
+            const pdfUrl = `https://link.gruporialma.com.br/api/pdf/${this.pedidoSelecionado.id}`;
+
+            try {
+                const response = await fetch(pdfUrl, { method: 'GET' });
+
+                if (!response.ok) {
+                    throw new Error('Erro ao carregar o PDF');
+                }
+
+                const arrayBuffer = await response.arrayBuffer();
+                this.pdfData = new Uint8Array(arrayBuffer);  // Armazena os dados do PDF
+                this.editPdf(idLink);
+            } catch (error) {
+                console.error('Erro ao carregar o PDF:', error);
+                alert('Erro ao carregar o PDF. Verifique a URL e tente novamente.');
+            }
+        },
+
+        async editPdf(idLink) {
+            try {
+                // Carregar o PDF
+                const pdfDoc = await PDFDocument.load(this.pdfData);
+                const pages = pdfDoc.getPages();
+
+                // Obter a primeira página
+                const firstPage = pages[0];
+
+                // Calcular a altura da página
+                const { width, height } = firstPage.getSize();
+
+                // Adicionar texto na altura desejada
+                const nome = localStorage.getItem('nome') || 'Nome não encontrado';
+                firstPage.drawText(`@${nome}`, {
+                    x: 155, // Posição horizontal
+                    y: height - 670, // Posição vertical a 50 unidades do topo
+                    size: 10,
+                    color: rgb(0, 0, 0),
+                });
+
+                // Salvar o PDF editado
+                const pdfBytes = await pdfDoc.save();
+
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+
+                this.gerenteService.aprovarPedidoGerente(this.idFluxo, idLink, this.urgente, blob).then((data) => {
+                    if (data.resposta.mensagem == 'Pedido aprovado com sucesso!') {
+                        this.showSuccess(data.resposta.mensagem);
+                        this.buscaPedidos();
+                        this.display = false;
+                    }
+                });
+
+            } catch (error) {
+                console.error('Erro ao editar o PDF:', error);
+                alert('Erro ao editar o PDF. Confira o console para mais detalhes.');
+            }
         },
 
         // Metódo responsável por reprovar fluxo
@@ -113,7 +168,6 @@ export default {
         geraLink(data) {
             let idPedido = data.pedido.id;
             let link = `https://link.gruporialma.com.br/site/#/aprovacao-externa/${idPedido}`;
-            // http://localhost:5173/site/#/aprovacao-externa/47 -> Exemplo
 
             // Cria um elemento de texto temporário
             const tempInput = document.createElement('input');
@@ -166,10 +220,10 @@ export default {
 
         // Metódo responsável por visualizar pdf
         visualizar(id, data) {
-            console.log(id);
-            console.log(data);
             this.idPedido = id;
+            this.idfluxo = data.id_fluxo;
             this.display = true;
+            this.pedidoSelecionado = data.pedido;
             if (data.pedido.status.status == 'Fluxo Reprovado') {
                 this.erroPedidoRepwrovado = true;
             }
@@ -206,7 +260,8 @@ export default {
         <Toast />
 
         <!-- Visualizar -->
-        <Dialog v-model:visible="display" maximizable modal header="Documento" :style="{ width: '80%' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="display" maximizable modal header="Documento" :style="{ width: '80%' }"
+            :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <div style="text-align: center; align-items: center; justify-content: center" class="flex items-center m">
                 <InputSwitch :trueValue="1" :falseValue="0" :modelValue="urgente" v-model="urgente" />
                 <label class="p-3" for="firstname2"><b>URGENTE?</b></label>
@@ -214,16 +269,20 @@ export default {
             <br />
             <div class="flex justify-content-center">
                 <div class="flex-1 m-1">
-                    <Button @click.prevent="aprovarPedidoDiretor(2)" icon="pi pi-check" label="Aprovar e Enviar Dr. Emival" class="p-button-success" style="width: 100%" />
+                    <Button @click.prevent="aprovarPedidoDiretor(2)" icon="pi pi-check"
+                        label="Aprovar e Enviar Dr. Emival" class="p-button-success" style="width: 100%" />
                 </div>
                 <div class="flex-1 m-1">
-                    <Button @click.prevent="aprovarPedidoDiretor(1)" icon="pi pi-check" label="Aprovar e Enviar Dr. Mônica" class="p-button-warning" style="width: 100%" />
+                    <Button @click.prevent="aprovarPedidoDiretor(1)" icon="pi pi-check"
+                        label="Aprovar e Enviar Dr. Mônica" class="p-button-warning" style="width: 100%" />
                 </div>
                 <div class="flex-1 m-1">
-                    <Button @click.prevent="aprovarPedidoDiretor(3)" icon="pi pi-check" label="Aprovar e Enviar Dr. Giovana" class="p-button-info" style="width: 100%" />
+                    <Button @click.prevent="aprovarPedidoDiretor(3)" icon="pi pi-check"
+                        label="Aprovar e Enviar Dr. Giovana" class="p-button-info" style="width: 100%" />
                 </div>
                 <div class="flex-1 m-1">
-                    <Button @click.prevent="reprovarPedido()" icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%" />
+                    <Button @click.prevent="reprovarPedido()" icon="pi pi-times" label="Reprovar"
+                        class="p-button-danger" style="width: 100%" />
                 </div>
             </div>
             <br />
@@ -239,7 +298,9 @@ export default {
                     <div class="card timeline-container">
                         <Timeline :value="conversa" align="alternate" class="customized-timeline">
                             <template #marker="slotProps">
-                                <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
+                                <span
+                                    class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2"
+                                    :style="{ backgroundColor: slotProps.item.color }">
                                     <i :class="slotProps.item.icon"></i>
                                 </span>
                             </template>
@@ -261,8 +322,10 @@ export default {
                         </Timeline>
                     </div>
                     <hr />
-                    <InputText class="col-12" type="text" v-model="this.novaMensagem" placeholder="Digite a mensagem..." />
-                    <Button @click.prevent="enviarMensagem()" label="Reprovar e enviar mensagem" class="mr-2 mt-3 p-button-success col-12" />
+                    <InputText class="col-12" type="text" v-model="this.novaMensagem"
+                        placeholder="Digite a mensagem..." />
+                    <Button @click.prevent="enviarMensagem()" label="Reprovar e enviar mensagem"
+                        class="mr-2 mt-3 p-button-success col-12" />
                 </div>
             </div>
         </Dialog>
@@ -272,26 +335,21 @@ export default {
             <div class="header-padrao">PEDIDOS PARA APROVAÇÃO</div>
 
             <div class="card">
-                <DataTable
-                    v-model:filters="filters"
-                    :value="pedidos"
-                    paginator
-                    :rows="10"
-                    dataKey="id"
+                <DataTable v-model:filters="filters" :value="pedidos" paginator :rows="10" dataKey="id"
                     :rowsPerPageOptions="[5, 10, 25, 50, 100]"
                     currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
-                    filterDisplay="row"
-                    :loading="loading"
-                    :globalFilterFields="['descricao', 'empresa.nome_empresa', 'country.name', 'representative.name', 'status.status']"
-                >
+                    filterDisplay="row" :loading="loading"
+                    :globalFilterFields="['descricao', 'empresa.nome_empresa', 'country.name', 'representative.name', 'status.status']">
                     <template #empty> Nenhum pedido encontrado. </template>
                     <template #loading> Loading customers data. Please wait. </template>
-                    <Column field="dt_inclusao_formatada" header="Dt. Inclusão" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
+                    <Column field="dt_inclusao_formatada" header="Dt. Inclusão" :showFilterMenu="false"
+                        :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
                         <template #body="{ data }">
                             {{ this.formatarData(data.pedido.dt_inclusao) }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Filtrar pela Dt. de Inclusão" />
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()"
+                                class="p-column-filter" placeholder="Filtrar pela Dt. de Inclusão" />
                         </template>
                     </Column>
                     <Column field="protheus" header="Nº Protheus" :showFilterMenu="false">
@@ -299,7 +357,8 @@ export default {
                             {{ data.pedido.protheus }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Filtrar pelo Nº Pedido Protheus" />
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()"
+                                class="p-column-filter" placeholder="Filtrar pelo Nº Pedido Protheus" />
                         </template>
                     </Column>
                     <Column field="valor_formatado" header="Valor" style="min-width: 12rem">
@@ -307,7 +366,8 @@ export default {
                             {{ data.valor_formatado }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pelo Valor" />
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()"
+                                class="p-column-filter" placeholder="Procurar pelo Valor" />
                         </template>
                     </Column>
                     <Column field="descricao" header="Fornecedor" style="min-width: 12rem">
@@ -315,15 +375,19 @@ export default {
                             {{ data.pedido.descricao }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Filtrar pela descrição" />
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()"
+                                class="p-column-filter" placeholder="Filtrar pela descrição" />
                         </template>
                     </Column>
-                    <Column field="empresa.nome_empresa" header="Empresa" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 8rem">
+                    <Column field="empresa.nome_empresa" header="Empresa" :showFilterMenu="false"
+                        :filterMenuStyle="{ width: '14rem' }" style="min-width: 8rem">
                         <template #body="{ data }">
                             {{ data.pedido.empresa.nome_empresa }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="empresas" placeholder="Selecione" class="p-column-filter" style="min-width: 10rem" :showClear="true">
+                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="empresas"
+                                placeholder="Selecione" class="p-column-filter" style="min-width: 10rem"
+                                :showClear="true">
                                 <template #option="slotProps">
                                     {{ slotProps.option }}
                                 </template>
@@ -335,7 +399,8 @@ export default {
                             {{ data.pedido.criador }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Filtrar por comprador" />
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()"
+                                class="p-column-filter" placeholder="Filtrar por comprador" />
                         </template>
                     </Column>
 
@@ -343,7 +408,8 @@ export default {
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
                             <div class="flex gap-2">
-                                <Button @click.prevent="visualizar(slotProps.data.id_fluxo, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
+                                <Button @click.prevent="visualizar(slotProps.data.id_fluxo, slotProps.data)"
+                                    icon="pi pi-eye" class="p-button-info" />
                             </div>
                         </template>
                     </Column>
@@ -392,8 +458,10 @@ export default {
 }
 
 .timeline-container {
-    max-height: 300px; /* Defina a altura máxima desejada */
-    overflow-y: auto; /* Adiciona uma barra de rolagem vertical quando o conteúdo excede a altura máxima */
+    max-height: 300px;
+    /* Defina a altura máxima desejada */
+    overflow-y: auto;
+    /* Adiciona uma barra de rolagem vertical quando o conteúdo excede a altura máxima */
 }
 
 .header-padrao {

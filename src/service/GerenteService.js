@@ -2,6 +2,12 @@ import API_URL from './config.js';
 
 const token = localStorage.getItem('token');
 
+const headers = {
+    Accept: 'application/pdf',
+    'Content-Type': 'application/pdf',
+    Authorization: 'Bearer ' + token
+};
+
 export default class GerenteService {
     async buscaPedidos(id) {
         return await fetch(`${API_URL}/pedidos/listar-gerente/` + id, {
@@ -59,7 +65,6 @@ export default class GerenteService {
     }
 
     async aprovarPedidoDiretor(id, idLink, urgente) {
-        console.log(id, idLink);
         return await fetch(`${API_URL}/pedidos/aprovar-fluxo-diretor/` + id + '/' + idLink + '/' + urgente, {
             method: 'GET',
             headers: {
@@ -146,6 +151,31 @@ export default class GerenteService {
                 id_usuario: parseInt(localStorage.getItem('usuario_id'), 10),
                 mensagem: novaMensagem
             })
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    aprovarPedidoGerente(id_fluxo, id_link, urgente, anexo) {
+        const formData = new FormData();
+        formData.append('idFluxo', id_fluxo ?? null);
+        formData.append('idLink', id_link ?? null);
+        formData.append('urgente', urgente) ?? 0;
+        formData.append('anexo', anexo, 'arquivo.pdf'); // 'arquivo.pdf' é o nome que você deseja dar ao arquivo no servidor
+
+        return fetch(`${API_URL}/gerente/aprovar-pedido-gerente`, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            },
+            body: formData
         })
             .then((res) => res.json())
             .then((d) => {
