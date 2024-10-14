@@ -673,7 +673,9 @@ export default {
                                             'Enviado para Pagamento',
                                             'Enviado para Emival',
                                             'Enviado para Giovana',
-                                            'Enviado para Monica'
+                                            'Enviado para Monica',
+                                            'Mensagem Emival',
+                                            'Reprovado'
                                         ].includes(slotProps.data.status.status)
                                     "
                                     @click.prevent="alterar(slotProps.data.id, slotProps.data.status)"

@@ -483,7 +483,7 @@ export default class PedidoService {
 
     async mensagemPedidoUnico(dados) {
         console.log(dados)
-        return await fetch(`${API_URL}/app/mensagem-acima/${dados[0].id}/${dados[0].mensagem}`, {
+        return await fetch(`${API_URL}/app/enviar-mensagem/${dados[0].id}/${dados[0].mensagem}`, {
             method: 'PUT',
             headers: {
                 Accept: 'application/json',

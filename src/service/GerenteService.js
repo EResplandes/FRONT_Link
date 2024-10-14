@@ -133,4 +133,27 @@ export default class GerenteService {
                 throw error;
             });
     }
+
+    async respondeMensagemEmival(novaMensagem, id_pedido) {
+        return await fetch(`${API_URL}/gerente/responde-mensagem-emival/` + id_pedido, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                id_usuario: parseInt(localStorage.getItem('usuario_id'), 10),
+                mensagem: novaMensagem
+            })
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
 }
