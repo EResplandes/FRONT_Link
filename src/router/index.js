@@ -189,6 +189,11 @@ const router = createRouter({
                     component: () => import('@/views/pages/presidencia/Emival.vue')
                 },
                 {
+                    path: '/emival-novo',
+                    name: 'emival-novo',
+                    component: () => import('@/views/pages/presidencia/Emival2.vue')
+                },
+                {
                     path: '/monica',
                     name: 'monica',
                     component: () => import('@/views/pages/presidencia/Monica.vue')

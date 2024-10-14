@@ -462,6 +462,25 @@ export default class PedidoService {
             });
     }
 
+    async mensagemPedidoUnico(dados) {
+        console.log(dados)
+        return await fetch(`${API_URL}/app/mensagem-acima/${dados[0].id}/${dados[0].mensagem}`, {
+            method: 'PUT',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
     // Requisição responsável por buscar quantidades
     async buscaQuantidades() {
         return await fetch(`${API_URL}/app/listarQuantidades`, {
@@ -660,7 +679,7 @@ export default class PedidoService {
                 throw error;
             });
     }
-    
+
     // Requisição responsável por buscar pedidos com status 15 - Enviado para financeiro
     async buscaPedidosFinanceiro() {
         return await fetch(`${API_URL}/pedidos/listar-pedidos-financeiro`, {
@@ -1107,24 +1126,24 @@ export default class PedidoService {
             });
     }
 
-        // Requisição responsável por enviar pedido para comprador justificar
-        async enviarPedidoComprador(id) {
-            return await fetch(`${API_URL}/pedidos/enviar-pedido-comprador/${id}`, {
-                method: 'GET',
-                headers: {
-                    Accept: 'application/json',
-                    Authorization: 'Bearer ' + token
-                }
+    // Requisição responsável por enviar pedido para comprador justificar
+    async enviarPedidoComprador(id) {
+        return await fetch(`${API_URL}/pedidos/enviar-pedido-comprador/${id}`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
             })
-                .then((res) => res.json())
-                .then((d) => {
-                    return d;
-                })
-                .catch((error) => {
-                    console.error('Error:', error);
-                    throw error;
-                });
-        }
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
 
     formatarDataParaYMD(data) {
         if (data) {
