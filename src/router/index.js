@@ -154,6 +154,11 @@ const router = createRouter({
                     component: () => import('@/views/pages/gerente/JustificarPedidosGerente.vue')
                 },
                 {
+                    path: '/pedidos-gerentes',
+                    name: 'pedidos-gerentes',
+                    component: () => import('@/views/pages/gerente/TodosPedidos.vue')
+                },
+                {
                     path: '/aprovacao-externa/:id_pedido',
                     name: 'aprovacao-externa',
                     component: () => import('@/views/pages/gerente/AprovacaoExterna.vue')

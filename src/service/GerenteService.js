@@ -186,4 +186,23 @@ export default class GerenteService {
                 throw error;
             });
     }
+
+    async buscaTodosPedidosGerente(id_gerente) {
+        return await fetch(`${API_URL}/gerente/listar-pedidos/` + id_gerente, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
 }
