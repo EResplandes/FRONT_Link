@@ -119,6 +119,8 @@ export default {
                     dt_inclusao_formatada: this.formatarData(pedido.dt_inclusao),
                     valor_formatado: pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
                 }));
+
+                this.form = {};
                 this.preloading = false;
                 this.showInfo('Filtro aplicado com sucesso!');
             });
