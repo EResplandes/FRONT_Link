@@ -308,12 +308,16 @@ export default {
 
             <div class="p-fluid formgrid grid justify-content-center">
                 <div class="field col-2 md:col-2">
-                    <label for="firstname2">Dt de Início <span class="obrigatorio">*</span></label>
-                    <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de vencimento'" v-model="form.dt_inicio" showIcon iconDisplay="input" />
+                    <label for="firstname2">Dt de Início</label>
+                    <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data'" v-model="form.dt_inicio" showIcon iconDisplay="input" />
                 </div>
                 <div class="field col-2 md:col-2">
-                    <label for="firstname2">Dt Fim <span class="obrigatorio">*</span></label>
-                    <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de vencimento'" v-model="form.dt_fim" showIcon iconDisplay="input" />
+                    <label for="firstname2">Dt Fim</label>
+                    <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data'" v-model="form.dt_fim" showIcon iconDisplay="input" />
+                </div>
+                <div class="field col-2 md:col-2">
+                    <label for="firstname2">Nº Pedido</label>
+                    <InputNumber v-tooltip.top="'Digite o número do pedido'" v-model="form.numero_pedido" showIcon iconDisplay="input" />
                 </div>
                 <div class="field col-2 md:col-2">
                     <label style="color: white" for="firstname2">.</label><br />

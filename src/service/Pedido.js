@@ -941,7 +941,8 @@ export default class PedidoService {
             },
             body: JSON.stringify({
                 dt_inicio: this.formatarDataParaYMD(form.dt_inicio),
-                dt_fim: this.formatarDataParaYMD(form.dt_fim)
+                dt_fim: this.formatarDataParaYMD(form.dt_fim),
+                numero_pedido: form?.numero_pedido
             })
         })
             .then((res) => res.json())
