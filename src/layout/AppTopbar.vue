@@ -5,6 +5,8 @@ import { useRouter } from 'vue-router';
 import API_URL from '../service/config';
 import { useToast } from 'primevue/usetoast';
 import RelatorioService from '../service/RelatorioService';
+import AutenticacaoService from '../service/AutenticacaoService';
+import Dialog from 'primevue/dialog';
 
 const { layoutConfig, onMenuToggle, setScale } = useLayout();
 
@@ -12,10 +14,14 @@ const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
 const router = useRouter();
 const relatorioService = new RelatorioService();
+const autenticacaoService = new AutenticacaoService();
 const visible = ref(false);
 const toast = useToast();
 const pedidos = ref(null);
 const nomeUsuario = localStorage.getItem('nome');
+const nova_senha_repitida = ref(null);
+const nova_senha = ref(null);
+const erro_senhas = ref(null);
 
 onMounted(() => {
     decrementScale(1);
@@ -23,22 +29,40 @@ onMounted(() => {
 
     const token = localStorage.getItem('token');
     const status = localStorage.getItem('status_usuario');
+    const acesso = localStorage.getItem('p_acesso');
 
     // Verifica se o usuário está logado
     if (token == '' || token == null || token == undefined) {
         router.push('/auth/login'); // Mandando para tela login
     }
 
+    // Verifica se usuário logado é o Dr. Emival para não resetar a senha dele
+    if (nomeUsuario != 'Emival Caiado' && acesso == 1) {
+        visible.value = true;
+    } else {
+        visible.value = false;
+    }
+
     relatorioService.buscaStatusPedidosPessoa(localStorage.getItem('usuario_id')).then((data) => {
         pedidos.value = data.informacoes;
     });
-
-    // // Verifica se o usuário está ativo, se não estiver ele deslogado o usuário
-    // if (status != 'Ativo') {
-    //     localStorage.clear();
-    //     router.push('/auth/access'); // Mandando para tela login
-    // }
 });
+
+const alteraSenhaAtual = () => {
+    erro_senhas.value = false;
+
+    if (nova_senha.value == nova_senha_repitida.value) {
+        autenticacaoService.alteraSenha(nova_senha.value, localStorage.getItem('usuario_id')).then((data) => {
+            if (data.resposta == 'Senha alterada com sucesso!') {
+                showSuccess();
+                visible.value = false;
+                localStorage.setItem('p_acesso', '0');
+            }
+        });
+    } else {
+        erro_senhas.value = true;
+    }
+};
 
 const decrementScale = (v) => {
     setScale(layoutConfig.scale.value - v);
@@ -113,10 +137,36 @@ const onClose = () => {
 const applyRowStyle = () => {
     return '#1ea97c';
 };
+
+const showSuccess = () => {
+    toast.add({ severity: 'success', summary: 'NOVA MENSAMGEM:', detail: 'Senha alterada com sucesso!', life: 3000 });
+};
 </script>
 
 <template>
+    <Toast />
+
     <div class="layout-topbar">
+        <Dialog :closable="false" v-model:visible="visible" modal header="MUDANÇA DE SENHA" :style="{ width: '40rem' }">
+            <hr />
+            <span class="text-surface-500 dark:text-surface-400 block mb-5">Bem-vindo(a)! Para garantir a segurança da sua conta, é necessário definir uma nova senha no seu primeiro acesso. </span>
+            <hr />
+            <div class="mb-3">
+                <label for="email" class="font-semibold block mb-3">DIGITE UMA NOVA SENHA:</label>
+                <Password id="password1" v-model="nova_senha" placeholder="Digite sua senha..." :feedback="false" :toggleMask="true" class="w-full mb-3" inputClass="w-full" :inputStyle="{ padding: '1rem' }"></Password>
+            </div>
+            <div class="mb-5">
+                <label for="email" class="font-semibold block mb-3">DIGITE NOVAMENTE:</label>
+                <Password id="password1" v-model="nova_senha_repitida" placeholder="Digite sua senha..." :feedback="false" :toggleMask="true" class="w-full mb-3" inputClass="w-full" :inputStyle="{ padding: '1rem' }"></Password>
+            </div>
+            <div v-if="erro_senhas" class="mb-5">
+                <Message severity="error">As senhas digitadas devem ser iguais.</Message>
+            </div>
+            <div class="flex justify-end gap-2">
+                <Button class="w-full" type="button" label="Salvar" severity="info" @click="alteraSenhaAtual()"></Button>
+            </div>
+        </Dialog>
+
         <router-link to="/" class="layout-topbar-logo">
             <img :src="logoUrl" alt="logo" />
         </router-link>
