@@ -461,13 +461,12 @@ export default {
                         </Timeline>
                     </div>
                     <hr />
-                    <InputText class="col-12" type="text" v-model="novaMensagem" placeholder="Digite a mensagem..." />
-                    <Button @click.prevent="enviarMensagem()" label="Enviar" class="mr-2 mt-3 p-button-success col-12" />
-                    <Button @click.prevent="this.displayAnexo = true" label="Alterar Pedido" class="mr-2 mt-3 p-button-secondary col-12" />
+                    <InputText v-if="this.dadosPedidos.status.status != 'Reprovado' || this.dadosPedidos.status.status != 'Correção Pendente'" class="col-12" type="text" v-model="novaMensagem" placeholder="Digite a mensagem..." />
+                    <Button v-if="this.dadosPedidos.status.status != 'Reprovado' || this.dadosPedidos.status.status != 'Correção Pendente'" @click.prevent="enviarMensagem()" label="Enviar" class="mr-2 mt-3 p-button-success col-12" />
                 </div>
             </div>
         </Dialog>
-
+        F
         <!-- Alterar informações pedido -->
         <Sidebar style="width: 500px" v-model:visible="displayAlteracao" :baseZIndex="1000" position="right">
             <div class="card p-fluid">
@@ -685,7 +684,7 @@ export default {
 
                                 <!-- Botão de Chat -->
                                 <Button
-                                    v-if="['Reprovado por Soleni', 'Fluxo Reprovado'].includes(slotProps.data.status.status)"
+                                    v-if="['Reprovado por Soleni', 'Fluxo Reprovado', 'Reprovado', 'Correção Pendente'].includes(slotProps.data.status.status)"
                                     @click.prevent="chat(slotProps.data.id, slotProps.data)"
                                     icon="pi pi-comments"
                                     class="p-button-secondary"
