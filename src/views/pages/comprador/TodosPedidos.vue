@@ -466,7 +466,7 @@ export default {
                 </div>
             </div>
         </Dialog>
-        F
+
         <!-- Alterar informações pedido -->
         <Sidebar style="width: 500px" v-model:visible="displayAlteracao" :baseZIndex="1000" position="right">
             <div class="card p-fluid">
