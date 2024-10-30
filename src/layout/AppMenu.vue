@@ -16,7 +16,7 @@ const model = ref([
     {
         label: 'Gestor de Fluxo',
         items: [
-            { label: 'Pedidos com Emival', icon: 'pi pi-fw pi-book', to: '/pedidos-emival', requiredRole: ['Gestor de Fluxo', 'Administrador'] },
+            { label: 'Pedidos com Emival', icon: 'pi pi-fw pi-book', to: '/pedidos-emiva-gestor-fluxo', requiredRole: ['Gestor de Fluxo', 'Administrador'] },
             {
                 label: 'Pedidos com Monica',
                 icon: 'pi pi-fw pi-book',

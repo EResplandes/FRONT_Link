@@ -93,6 +93,25 @@ export default class PedidoService {
             });
     }
 
+    // Requisição responsável por listar todos pedidos com emival para o Gestor de Fluxo
+    async pedidosEmivalGestorFluxo() {
+        return await fetch(`${API_URL}/pedidos/listar-emival-gestor-fluxo`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
     // Requisição responsável por definir pedido como urgente pela soleni
     async pedidoUrgente(idPedido) {
         return await fetch(`${API_URL}/pedidos/alterar-urgente/${idPedido}`, {
@@ -482,7 +501,7 @@ export default class PedidoService {
     }
 
     async mensagemPedidoUnico(dados) {
-        console.log(dados)
+        console.log(dados);
         return await fetch(`${API_URL}/app/enviar-mensagem/${dados[0].id}/${dados[0].mensagem}`, {
             method: 'PUT',
             headers: {

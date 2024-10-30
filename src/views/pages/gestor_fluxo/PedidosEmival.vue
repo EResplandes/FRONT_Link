@@ -30,7 +30,7 @@ export default {
 
     mounted: function () {
         // Metódo responsável por buscar todas os pedidos com Emival
-        this.pedidoService.pedidosEmival().then((data) => {
+        this.pedidoService.pedidosEmivalGestorFluxo().then((data) => {
             this.pedidos = data.pedidos;
             this.preloading = false;
         });

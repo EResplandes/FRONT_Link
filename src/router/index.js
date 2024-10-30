@@ -19,6 +19,11 @@ const router = createRouter({
                     component: () => import('@/views/pages/pedidos/PedidosEmival.vue')
                 },
                 {
+                    path: '/pedidos-emiva-gestor-fluxo',
+                    name: 'pedidos-emival-gestor-fluxo',
+                    component: () => import('@/views/pages/gestor_fluxo/PedidosEmival.vue')
+                },
+                {
                     path: '/pedidos-antecipados',
                     name: 'pedidos-antecipados',
                     component: () => import('@/views/pages/presidencia/PedidosAntecipados.vue')
