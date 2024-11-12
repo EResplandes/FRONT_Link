@@ -41,6 +41,8 @@ const segundos = pad(dataAtual.getSeconds());
 const dataHoraFormatada = `${dia}/${mes}/${ano} às ${horas}:${minutos}:${segundos}`;
 
 export function generatePDF(data) {
+    console.log(data);
+
     // Verifica o status do pedido
     const statusDoPedido = data.pedido[0].status;
 
@@ -146,6 +148,11 @@ export function generatePDF(data) {
         alternateRowStyles: { fillColor: [255, 255, 255] }, // Cor de fundo das linhas alternadas da tabela
         bodyStyles: { halign: 'center', fontSize: 8 }
     });
+
+    const compradorText = `Comprador: ${data.pedido[0].comprador}`;
+    const pageWidth = doc.internal.pageSize.width;
+    doc.setFontSize(10);
+    doc.text(compradorText, pageWidth - doc.getTextWidth(compradorText) - 10, doc.lastAutoTable.finalY + 10); // 10 unidades de margem da borda direita
 
     // Se o status do pedido for "Aprovado com Ressalva", faça a requisição fetch
     if (statusDoPedido === 'Aprovado com Ressalva') {
