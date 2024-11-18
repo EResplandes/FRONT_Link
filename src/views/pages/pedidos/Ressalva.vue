@@ -109,7 +109,6 @@ export default {
         enviarMensagem() {
             this.preloading = true;
             this.pedidoService.respondePedidoRessalva(this.novaMensagem, this.id_pedido).then((data) => {
-                console.log(data);
                 if (data.resposta == 'Pedido respondido com sucesso!') {
                     this.showSuccess('Pedido respondido com sucesso!');
                     this.displayChat = false;

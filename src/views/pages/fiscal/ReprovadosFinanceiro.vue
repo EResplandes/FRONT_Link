@@ -74,7 +74,6 @@ export default {
         chat(id) {
             this.id_pedido = id;
             this.chatService.buscaConversa(id).then((data) => {
-                console.log(data);
                 this.conversa = data.conversa;
                 this.displayChat = true;
 

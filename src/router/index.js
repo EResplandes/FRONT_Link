@@ -159,6 +159,16 @@ const router = createRouter({
                     component: () => import('@/views/pages/gerente/JustificarPedidosGerente.vue')
                 },
                 {
+                    path: '/justificar-pedidos-dp',
+                    name: 'justificar-pedidos-dp',
+                    component: () => import('@/views/pages/dp/JustificarPedidosDp.vue')
+                },
+                {
+                    path: '/todos-pedidos-dp',
+                    name: 'todos-pedidos-dp',
+                    component: () => import('@/views/pages/dp/TodosPedidos.vue')
+                },
+                {
                     path: '/pedidos-gerentes',
                     name: 'pedidos-gerentes',
                     component: () => import('@/views/pages/gerente/TodosPedidos.vue')

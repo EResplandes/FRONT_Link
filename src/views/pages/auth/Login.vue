@@ -37,7 +37,6 @@ export default {
                         this.addMessage('error');
                     } else {
                         // Salva no localStorage os dados do usuário
-                        console.log(data.usuario[0].id);
                         localStorage.clear();
                         localStorage.setItem('token', data.token);
                         localStorage.setItem('usuario_id', data.usuario[0].id);

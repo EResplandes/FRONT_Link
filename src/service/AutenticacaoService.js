@@ -44,7 +44,6 @@ export default class AutenticacaoService {
     }
 
     async alteraSenha(nova_senha, id_usuario) {
-        console.log(nova_senha, id_usuario);
         return await fetch(`${API_URL}/autenticacao/alterar-senha/` + id_usuario, {
             method: 'POST',
             headers: {

@@ -6,6 +6,8 @@ import PedidoService from '../../../service/Pedido';
 import EmpresaService from '../../../service/EmpresaService';
 import StatusService from '../../../service/StatusService';
 import ChatService from '../../../service/ChatService';
+import LocalService from '../../../service/LocalService';
+import DpService from '../../../service/DpService';
 import { generatePDF } from '../comprador/aprovacao';
 import { FilterMatchMode } from 'primevue/api';
 
@@ -13,20 +15,22 @@ export default {
     data() {
         return {
             toast: new useToast(),
-            displayConfirmation: ref(false),
             pedidoService: new PedidoService(),
             empresaService: new EmpresaService(),
             statusService: new StatusService(),
+            dpService: new DpService(),
+            localService: new LocalService(),
             chatService: new ChatService(),
-            displayConfirmationActivation: ref(false),
-            visibleRight: ref(false),
             confirm: new useConfirm(),
-            loading1: ref(null),
+            idPedido: ref(null),
             empresas: ref([]),
+            empresa: ref([]),
+            local: ref([]),
             pedidos: ref(null),
+            pedidosSemFluxo: ref(null),
+            novaMensagem: ref(null),
             status: ref(null),
             form: ref({}),
-            editar: ref(false),
             preloading: ref(true),
             displayChat: ref(false),
             display: ref(false),
@@ -39,11 +43,12 @@ export default {
                 global: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 protheus: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 descricao: { value: null, matchMode: FilterMatchMode.CONTAINS },
-                'local.local': { value: null, matchMode: FilterMatchMode.CONTAINS },
+                criador: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 dt_inclusao_formatada: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 'empresa.nome_empresa': { value: null, matchMode: FilterMatchMode.CONTAINS },
-                status: { value: null, matchMode: FilterMatchMode.IN },
-                valor_formatado: { value: null, matchMode: FilterMatchMode.CONTAINS }
+                status: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                valor_formatado: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                'local.local': { value: null, matchMode: FilterMatchMode.CONTAINS }
             },
             loading: true
         };
@@ -51,17 +56,22 @@ export default {
 
     mounted: function () {
         // Metódo responsável por buscar todas os pedidos
-        this.pedidoService.buscaTodosPedidosExternos().then((data) => {
-            this.pedidos = data.pedidos.map((pedido) => ({
+        this.dpService.listarPedidosParaJustificar().then((data) => {
+            this.pedidos = data.pedidos_sem_fluxo.map((pedido) => ({
                 ...pedido,
                 dt_inclusao_formatada: this.formatarData(pedido.dt_inclusao),
-                valor_formatado: pedido.valor.toLocaleString('pt-BR', {
-                    style: 'currency',
-                    currency: 'BRL'
-                })
+                valor_formatado: pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
             }));
+
             this.preloading = false;
             this.loading = false;
+        });
+
+        // Metódo responsável por buscar todas empresas
+        this.empresaService.buscaEmpresas().then((data) => {
+            if (data.resposta == 'Empresas listados com sucesso!') {
+                this.empresa = data.empresas;
+            }
         });
 
         // Metódo responsável por buscar todas empresas
@@ -74,7 +84,21 @@ export default {
         // Metódo responsável por buscar todos status
         this.statusService.buscaStatus().then((data) => {
             if (data.resposta == 'Status listados com sucesso!') {
-                this.status = data.itens;
+                this.status = data.itens.map((status) => status.status);
+            }
+        });
+
+        // Metódo responsável por buscar todos os locais
+        this.localService.buscaLocais().then((data) => {
+            if (data.resposta == 'Locais listados com sucesso!') {
+                const locais = data.locais || []; // Garante que locais é um array
+
+                // Mapeia o array pegando apenas o nome do campo "local"
+                const nomesLocais = locais.map((local) => local.local);
+
+                // Atribui o array de nomes à propriedade local
+                this.local = nomesLocais;
+                this.preloading = false;
             }
         });
     },
@@ -91,18 +115,16 @@ export default {
             }
         },
 
-        buscaInformacoesPedido(id) {
-            this.preloading = true;
-            this.pedidoService.buscaInformacoesPedido(id).then((data) => {
-                this.imprimirAutorizacao(data);
-            });
-        },
         // Metódo responsável por buscar todos pedidos
         buscaPedidos() {
-            this.preloading = true;
-            this.pedidoService.buscaTodosPedidosExternos().then((data) => {
-                this.pedidos = data.pedidos;
+            this.dpService.listarPedidosParaJustificar().then((data) => {
+                this.pedidos = data.pedidos_sem_fluxo.map((pedido) => ({
+                    ...pedido,
+                    dt_inclusao_formatada: this.formatarData(pedido.dt_inclusao),
+                    valor_formatado: pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                }));
                 this.preloading = false;
+                this.loading = false;
             });
         },
 
@@ -131,6 +153,8 @@ export default {
         },
 
         chat(id, data) {
+            this.dadosPedidos = data;
+            this.idPedido = id;
             this.displayChat = true;
             this.chatService.buscaConversa(id).then((data) => {
                 if (data.resposta == 'Chat listado com sucesso!') {
@@ -146,68 +170,16 @@ export default {
             });
         },
 
-        filtrar() {
-            this.preloading = true;
-
-            this.pedidoService.buscaTodosPedidosExternosComFiltro(this.form).then((data) => {
-                if (data.resposta == 'Pedidos listados com sucesso!') {
-                    this.pedidos = data.pedidos;
-                    this.showInfo('Filtro aplicado com sucesso!');
-                } else {
-                    this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
-                }
-
-                this.preloading = false;
-            });
-        },
-
         showSuccess(mensagem) {
-            this.toast.add({
-                severity: 'success',
-                summary: 'Sucesso!',
-                detail: mensagem,
-                life: 3000
-            });
+            this.toast.add({ severity: 'success', summary: 'Sucesso!', detail: mensagem, life: 3000 });
         },
 
         showInfo(mensagem) {
-            this.toast.add({
-                severity: 'info',
-                summary: 'Aviso!',
-                detail: mensagem,
-                life: 3000
-            });
+            this.toast.add({ severity: 'info', summary: 'Aviso!', detail: mensagem, life: 3000 });
         },
 
         showError(mensagem) {
-            this.toast.add({
-                severity: 'error',
-                summary: 'Ocorreu um erro!',
-                detail: mensagem,
-                life: 3000
-            });
-        },
-
-        // Metódo responsável por buscar pedidos com filtros
-        buscaFiltros() {
-            this.preloading = true;
-            this.pedidoService.filtroPedidos(this.form).then((data) => {
-                if (data.resposta == 'Pedidos para o Dr. Emival Caiado!') {
-                    this.pedidos = data.pedidos;
-                    this.form = {};
-                    this.showInfo('Filtros aplicados com sucesso!');
-                    this.preloading = false;
-                } else {
-                    this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
-                }
-            });
-        },
-
-        // Metódo responsável por limpagem de filtros
-        limparFiltro() {
-            this.buscaPedidos();
-            this.showInfo('Filtro removidos com sucesso!');
-            this.form = {};
+            this.toast.add({ severity: 'error', summary: 'Ocorreu um erro!', detail: mensagem, life: 3000 });
         },
 
         getStatus(dados) {
@@ -258,27 +230,99 @@ export default {
                 case 'Enviado para Emival':
                     return 'info';
 
-                case 'negotiation':
+                case 'Enviado para Fiscal':
                     return 'warning';
 
                 case 'renewal':
                     return null;
             }
+        },
+
+        enviarMensagem() {
+            // Caso pedido tenha sido reprovado por Emival e esteja com status Reprovado
+            if (this.dadosPedidos.status.status == 'Reprovado') {
+                this.preloading = true;
+                this.pedidoService.respondePedidoReprovado(this.pdf, this.novaMensagem, this.idPedido).then((data) => {
+                    if (data.resposta == 'Mensagem enviada com sucesso!') {
+                        this.showSuccess('Mensagem enviada com sucesso!');
+                        this.displayChat = false;
+                        this.buscaPedidos();
+                        this.novaMensagem = '';
+                    } else {
+                        this.showError('Ocorreu algum problema, entre em contato com o Administrador');
+                    }
+                });
+            } else if (this.dadosPedidos.status.status == 'Aprovado com Ressalva') {
+                this.preloading = true;
+                this.pedidoService.respondePedidoRessalva(this.novaMensagem, this.idPedido).then((data) => {
+                    if (data.resposta == 'Pedido respondido com sucesso!') {
+                        this.showSuccess('Mensagem enviada com sucesso!');
+                        this.displayChat = false;
+                        this.buscaPedidos();
+                        this.novaMensagem = '';
+                    } else {
+                        this.showError('Ocorreu algum problema, entre em contato com o Administrador');
+                    }
+                });
+            } else {
+                this.preloading = true;
+                this.gerenteService.respondeMensagemEmival(this.novaMensagem, this.idPedido).then((data) => {
+                    if (data.resposta == 'Pedido respondido com sucesso!') {
+                        this.showSuccess(data.resposta);
+                        this.displayChat = false;
+                        this.buscaPedidos();
+                        this.novaMensagem = '';
+                    } else {
+                        this.showError('Ocorreu algum problema, entre em contato com o Administrador');
+                    }
+                });
+            }
+        },
+
+        // Modal de confirmação para envio de pedido
+        confirmEnvio(id_pedido, comprador) {
+            this.confirm.require({
+                message: `Tem certeza de que deseja enviar o pedido de compra para o comprador: ${comprador}?`,
+                header: 'Envio de Pedido',
+                icon: 'pi pi-info-circle',
+                rejectLabel: 'Cancelar',
+                acceptLabel: 'Enviar',
+                rejectClass: 'p-button-secondary p-button-outlined',
+                acceptClass: 'p-button-warning',
+                accept: () => {
+                    this.enviarPedidoComprador(id_pedido);
+                },
+                reject: () => {}
+            });
+        },
+
+        // Metódo responsável por enviar pedido
+        enviarPedidoComprador(id_pedido) {
+            this.pedidoService.enviarPedidoComprador(id_pedido).then((data) => {
+                if (data.resposta == 'Pedido enviado para comprador com sucesso!') {
+                    this.showSuccess(data.resposta);
+                    this.buscaPedidos();
+                } else {
+                    this.showError(data.resposta);
+                }
+            });
         }
     }
 };
 </script>
 
 <template>
-    <div style="z-index: 99" v-if="preloading" class="full-screen-spinner">
+    <!-- <div style="z-index: 99" v-if="preloading" class="full-screen-spinner">
         <ProgressSpinner />
-    </div>
+    </div> -->
     <div class="grid">
         <Toast />
         <!-- Visualizar -->
         <Dialog header="Documento" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
             <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
         </Dialog>
+
+        <ConfirmDialog></ConfirmDialog>
 
         <!-- Chat -->
         <Dialog header="Chat" v-model:visible="displayChat" :style="{ width: '40%' }" :modal="true">
@@ -309,35 +353,15 @@ export default {
                         </Timeline>
                     </div>
                     <hr />
+                    <InputText class="col-12" type="text" v-model="novaMensagem" placeholder="Digite a mensagem..." />
+                    <Button @click.prevent="enviarMensagem()" label="Enviar" class="mr-2 mt-3 p-button-success col-12" />
                 </div>
             </div>
         </Dialog>
 
         <!-- Tabela com todos pedidos -->
         <div class="col-12">
-            <div class="col-12 lg:col-6">
-                <Toast />
-            </div>
-
-            <div class="p-fluid formgrid grid justify-content-center">
-                <div class="field col-2 md:col-2">
-                    <label for="firstname2">Dt de Início <span class="obrigatorio">*</span></label>
-                    <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de vencimento'" v-model="form.dt_inicio" showIcon iconDisplay="input" />
-                </div>
-                <div class="field col-2 md:col-2">
-                    <label for="firstname2">Dt Fim <span class="obrigatorio">*</span></label>
-                    <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data de vencimento'" v-model="form.dt_fim" showIcon iconDisplay="input" />
-                </div>
-                <div class="field col-2 md:col-2">
-                    <label style="color: white" for="firstname2">.</label><br />
-                    <Button label="Pesquisar" @click.prevent="filtrar()" icon="pi pi-search" class="p-button-info" />
-                </div>
-                <div class="field col-2 md:col-2">
-                    <label style="color: white" for="firstname2">.</label><br />
-                    <Button label="Limpar Filtros" @click.prevent="limparFiltro()" icon="pi pi-search" class="p-button-danger" />
-                </div>
-            </div>
-
+            <div style="margin-top: 10px" class="header-padrao">JUSTIFICAR PEDIDOS</div>
             <div class="card">
                 <DataTable
                     v-model:filters="filters"
@@ -345,9 +369,11 @@ export default {
                     paginator
                     :rows="10"
                     dataKey="id"
+                    :rowsPerPageOptions="[5, 10, 25, 50, 100]"
+                    currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
                     filterDisplay="row"
                     :loading="loading"
-                    :globalFilterFields="['descricao', 'empresa.nome_empresa', 'country.name', 'representative.name', 'status']"
+                    :globalFilterFields="['descricao', 'empresa.nome_empresa', 'country.name', 'representative.name', 'status.status']"
                 >
                     <template #empty> Nenhum Pedido Encontrado. </template>
                     <template #loading> Loading customers data. Please wait. </template>
@@ -356,15 +382,15 @@ export default {
                             {{ data.dt_inclusao_formatada }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pela Dt. de Inclusão" />
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Filtrar pela Dt. de Inclusão" />
                         </template>
                     </Column>
-                    <Column field="protheus" header="Nº Protheus" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
+                    <Column field="protheus" header="Nº Protheus" :showFilterMenu="false">
                         <template #body="{ data }">
                             {{ data.protheus }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pela Dt. de Inclusão" />
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Filtrar pelo Nº Pedido Protheus" />
                         </template>
                     </Column>
                     <Column field="valor_formatado" header="Valor" style="min-width: 12rem">
@@ -372,74 +398,94 @@ export default {
                             {{ data.valor_formatado }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pelo Valor" />
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pelo valor" />
                         </template>
                     </Column>
-
+                    <Column field="criador" header="Comprador" style="min-width: 12rem">
+                        <template #body="{ data }">
+                            {{ data.criador }}
+                        </template>
+                        <template #filter="{ filterModel, filterCallback }">
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pelo comprador" />
+                        </template>
+                    </Column>
                     <Column field="descricao" header="Fornecedor" style="min-width: 12rem">
                         <template #body="{ data }">
                             {{ data.descricao }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pelo fornecedor" />
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Filtrar pela descrição" />
                         </template>
                     </Column>
-
-                    <Column field="local.local" header="Local" style="min-width: 12rem">
-                        <template #body="{ data }">
-                            {{ data.local.local }}
-                        </template>
-                        <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pela Descrição" />
-                        </template>
-                    </Column>
-
-                    <Column field="empresa.nome_empresa" header="Empresa" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
+                    <Column field="empresa.nome_empresa" header="Empresa" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 8rem">
                         <template #body="{ data }">
                             {{ data.empresa.nome_empresa }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="empresas" placeholder="Selecione uma Empresa" class="p-column-filter" style="min-width: 12rem" :showClear="true">
+                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="empresas" placeholder="Selecione" class="p-column-filter" style="min-width: 10rem" :showClear="true">
                                 <template #option="slotProps">
                                     {{ slotProps.option }}
                                 </template>
                             </Dropdown>
                         </template>
                     </Column>
-
-                    <Column header="Status" filterField="status" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 16rem">
+                    <Column field="local.local" header="Local" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 8rem">
+                        <template #body="{ data }">
+                            {{ data.local.local }}
+                        </template>
+                        <template #filter="{ filterModel, filterCallback }">
+                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="local" placeholder="Selecione" class="p-column-filter" style="min-width: 10rem" :showClear="true">
+                                <template #option="slotProps">
+                                    {{ slotProps.option }}
+                                </template>
+                            </Dropdown>
+                        </template>
+                    </Column>
+                    <Column header="Status" filterField="status" :showFilterMenu="false" :filterMenuStyle="{ width: '10rem' }" style="min-width: 10rem">
                         <template #body="{ data }">
                             <div class="flex align-items-center gap-2">
                                 <Tag :value="getStatus(data)" :severity="getSeverity(data.status.status)" />
                             </div>
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <MultiSelect v-model="filterModel.value" @change="filterCallback()" :options="status" optionLabel="status" placeholder="Todos" class="p-column-filter" style="min-width: 16rem" :maxSelectedLabels="1">
+                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="status" placeholder="Selecione" class="p-column-filter" style="min-width: 10rem" :showClear="true">
                                 <template #option="slotProps">
-                                    <div class="flex align-items-center gap-2">
-                                        <span>{{ slotProps.option.status }}</span>
-                                    </div>
+                                    {{ slotProps.option }}
                                 </template>
-                            </MultiSelect>
+                            </Dropdown>
                         </template>
                     </Column>
                     <Column field="..." header="..." :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
                             <div class="flex gap-2">
-                                <!-- Botão de Visualizar -->
                                 <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
 
-                                <!-- Botão de Chat (exibido condicionalmente) -->
-                                <Button v-if="['Reprovado', 'Aprovado com Ressalva'].includes(slotProps.data.status.status)" @click.prevent="chat(slotProps.data.id, slotProps.data)" icon="pi pi-comments" class="p-button-secon" />
+                                <!-- Botão de Chat -->
+                                <Button v-if="['Aprovado com Ressalva', 'Reprovado'].includes(slotProps.data.status.status)" @click.prevent="chat(slotProps.data.id, slotProps.data)" icon="pi pi-comments" class="p-button-secondary" />
 
-                                <!-- Botão de Imprimir (exibido condicionalmente) -->
-                                <Button v-if="['Aprovado', 'Aprovado com Ressalva'].includes(slotProps.data.status.status)" @click.prevent="buscaInformacoesPedido(slotProps.data.id)" icon="pi pi-print" class="p-button-secondary" />
+                                <!-- Botão de Imprimir -->
+                                <Button
+                                    v-if="
+                                        ['Aprovado', 'Aprovado com Ressalva', 'Resposta do Pedido de Compra Aprovado com Ressalva', 'Retorno do Pedido de Compra Aprovado com Ressalva', 'Enviado para Fiscal', 'Enviado para Financeiro'].includes(
+                                            slotProps.data.status.status
+                                        )
+                                    "
+                                    @click.prevent="buscaInformacoesPedido(slotProps.data.id)"
+                                    icon="pi pi-print"
+                                    class="p-button-secondary"
+                                />
+
+                                <!-- Botão de Envio -->
+                                <Button @click.prevent="confirmEnvio(slotProps.data.id, slotProps.data.criador)" icon="pi pi-pencil" class="p-button-warning" />
                             </div>
                         </template>
                     </Column>
                 </DataTable>
             </div>
+        </div>
+        <div class="col-12 lg:col-6">
+            <Toast />
         </div>
     </div>
 </template>
@@ -487,5 +533,15 @@ export default {
     /* Defina a altura máxima desejada */
     overflow-y: auto;
     /* Adiciona uma barra de rolagem vertical quando o conteúdo excede a altura máxima */
+}
+
+.header-padrao {
+    background-color: #3b82f6;
+    color: white;
+    font-weight: 600;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    text-align: center;
 }
 </style>

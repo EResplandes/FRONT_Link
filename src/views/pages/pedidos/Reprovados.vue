@@ -66,7 +66,6 @@ export default {
         // Metódo responsável por buscar todas os pedidos reprovados
         this.pedidoService.buscaReprovados(localStorage.getItem('local_id')).then((data) => {
             this.pedidos = data.pedidos;
-            console.log(data);
             this.preloading = false;
         });
 
@@ -99,7 +98,6 @@ export default {
         chat(id) {
             this.id_pedido = id;
             this.chatService.buscaConversa(id).then((data) => {
-                console.log(data);
                 this.conversa = data.conversa;
                 this.displayChat = true;
             });

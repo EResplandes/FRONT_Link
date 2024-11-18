@@ -48,7 +48,6 @@ export default {
 
         // Metódo responsável por buscar todos os bancos
         this.bancoService.listarBancos().then((data) => {
-            console.log(data);
             this.bancos = data.bancos;
         });
     },

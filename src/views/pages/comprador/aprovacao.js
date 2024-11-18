@@ -41,7 +41,6 @@ const segundos = pad(dataAtual.getSeconds());
 const dataHoraFormatada = `${dia}/${mes}/${ano} às ${horas}:${minutos}:${segundos}`;
 
 export function generatePDF(data) {
-    console.log(data);
 
     // Verifica o status do pedido
     const statusDoPedido = data.pedido[0].status;
@@ -173,7 +172,6 @@ export function generatePDF(data) {
                 if (data.resposta && data.conversa && data.conversa.length > 0) {
                     const mensagemResposta = data.resposta;
                     const conversa = data.conversa.map((item) => `${item.id_usuario.name}: ${item.mensagem}`).join('\n');
-                    console.log(data);
                     // Adiciona as mensagens ao documento PDF
                     doc.setFontSize(10);
 

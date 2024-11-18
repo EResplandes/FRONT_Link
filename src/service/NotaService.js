@@ -89,7 +89,6 @@ export default class NotaService {
 
     // Requisição responsável por dar baixa em nota
     async darBaixa(id, form) {
-        console.log(form);
         return await fetch(`${API_URL}/notas/dar-baixa/${id}`, {
             method: 'POST',
             headers: {

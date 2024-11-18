@@ -24,7 +24,6 @@ export default {
                 this.relatorioService.buscaPedidosAprovados(this.data).then((data) => {
                     this.preloading = false;
                     try {
-                        console.log(data.pedidos);
                         generatePDF(data.pedidos);
                         this.showSuccess('Relatório gerado com sucesso!');
                     } catch (error) {

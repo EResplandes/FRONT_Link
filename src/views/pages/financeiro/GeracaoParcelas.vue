@@ -45,7 +45,6 @@ export default {
         this.pedidoService.buscaPedidosFinanceiro().then((data) => {
             this.pedidos = data.pedidos;
             this.preloading = false;
-            console.log(data);
         });
     },
 

@@ -49,7 +49,6 @@ export default {
         this.notaService.pedidosReprovadosFiscalPorComprador(localStorage.getItem('usuario_id')).then((data) => {
             this.preloading = false;
             this.pedidos = data.pedidos;
-            console.log(data);
         });
 
         // Metódo responsável por buscar todas empresas
@@ -80,7 +79,6 @@ export default {
         // Metódo responsável por buscar chat
         chat(id) {
             this.chatService.buscaConversa(id).then((data) => {
-                console.log(data);
                 this.conversa = data.conversa;
                 this.displayChat = true;
             });

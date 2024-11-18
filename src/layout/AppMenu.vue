@@ -31,6 +31,21 @@ const model = ref([
         ]
     },
     {
+        label: 'Departamento Pessoal',
+        items: [
+            { label: 'Pedidos com Emival', icon: 'pi pi-fw pi-users', to: '/pedidos-emiva-gestor-fluxo', requiredRole: ['Comprador', 'Administrador'], requiredNome: ['Eduardo C. Resplandes', 'DP BRASÍLIA'] },
+            {
+                label: 'Pedidos com Monica',
+                icon: 'pi pi-fw pi-book',
+                to: '/pedidos-monica',
+                requiredRole: ['Comprador', 'Administrador'],
+                requiredNome: ['DP BRASÍLIA', 'Eduardo C. Resplandes']
+            },
+            { label: 'Justificar Pedidos', icon: 'pi pi-fw pi-book', to: '/justificar-pedidos-dp', requiredRole: ['Administrador', 'Comprador'], requiredNome: ['Eduardo C. Resplandes', 'DP BRASÍLIA'] },
+            { label: 'Todos Pedidos', icon: 'pi pi-fw pi-book', to: '/todos-pedidos-dp', requiredRole: ['Administrador', 'Comprador'], requiredNome: ['Eduardo C. Resplandes', 'DP BRASÍLIA'] }
+        ]
+    },
+    {
         label: 'Comparação de Preços',
         items: [{ label: 'Consulta', icon: 'pi pi-fw pi-book', to: '/consulta-precos', requiredRole: ['Apresentação'] }]
     },

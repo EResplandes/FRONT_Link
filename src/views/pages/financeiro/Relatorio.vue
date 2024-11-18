@@ -37,7 +37,6 @@ export default {
     mounted: function () {
         // Metódo responsável por buscar todas os pedidos
         this.pedidoService.pedidosAuditoriaFinanceiro().then((data) => {
-            console.log(data);
             this.pedidos = data.pedidos;
             this.preloading = false;
             this.totalPedidos = data.totalPedidos;

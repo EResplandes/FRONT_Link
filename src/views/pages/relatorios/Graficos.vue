@@ -15,7 +15,6 @@ export default {
     mounted: function () {
         this.relatorioService.buscaInformacoesGrafico().then((data) => {
             this.informacoes = data.informacoes;
-            console.log(data);
             this.chartData = this.setChartData(this.informacoes);
             this.chartOptions = this.setChartOptions();
         });

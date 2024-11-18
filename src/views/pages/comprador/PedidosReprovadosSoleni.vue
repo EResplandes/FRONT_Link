@@ -46,7 +46,6 @@ export default {
     mounted: function () {
         // Metódo responsável por buscar todas os pedidos reprovados por gerente com status 10
         this.pedidoService.buscaReprovadosSoleni(localStorage.getItem('usuario_id')).then((data) => {
-            console.log(data);
             this.pedidos = data.pedidos;
             this.preloading = false;
         });
@@ -80,7 +79,6 @@ export default {
         chat(id) {
             this.id_pedido = id;
             this.chatService.buscaConversa(id).then((data) => {
-                console.log(data);
                 this.conversa = data.conversa;
                 this.displayChat = true;
             });
