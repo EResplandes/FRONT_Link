@@ -112,6 +112,25 @@ export default class PedidoService {
             });
     }
 
+    // Requisição responsável por listar todos pedidos com emival somente da DP
+    async pedidosEmivalDp() {
+        return await fetch(`${API_URL}/dp/listar-emival-dp`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
     // Requisição responsável por definir pedido como urgente pela soleni
     async pedidoUrgente(idPedido) {
         return await fetch(`${API_URL}/pedidos/alterar-urgente/${idPedido}`, {

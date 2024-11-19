@@ -21,7 +21,7 @@ const model = ref([
                 label: 'Pedidos com Monica',
                 icon: 'pi pi-fw pi-book',
                 to: '/pedidos-monica',
-                requiredRole: ['Gestor de Fluxo', 'Administrador', 'Gerente', 'Comprador Externo'],
+                requiredRole: ['Gestor de Fluxo', 'Administrador', 'Gerente'],
                 requiredNome: ['DP', 'Soleni', 'Eduardo C. Resplandes', 'Ana Paulino', 'Neide']
             },
             { label: 'Pedidos com Giovana', icon: 'pi pi-fw pi-book', to: '/pedidos-giovana', requiredRole: ['Gestor de Fluxo', 'Administrador'] },
@@ -33,7 +33,7 @@ const model = ref([
     {
         label: 'Departamento Pessoal',
         items: [
-            { label: 'Pedidos com Emival', icon: 'pi pi-fw pi-users', to: '/pedidos-emiva-gestor-fluxo', requiredRole: ['Comprador', 'Administrador', 'Comprador Externo'], requiredNome: ['Eduardo C. Resplandes', 'DP BRASÍLIA', 'DP'] },
+            { label: 'Pedidos com Emival', icon: 'pi pi-fw pi-users', to: '/pedidos-emival-dp', requiredRole: ['Comprador', 'Administrador', 'Comprador Externo'], requiredNome: ['Eduardo C. Resplandes', 'DP BRASÍLIA', 'DP'] },
             {
                 label: 'Pedidos com Monica',
                 icon: 'pi pi-fw pi-book',
