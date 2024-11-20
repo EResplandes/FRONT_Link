@@ -181,7 +181,7 @@ const showSuccess = () => {
 
         <div class="layout-topbar-menu" :class="topbarMenuClasses">
             <button @click="showTemplate" class="p-link layout-topbar-button" label="Sair">
-                <i class="pi pi-bell m-1"></i>
+                <i class="pi pi-unlock m-1"></i>
                 <i class="pi pi-use m-1"></i>
             </button>
             <button @click="logout()" class="p-link layout-topbar-button" label="Sair"><i class="pi pi-sign-out m-1"></i> Sair</button>
