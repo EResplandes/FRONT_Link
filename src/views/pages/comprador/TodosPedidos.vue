@@ -461,8 +461,8 @@ export default {
                         </Timeline>
                     </div>
                     <hr />
-                    <InputText v-if="this.dadosPedidos.status.status != 'Reprovado' || this.dadosPedidos.status.status != 'Correção Pendente'" class="col-12" type="text" v-model="novaMensagem" placeholder="Digite a mensagem..." />
-                    <Button v-if="this.dadosPedidos.status.status != 'Reprovado' || this.dadosPedidos.status.status != 'Correção Pendente'" @click.prevent="enviarMensagem()" label="Enviar" class="mr-2 mt-3 p-button-success col-12" />
+                    <InputText v-if="this.dadosPedidos.status.status != 'Reprovado' && this.dadosPedidos.status.status != 'Correção Pendente'" class="col-12" type="text" v-model="novaMensagem" placeholder="Digite a mensagem..." />
+                    <Button v-if="this.dadosPedidos.status.status != 'Reprovado' && this.dadosPedidos.status.status != 'Correção Pendente'" @click.prevent="enviarMensagem()" label="Enviar" class="mr-2 mt-3 p-button-success col-12" />
                 </div>
             </div>
         </Dialog>
