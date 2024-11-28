@@ -339,7 +339,7 @@ export default class PedidoService {
 
     // Requisição responsável por buscar todos pedidos
     async buscaTodosPedidos() {
-        return await fetch(`${API_URL}/pedidos/listar-pedidos/`, {
+        return await fetch(`${API_URL}/pedidos/listar-pedidos`, {
             method: 'GET',
             headers: {
                 Accept: 'application/json',

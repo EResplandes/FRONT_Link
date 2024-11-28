@@ -52,7 +52,7 @@ export default {
 
     mounted: function () {
         // Metódo responsável por buscar todas os pedidos
-        this.pedidoService.buscaTodosPedidos(localStorage.getItem('local_id')).then((data) => {
+        this.pedidoService.buscaTodosPedidos().then((data) => {
             this.pedidos = data.pedidos.map((pedido) => ({
                 ...pedido,
                 dt_inclusao_formatada: this.formatarData(pedido.dt_inclusao),

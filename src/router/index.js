@@ -144,6 +144,26 @@ const router = createRouter({
                     component: () => import('@/views/pages/pedidos/CadastroSemFluxo.vue')
                 },
                 {
+                    path: '/cadastro-lm',
+                    name: 'cadastro-lm',
+                    component: () => import('@/views/pages/lista-materiais/engenharia/CadastroLm.vue')
+                },
+                {
+                    path: '/todas-lms',
+                    name: 'todas-lms',
+                    component: () => import('@/views/pages/lista-materiais/gerente/TodasLms.vue')
+                },
+                {
+                    path: '/minhas-lms',
+                    name: 'minhas-lms',
+                    component: () => import('@/views/pages/lista-materiais/comprador/MinhasLms.vue')
+                },
+                {
+                    path: '/controle-lms-almoxarife',
+                    name: 'controle-lms-almoxarife',
+                    component: () => import('@/views/pages/lista-materiais/almoxarifado/MinhasLms.vue')
+                },
+                {
                     path: '/buscar-precos',
                     name: 'buscar-precos',
                     component: () => import('@/views/pages/comprador/Cotacao.vue')
