@@ -58,7 +58,7 @@ const model = ref([
         items: [
             { label: 'Para Aprovação', icon: 'pi pi-fw pi-reply', to: '/aprovacao-gerentes', requiredRole: ['Diretor', 'Gerente', 'Administrador'] },
             { label: 'Justificar Pedidos', icon: 'pi pi-fw pi-book', to: '/justificar-pedidos-gerente', requiredRole: ['Administrador', 'Diretor', 'Gerente'] },
-            { label: 'LMs', icon: 'pi pi-fw pi-book', to: '/todas-lms', requiredRole: ['Administrador', 'Diretor', 'Gerente'], requiredNome: ['Eduardo C. Resplandes', 'Paulo'] },
+            { label: 'LMs', icon: 'pi pi-fw pi-book', to: '/todas-lms', requiredRole: ['Administrador', 'Diretor', 'Gerente'], requiredNome: ['Eduardo C. Resplandes', 'Paulo', 'Cairo'] },
             { label: 'Todos', icon: 'pi pi-fw pi-book', to: '/todos-pedidos-soleni', requiredRole: ['Gerente', 'Administrador'] },
             { label: 'Todos Pedidos Associados', icon: 'pi pi-fw pi-book', to: '/pedidos-gerentes', requiredRole: ['Gerente', 'Administrador'] },
             { label: 'Pedidos com Emival', icon: 'pi pi-fw pi-book', to: '/pedidos-emival', requiredRole: ['Administrador', 'Gerente'] },
