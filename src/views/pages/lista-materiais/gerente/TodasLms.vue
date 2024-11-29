@@ -26,7 +26,8 @@ export default {
             compradorSelecionado: ref(null),
             modalAssociarComprador: ref(null),
             modalHistoricoLancamentos: ref(null),
-            modalVisualizarLm: ref(null)
+            modalVisualizarLm: ref(null),
+            validaGerenteResponsavel: localStorage.getItem('nome')
         };
     },
 
@@ -410,7 +411,13 @@ export default {
                 <Column header="...">
                     <template #body="slotProps">
                         <div class="flex gap-2">
-                            <Button icon="pi pi-pencil" @click.prevent="abrirModalAssociarComprador(slotProps.data.id)" class="p-button-rounded p-button-success" @click="editar(slotProps.data)" />
+                            <Button
+                                v-if="validaGerenteResponsavel == 'Paulo' || validaGerenteResponsavel == 'Eduardo C. Resplandes'"
+                                icon="pi pi-pencil"
+                                @click.prevent="abrirModalAssociarComprador(slotProps.data.id)"
+                                class="p-button-rounded p-button-success"
+                                @click="editar(slotProps.data)"
+                            />
                             <Button icon="pi pi-eye" @click.prevent="abrirModalVisualizarLm(slotProps.data)" class="p-button-rounded p-button-info" />
                             <Button icon="pi pi-comments" @click.prevent="abrirChatLm(slotProps.data)" class="p-button-rounded p-button-secondary" />
                             <!-- <Button icon="pi pi-trash" class="p-button-rounded p-button-danger" @click="deletar(slotProps.data)" /> -->
