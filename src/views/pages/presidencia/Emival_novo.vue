@@ -19,6 +19,7 @@ export default {
             urgente: ref(0),
             conversa: ref(null),
             displayChat: ref(false),
+            displayChatRessalva: ref(false),
             pedidoSelecionado: ref(null),
             pdfData: null,
             preloading: ref(true),
@@ -32,7 +33,7 @@ export default {
 
     mounted: function () {
         // Metódo responsável por buscar todos pedidos com Giovana
-        this.pedidoService.pedidosGiovana().then((data) => {
+        this.pedidoService.listarTodosPedidosEmivalTemp().then((data) => {
             this.pedidos = data.pedidos;
             this.preloading = false;
         });
@@ -42,92 +43,58 @@ export default {
         // Metódo responsável por buscar todos pedidos do usuário logado
         buscaPedidos() {
             this.preloading = true;
-            this.pedidoService.pedidosGiovana().then((data) => {
+            this.pedidoService.listarTodosPedidosEmivalTemp().then((data) => {
                 this.pedidos = data.pedidos;
                 this.preloading = false;
             });
         },
 
-        async aprovarPedido(idDestino) {
-            // const pdfUrl = `http://127.0.0.1:8000/api/pdf/${this.pedidoSelecionado.id}`;
-            const pdfUrl = `https://link.gruporialma.com.br/api/pdf/${this.pedidoSelecionado.id}`;
-
-            try {
-                const response = await fetch(pdfUrl, { method: 'GET' });
-
-                if (!response.ok) {
-                    throw new Error('Erro ao carregar o PDF');
-                }
-
-                const arrayBuffer = await response.arrayBuffer();
-                this.pdfData = new Uint8Array(arrayBuffer);  // Armazena os dados do PDF
-                this.editPdf(idDestino);
-            } catch (error) {
-                console.error('Erro ao carregar o PDF:', error);
-                alert('Erro ao carregar o PDF. Verifique a URL e tente novamente.');
-            }
-        },
-
-        async editPdf(idDestino) {
-            try {
-                // Carregar o PDF
-                const pdfDoc = await PDFDocument.load(this.pdfData);
-                const pages = pdfDoc.getPages();
-
-                // Obter a primeira página
-                const firstPage = pages[0];
-
-                // Calcular a altura da página
-                const { width, height } = firstPage.getSize();
-
-                // Adicionar texto na altura desejada
-                const nome = localStorage.getItem('nome') || 'Nome não encontrado';
-                firstPage.drawText(`@${nome}`, {
-                    x: 300, // Posição horizontal
-                    y: height - 670, // Posição vertical a 50 unidades do topo
-                    size: 10,
-                    color: rgb(0, 0, 0),
-                });
-
-                // Salvar o PDF editado
-                const pdfBytes = await pdfDoc.save();
-
-                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-
-                this.pedidoService.aprovarGiovanaPdf(this.pedidoSelecionado.id, idDestino, blob).then((data) => {
-                    if (data.resposta == 'Pedido aprovado com sucesso!') {
-                        this.showSuccess(data.resposta);
-                        this.buscaPedidos();
-                        this.display = false;
-                    }
-                });
-
-            } catch (error) {
-                console.error('Erro ao editar o PDF:', error);
-                alert('Erro ao editar o PDF. Confira o console para mais detalhes.');
-            }
-        },
-
-
         // Metódo responsável por reprovar fluxo
-        reprovarPedido() {
-            this.pedidoService.reprovarGiovana(this.idPedido, this.novaMensagem).then((data) => {
-                if (data.resposta == 'Pedido aprovado com sucesso!') {
-                    this.showSuccess('Pedido aprovado com sucesso!');
-                    this.buscaPedidos();
-                } else {
-                    this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
-                }
-
+        reprovarPedidoEmivalTemp() {
+            this.pedidoService.reprovarPedidoEmivalTemp(this.idPedido, this.novaMensagem).then((data) => {
+                this.showSuccess('Pedido reprovado com sucesso!');
+                this.buscaPedidos();
                 this.display = false;
                 this.displayChat = false;
                 this.preloading = false;
+                this.novaMensagem = '';
+            });
+        },
+
+        ressalvaPedidoEmivalTemp() {
+            this.pedidoService.ressalvaPedidoEmivalTemp(this.idPedido, this.novaMensagem).then((data) => {
+                this.showSuccess('Pedido com ressalva com sucesso!');
+                this.buscaPedidos();
+                this.displayChatRessalva = false;
+                this.display = false;
+                this.preloading = false;
+                this.novaMensagem = '';
+            });
+        },
+
+        // Metódo responsável por aprovar pedido
+        aprovar() {
+            this.pedidoService.aprovarPedidoEmivalTemp(this.idPedido).then((data) => {
+                this.showSuccess('Pedido aprovado com sucesso!');
+                this.buscaPedidos();
+                this.display = false;
             });
         },
 
         // Metódo responsável por reprovar fluxo
         chat(id) {
             this.displayChat = true;
+            this.chatService.buscaConversa(this.idPedido).then((data) => {
+                if (data.resposta == 'Chat listado com sucesso!') {
+                    this.conversa = data.conversa;
+                } else {
+                    this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
+                }
+            });
+        },
+
+        chatRessalva(id) {
+            this.displayChatRessalva = true;
             this.chatService.buscaConversa(this.idPedido).then((data) => {
                 if (data.resposta == 'Chat listado com sucesso!') {
                     this.conversa = data.conversa;
@@ -156,6 +123,10 @@ export default {
 
         // Metódo responsável por visualizar pdf
         visualizar(data) {
+            const dialog = document.querySelector('.p-dialog');
+            if (dialog) {
+                dialog.classList.add('p-dialog-maximized');
+            }
             this.display = true;
             this.pedidoSelecionado = data;
             this.idPedido = data.id;
@@ -192,38 +163,32 @@ export default {
         <Toast />
 
         <!-- Visualizar -->
-        <Dialog v-model:visible="display" maximizable modal header="Documento" :style="{ width: '80%' }"
-            :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <div class="flex justify-content-center">
-                <div class="flex-1 m-1">
-                    <Button @click.prevent="aprovarPedido(1)" icon="pi pi-check" label="Aprovar e Enviar Dr. Emival"
-                        class="p-button-success" style="width: 100%" />
-                </div>
-                <div class="flex-1 m-1">
-                    <Button @click.prevent="aprovarPedido(2)" icon="pi pi-check" label="Aprovar e Enviar Financeiro"
-                        class="p-button-info" style="width: 100%" />
-                </div>
-                <div class="flex-1 m-1">
-                    <Button @click.prevent="chat()" icon="pi pi-times" label="Reprovar" class="p-button-danger"
-                        style="width: 100%" />
-                </div>
-            </div>
-            <br />
+        <Dialog v-model:visible="display" :maximized="true" modal header="Documento" :style="{ width: '100%' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <div class="col-12 md:col-12">
                 <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
             </div>
+            <div class="flex justify-content-center">
+                <div class="flex-1 m-1">
+                    <Button @click.prevent="chat(1)" icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%" />
+                </div>
+                <div class="flex-1 m-1">
+                    <Button @click.prevent="chatRessalva(2)" icon="pi pi-check" label="Ressalva" class="p-button-info" style="width: 100%" />
+                </div>
+                <div class="flex-1 m-1">
+                    <Button @click.prevent="aprovar(1)" icon="pi pi-check" label="Aprovar" class="p-button-success" style="width: 100%" />
+                </div>
+            </div>
+            <br />
         </Dialog>
 
         <!-- Chat -->
-        <Dialog header="Chat" v-model:visible="displayChat" :style="{ width: '40%' }" :modal="true">
+        <Dialog header="Chat" v-model:visible="displayChat" :style="{ width: '60%' }" :modal="true">
             <div class="grid">
                 <div class="col-12">
                     <div class="card timeline-container">
                         <Timeline :value="conversa" align="alternate" class="customized-timeline">
                             <template #marker="slotProps">
-                                <span
-                                    class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2"
-                                    :style="{ backgroundColor: slotProps.item.color }">
+                                <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
                                     <i :class="slotProps.item.icon"></i>
                                 </span>
                             </template>
@@ -245,10 +210,43 @@ export default {
                         </Timeline>
                     </div>
                     <hr />
-                    <InputText class="col-12" type="text" v-model="this.novaMensagem"
-                        placeholder="Digite a mensagem..." />
-                    <Button @click.prevent="reprovarPedido()" label="Reprovar e enviar mensagem"
-                        class="mr-2 mt-3 p-button-success col-12" />
+                    <InputText class="col-12" type="text" v-model="this.novaMensagem" placeholder="Digite a mensagem..." />
+                    <Button @click.prevent="reprovarPedidoEmivalTemp()" label="Reprovar e enviar mensagem" class="mr-2 mt-3 p-button-success col-12" />
+                </div>
+            </div>
+        </Dialog>
+
+        <!-- Chat -->
+        <Dialog header="Chat" v-model:visible="displayChatRessalva" :style="{ width: '60%' }" :modal="true">
+            <div class="grid">
+                <div class="col-12">
+                    <div class="card timeline-container">
+                        <Timeline :value="conversa" align="alternate" class="customized-timeline">
+                            <template #marker="slotProps">
+                                <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
+                                    <i :class="slotProps.item.icon"></i>
+                                </span>
+                            </template>
+                            <template #content="slotProps">
+                                <Card>
+                                    <template #title>
+                                        {{ slotProps.item.id_usuario.name }}
+                                    </template>
+                                    <template #subtitle>
+                                        {{ this.formatarData(slotProps.item.data_mensagem) }}
+                                    </template>
+                                    <template #content>
+                                        <h6>
+                                            {{ slotProps.item.mensagem }}
+                                        </h6>
+                                    </template>
+                                </Card>
+                            </template>
+                        </Timeline>
+                    </div>
+                    <hr />
+                    <InputText class="col-12" type="text" v-model="this.novaMensagem" placeholder="Digite a mensagem..." />
+                    <Button @click.prevent="ressalvaPedidoEmivalTemp()" label="Reprovar e enviar mensagem" class="mr-2 mt-3 p-button-success col-12" />
                 </div>
             </div>
         </Dialog>
@@ -259,14 +257,22 @@ export default {
                 <Toast />
             </div>
             <div class="card">
-                <DataTable dataKey="id" :value="pedidos" :paginator="true" :rows="10"
+                <DataTable
+                    dataKey="id"
+                    :value="pedidos"
+                    :paginator="true"
+                    max
+                    :rows="10"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25, 50, 100]"
                     currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
-                    responsiveLayout="scroll" filterDisplay="menu" stripedRows>
+                    responsiveLayout="scroll"
+                    filterDisplay="menu"
+                    stripedRows
+                >
                     <template #header>
                         <div class="flex justify-content-between">
-                            <h5 for="empresa">Pedidos com Dr. Giovana</h5>
+                            <h5 for="empresa">Pedidos com Dr. Emival</h5>
                         </div>
                     </template>
                     <template #empty> Nenhum pedido encontrado! </template>
@@ -275,8 +281,7 @@ export default {
                     <Column field="" header="" class="w-1">
                         <template #body="slotProps">
                             <span class="p-column-title">Dt. Inclusão</span>
-                            <Tag v-if="slotProps.data.urgente == 1" class="mr-2" severity="danger" value="Urgente">
-                            </Tag>
+                            <Tag v-if="slotProps.data.urgente == 1" class="mr-2" severity="danger" value="Urgente"> </Tag>
                             <Tag v-else class="mr-2" severity="info" value="Normal"></Tag>
                         </template>
                     </Column>
@@ -285,20 +290,6 @@ export default {
                         <template #body="slotProps">
                             <span class="p-column-title">Dt. Inclusão</span>
                             {{ formatarData(slotProps.data.dt_inclusao) }}
-                        </template>
-                    </Column>
-
-                    <Column field="Nº Protheus" header="Nº Protheus" :sortable="true" class="w-1">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Nº Protheus</span>
-                            {{ slotProps.data.protheus }}
-                        </template>
-                    </Column>
-
-                    <Column field="Empresa" header="Empresa" :sortable="true" class="w-2">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Empresa</span>
-                            {{ slotProps.data.empresa?.nome_empresa }}
                         </template>
                     </Column>
 
@@ -333,8 +324,7 @@ export default {
                             <span class="p-column-title"></span>
                             <div class="grid">
                                 <div class="col-4 md:col-4 mr-3">
-                                    <Button @click.prevent="visualizar(slotProps.data)" icon="pi pi-eye"
-                                        class="p-button-info" />
+                                    <Button @click.prevent="visualizar(slotProps.data)" icon="pi pi-eye" class="p-button-info" />
                                 </div>
                             </div>
                         </template>

@@ -32,7 +32,7 @@ export default {
             preloading: ref(true),
             display: ref(false),
             novaMensagem: ref(null),
-            urlBase: 'https://link.gruporialma.com.br/storage',
+            urlBase: 'http://18.231.204.108/storage',
             pdf: ref(null),
             pdfsrc: ref(null),
             fluxoPedido: ref(null),
@@ -99,7 +99,6 @@ export default {
 
         // Metódo responsável por diretor aprovar pedido
         async aprovarPedidoDiretor(idLink) {
-
             // const pdfUrl = `http://127.0.0.1:8000/api/pdf/${this.pedidoSelecionado.id}`;
             const pdfUrl = `https://link.gruporialma.com.br/api/pdf/${this.pedidoSelecionado.id}`;
 
@@ -111,7 +110,7 @@ export default {
                 }
 
                 const arrayBuffer = await response.arrayBuffer();
-                this.pdfData = new Uint8Array(arrayBuffer);  // Armazena os dados do PDF
+                this.pdfData = new Uint8Array(arrayBuffer); // Armazena os dados do PDF
                 this.editPdf(idLink);
             } catch (error) {
                 console.error('Erro ao carregar o PDF:', error);
@@ -137,7 +136,7 @@ export default {
                     x: 155, // Posição horizontal
                     y: height - 670, // Posição vertical a 50 unidades do topo
                     size: 10,
-                    color: rgb(0, 0, 0),
+                    color: rgb(0, 0, 0)
                 });
 
                 // Salvar o PDF editado
@@ -152,7 +151,6 @@ export default {
                         this.display = false;
                     }
                 });
-
             } catch (error) {
                 console.error('Erro ao editar o PDF:', error);
                 alert('Erro ao editar o PDF. Confira o console para mais detalhes.');
@@ -260,8 +258,7 @@ export default {
         <Toast />
 
         <!-- Visualizar -->
-        <Dialog v-model:visible="display" maximizable modal header="Documento" :style="{ width: '80%' }"
-            :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="display" maximizable modal header="Documento" :style="{ width: '80%' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <div style="text-align: center; align-items: center; justify-content: center" class="flex items-center m">
                 <InputSwitch :trueValue="1" :falseValue="0" :modelValue="urgente" v-model="urgente" />
                 <label class="p-3" for="firstname2"><b>URGENTE?</b></label>
@@ -269,20 +266,10 @@ export default {
             <br />
             <div class="flex justify-content-center">
                 <div class="flex-1 m-1">
-                    <Button @click.prevent="aprovarPedidoDiretor(2)" icon="pi pi-check"
-                        label="Aprovar e Enviar Dr. Emival" class="p-button-success" style="width: 100%" />
+                    <Button @click.prevent="aprovarPedido()" icon="pi pi-check" label="Aprovar" class="p-button-success" style="width: 100%" />
                 </div>
                 <div class="flex-1 m-1">
-                    <Button @click.prevent="aprovarPedidoDiretor(1)" icon="pi pi-check"
-                        label="Aprovar e Enviar Dr. Mônica" class="p-button-warning" style="width: 100%" />
-                </div>
-                <div class="flex-1 m-1">
-                    <Button @click.prevent="aprovarPedidoDiretor(3)" icon="pi pi-check"
-                        label="Aprovar e Enviar Dr. Giovana" class="p-button-info" style="width: 100%" />
-                </div>
-                <div class="flex-1 m-1">
-                    <Button @click.prevent="reprovarPedido()" icon="pi pi-times" label="Reprovar"
-                        class="p-button-danger" style="width: 100%" />
+                    <Button @click.prevent="reprovarPedido()" icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%" />
                 </div>
             </div>
             <br />
@@ -298,9 +285,7 @@ export default {
                     <div class="card timeline-container">
                         <Timeline :value="conversa" align="alternate" class="customized-timeline">
                             <template #marker="slotProps">
-                                <span
-                                    class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2"
-                                    :style="{ backgroundColor: slotProps.item.color }">
+                                <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
                                     <i :class="slotProps.item.icon"></i>
                                 </span>
                             </template>
@@ -322,10 +307,8 @@ export default {
                         </Timeline>
                     </div>
                     <hr />
-                    <InputText class="col-12" type="text" v-model="this.novaMensagem"
-                        placeholder="Digite a mensagem..." />
-                    <Button @click.prevent="enviarMensagem()" label="Reprovar e enviar mensagem"
-                        class="mr-2 mt-3 p-button-success col-12" />
+                    <InputText class="col-12" type="text" v-model="this.novaMensagem" placeholder="Digite a mensagem..." />
+                    <Button @click.prevent="enviarMensagem()" label="Reprovar e enviar mensagem" class="mr-2 mt-3 p-button-success col-12" />
                 </div>
             </div>
         </Dialog>
@@ -335,21 +318,26 @@ export default {
             <div class="header-padrao">PEDIDOS PARA APROVAÇÃO</div>
 
             <div class="card">
-                <DataTable v-model:filters="filters" :value="pedidos" paginator :rows="10" dataKey="id"
+                <DataTable
+                    v-model:filters="filters"
+                    :value="pedidos"
+                    paginator
+                    :rows="10"
+                    dataKey="id"
                     :rowsPerPageOptions="[5, 10, 25, 50, 100]"
                     currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
-                    filterDisplay="row" :loading="loading"
-                    :globalFilterFields="['descricao', 'empresa.nome_empresa', 'country.name', 'representative.name', 'status.status']">
+                    filterDisplay="row"
+                    :loading="loading"
+                    :globalFilterFields="['descricao', 'empresa.nome_empresa', 'country.name', 'representative.name', 'status.status']"
+                >
                     <template #empty> Nenhum pedido encontrado. </template>
                     <template #loading> Loading customers data. Please wait. </template>
-                    <Column field="dt_inclusao_formatada" header="Dt. Inclusão" :showFilterMenu="false"
-                        :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
+                    <Column field="dt_inclusao_formatada" header="Dt. Inclusão" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
                         <template #body="{ data }">
                             {{ this.formatarData(data.pedido.dt_inclusao) }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()"
-                                class="p-column-filter" placeholder="Filtrar pela Dt. de Inclusão" />
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Filtrar pela Dt. de Inclusão" />
                         </template>
                     </Column>
                     <Column field="protheus" header="Nº Protheus" :showFilterMenu="false">
@@ -357,8 +345,7 @@ export default {
                             {{ data.pedido.protheus }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()"
-                                class="p-column-filter" placeholder="Filtrar pelo Nº Pedido Protheus" />
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Filtrar pelo Nº Pedido Protheus" />
                         </template>
                     </Column>
                     <Column field="valor_formatado" header="Valor" style="min-width: 12rem">
@@ -366,8 +353,7 @@ export default {
                             {{ data.valor_formatado }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()"
-                                class="p-column-filter" placeholder="Procurar pelo Valor" />
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pelo Valor" />
                         </template>
                     </Column>
                     <Column field="descricao" header="Fornecedor" style="min-width: 12rem">
@@ -375,19 +361,15 @@ export default {
                             {{ data.pedido.descricao }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()"
-                                class="p-column-filter" placeholder="Filtrar pela descrição" />
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Filtrar pela descrição" />
                         </template>
                     </Column>
-                    <Column field="empresa.nome_empresa" header="Empresa" :showFilterMenu="false"
-                        :filterMenuStyle="{ width: '14rem' }" style="min-width: 8rem">
+                    <Column field="empresa.nome_empresa" header="Empresa" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 8rem">
                         <template #body="{ data }">
                             {{ data.pedido.empresa.nome_empresa }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="empresas"
-                                placeholder="Selecione" class="p-column-filter" style="min-width: 10rem"
-                                :showClear="true">
+                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="empresas" placeholder="Selecione" class="p-column-filter" style="min-width: 10rem" :showClear="true">
                                 <template #option="slotProps">
                                     {{ slotProps.option }}
                                 </template>
@@ -399,8 +381,7 @@ export default {
                             {{ data.pedido.criador }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()"
-                                class="p-column-filter" placeholder="Filtrar por comprador" />
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Filtrar por comprador" />
                         </template>
                     </Column>
 
@@ -408,8 +389,7 @@ export default {
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
                             <div class="flex gap-2">
-                                <Button @click.prevent="visualizar(slotProps.data.id_fluxo, slotProps.data)"
-                                    icon="pi pi-eye" class="p-button-info" />
+                                <Button @click.prevent="visualizar(slotProps.data.id_fluxo, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
                             </div>
                         </template>
                     </Column>

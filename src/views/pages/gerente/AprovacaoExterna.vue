@@ -14,7 +14,7 @@ export default {
             route: useRoute(),
             gerenteService: new GerenteService(),
             pedidoExternoService: new PedidoExterno(),
-            urlBase: 'https://link.gruporialma.com.br/storage',
+            urlBase: 'http://18.231.204.108/storage',
             pdf: ref(null),
             pdfsrc: ref(null),
             informacoes: ref({}),

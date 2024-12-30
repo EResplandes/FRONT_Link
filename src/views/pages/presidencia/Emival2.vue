@@ -33,7 +33,7 @@ export default {
             quantidadesPedidos: ref({}),
             form: ref({}),
             pdfsrc: ref(null),
-            urlBase: 'https://link.gruporialma.com.br/storage', // Ambiente de Produção
+            urlBase: 'http://18.231.204.108/storage', // Ambiente de Produção
             adobeApiReady: false,
             previewFilePromise: null,
             titleDocumento: '',
@@ -181,7 +181,7 @@ export default {
             viewer.id = 'viewer';
             this.$refs.pdfContainer.appendChild(viewer);
             let adobeDCView = new AdobeDC.View({
-                clientId: 'e8c98881c48049bbb03b3c5d5db05129',
+                clientId: 'e554d20b8f714b768bbbae4b194fa',
                 divId: 'viewer'
             });
             this.previewFilePromise = adobeDCView.previewFile(
@@ -212,7 +212,7 @@ export default {
             vieweracima.id = 'vieweracima';
             this.$refs.pdfContainerAcima.appendChild(vieweracima);
             let adobeDCView = new AdobeDC.View({
-                clientId: 'e8c98881c48049bbb03b3c5d5db05129',
+                clientId: 'e554d20b8f714b768bbbae4b194fa',
                 divId: 'vieweracima'
             });
             this.previewFilePromise = adobeDCView.previewFile(

@@ -239,6 +239,11 @@ const router = createRouter({
                     component: () => import('@/views/pages/presidencia/Emival2.vue')
                 },
                 {
+                    path: '/emival-temporario',
+                    name: 'emival-temporario',
+                    component: () => import('@/views/pages/presidencia/Emival_novo.vue')
+                },
+                {
                     path: '/monica',
                     name: 'monica',
                     component: () => import('@/views/pages/presidencia/Monica.vue')

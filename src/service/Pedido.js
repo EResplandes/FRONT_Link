@@ -1121,6 +1121,109 @@ export default class PedidoService {
             });
     }
 
+    // Requisição responsável por listar todos pedidos com Emival de forma temporaria
+    async listarTodosPedidosEmivalTemp() {
+        return await fetch(`${API_URL}/app/listar-todos-pedidos-emival-temp`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    // Requisição responsável por listar todos pedidos com Giovana Caiado
+    async pedidosEmivalTodos() {
+        return await fetch(`${API_URL}/app/litar-todos-pedidos-emvail`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    // Requisição responsável aprovar pedido emival temp
+    async aprovarPedidoEmivalTemp(id) {
+        return await fetch(`${API_URL}/app/aprovar-pedido-emival-temp/${id}`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    reprovarPedidoEmivalTemp(idPedido, mensagem) {
+        return fetch(`${API_URL}/app/reprovar-pedido-emival-temp`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                id_pedido: idPedido,
+                mensagem: mensagem
+            })
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    ressalvaPedidoEmivalTemp(idPedido, mensagem) {
+        return fetch(`${API_URL}/app/ressalva-pedido-emival-temp`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                id_pedido: idPedido,
+                mensagem: mensagem
+            })
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
     // Requisição responsável aprovar pedido
     async aprovarGiovana(id, idDestino) {
         return await fetch(`${API_URL}/pedidos/aprovar-giovana/${id}/${idDestino}`, {

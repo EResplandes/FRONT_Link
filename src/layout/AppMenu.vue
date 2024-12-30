@@ -133,6 +133,7 @@ const model = ref([
         label: 'Presidência',
         items: [
             { label: 'Emival', icon: 'pi pi-fw pi-users', to: '/emival-novo', requiredRole: ['Presidente', 'Administrador'] },
+            { label: 'Emival Temp.', icon: 'pi pi-fw pi-users', to: '/emival-temporario', requiredRole: ['Presidente', 'Administrador'] },
             // { label: 'Emival 2.0', icon: 'pi pi-fw pi-users', to: '/emival-novo', requiredRole: ['Presidente', 'Administrador'] },
             { label: 'Giovana', icon: 'pi pi-fw pi-users', to: '/giovana', requiredRole: ['Diretor', 'Administrador'], requiredNome: ['Giovana', 'Eduardo C. Resplandes'] },
             { label: 'Auditoria', icon: 'pi pi-fw pi-book', to: '/pedidos-antecipados', requiredRole: ['Presidente', 'Administrador'] },

@@ -32,7 +32,7 @@ export default {
             quantidadesPedidos: ref({}),
             form: ref({}),
             pdfsrc: ref(null),
-            urlBase: 'https://link.gruporialma.com.br/storage', // Ambiente de Produção
+            urlBase: 'http://18.231.204.108/storage', // Ambiente de Produção
             adobeApiReady: false,
             previewFilePromise: null,
             titleDocumento: '',
@@ -897,27 +897,12 @@ export default {
         <div v-if="this.pedidoSelecionado.verifica_chat && this.pedidoSelecionado.status.id == 12" class="flex align-items-center justify-content-center">
             <InlineMessage class="mb-3 msg-aviso" severity="success"> RESPOSTA DO PEDIDO DE COMPRA APROVADO COM RESSALVA </InlineMessage>
         </div>
-        <!-- <div class="flex align-items-center justify-content-start" v-if="this.pedidoSelecionado.assinados.length > 0">
-            <label for="buttondisplay" class="font-bold block mb-2">Autorizações: </label>
-            <div v-for="(message, index) in this.pedidoSelecionado.assinados" :key="index">
-                <InlineMessage class="m-2" severity="success">
-                    {{ formattedMessage(message) }}
-                </InlineMessage>
-            </div>
-        </div> -->
 
         <div class="grid justify-content-center">
             <div class="col-12 md:col-12" style="position: relative">
                 <!-- Container para a assinatura -->
                 <div class="assinatura" style="position: absolute; top: 680px; left: 40px; z-index: 10; display: flex; flex-wrap: wrap">
-                    <!-- Aqui você pode adicionar o componente ou imagem da assinatura -->
-                    <!-- <div v-for="(message, index) in this.pedidoSelecionado.assinados" :key="index" style="margin-right: 20px">
-                        <span>
-                            Documento Assinado Digitalmente por:
-                            <br />
-                            <b>@ {{ formattedMessage(message) }}</b>
-                        </span>
-                    </div> -->
+                
                 </div>
 
                 <!-- Iframe para o PDF -->

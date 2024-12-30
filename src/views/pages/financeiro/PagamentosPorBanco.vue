@@ -22,7 +22,7 @@ export default {
             displayDiretorio: ref(false),
             display: ref(false),
             displayParcelas: ref(false),
-            urlBase: 'https://link.gruporialma.com.br/storage',
+            urlBase: 'http://18.231.204.108/storage',
             pdf: ref(null),
             bancos: ref(null),
             pdfsrc: ref(null),

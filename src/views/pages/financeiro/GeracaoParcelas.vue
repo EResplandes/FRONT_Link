@@ -28,7 +28,7 @@ export default {
             displayParcelas: ref(false),
             displayPedidoBoletoNota: ref(null),
             display: ref(false),
-            urlBase: 'https://link.gruporialma.com.br/storage',
+            urlBase: 'http://18.231.204.108/storage',
             pdf: ref(null),
             pdfsrc: ref(null),
             pdfsrcboleto: ref(null),
