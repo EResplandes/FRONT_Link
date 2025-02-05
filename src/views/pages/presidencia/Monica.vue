@@ -22,7 +22,7 @@ export default {
             displayAcima: ref(false),
             pedidoAcima: ref({}),
             pdfsrc: ref(null),
-            urlBase: 'http://18.231.204.108/storage', // Ambiente de Produção
+            urlBase: 'http://34.196.238.92/storage', // Ambiente de Produção
             adobeApiReady: false,
             previewFilePromise: null,
             titleDocumento: '',
@@ -341,6 +341,8 @@ export default {
 
         visualizarAcima(id, data) {
             this.pedidoSelecionado = data;
+            this.pdfsrc = this.urlBase + '/' + data.anexo;
+            console.log(this.pdfsrc);
             this.titleDocumento = `Pedido ${this.currentIndex + 1} de ${this.pedidos.length} Pedidos`;
             this.pedidoAcima = data;
             this.display = true;
@@ -436,8 +438,11 @@ export default {
                 </div>
             </div>
             <div class="grid flex justify-content-center">
-                <div class="col-12 md:col-12">
+                <!-- <div class="col-12 md:col-12">
                     <div ref="pdfContainerAcima" :style="pdfContainerStyle"></div>
+                </div> -->
+                <div class="col-12 md:col-12">
+                    <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
                 </div>
                 <div class="col-4 md:col-3">
                     <Button icon="pi pi-times" label="Pedido Anterior" class="p-button-secondary" style="width: 100%; height: 50px" @click.prevent="voltarAcima()" :disabled="this.currentIndex == 0" />

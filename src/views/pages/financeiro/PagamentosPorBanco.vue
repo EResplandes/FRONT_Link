@@ -22,7 +22,7 @@ export default {
             displayDiretorio: ref(false),
             display: ref(false),
             displayParcelas: ref(false),
-            urlBase: 'http://18.231.204.108/storage',
+            urlBase: 'http://34.196.238.92/storage',
             pdf: ref(null),
             bancos: ref(null),
             pdfsrc: ref(null),

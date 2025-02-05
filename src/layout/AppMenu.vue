@@ -21,8 +21,7 @@ const model = ref([
                 label: 'Pedidos com Monica',
                 icon: 'pi pi-fw pi-book',
                 to: '/pedidos-monica',
-                requiredRole: ['Gestor de Fluxo', 'Administrador', 'Gerente'],
-                requiredNome: ['DP', 'Soleni', 'Eduardo C. Resplandes', 'Ana Paulino', 'Neide']
+                requiredRole: ['Gestor de Fluxo', 'Administrador']
             },
             { label: 'Pedidos com Giovana', icon: 'pi pi-fw pi-book', to: '/pedidos-giovana', requiredRole: ['Gestor de Fluxo', 'Administrador'] },
             { label: 'Análise de Fluxo', icon: 'pi pi-fw pi-sitemap', to: '/gestor-fluxo', requiredRole: ['Gestor de Fluxo', 'Administrador'] },
@@ -60,8 +59,9 @@ const model = ref([
             { label: 'Justificar Pedidos', icon: 'pi pi-fw pi-book', to: '/justificar-pedidos-gerente', requiredRole: ['Administrador', 'Diretor', 'Gerente'] },
             { label: 'LMs', icon: 'pi pi-fw pi-book', to: '/todas-lms', requiredRole: ['Administrador', 'Diretor', 'Gerente'], requiredNome: ['Eduardo C. Resplandes', 'Paulo', 'Cairo'] },
             { label: 'Todos', icon: 'pi pi-fw pi-book', to: '/todos-pedidos-soleni', requiredRole: ['Gerente', 'Administrador'] },
-            { label: 'Todos Pedidos Associados', icon: 'pi pi-fw pi-book', to: '/pedidos-gerentes', requiredRole: ['Gerente', 'Administrador'] },
-            { label: 'Pedidos com Emival', icon: 'pi pi-fw pi-book', to: '/pedidos-emival', requiredRole: ['Administrador', 'Gerente'] },
+            { label: 'Todos Pedidos Associados', icon: 'pi pi-fw pi-book', to: '/pedidos-gerentes', requiredRole: ['Gerente', 'Administrador', 'Diretor'] },
+            { label: 'Pedidos com Emival', icon: 'pi pi-fw pi-book', to: '/pedidos-emival', requiredRole: ['Administrador', 'Gerente', 'Diretor'] },
+            { label: 'Pedidos com Mônica', icon: 'pi pi-fw pi-book', to: '/pedidos-monica', requiredRole: ['Administrador', 'Gerente', 'Diretor'] },
             { label: 'Pedidos com Giovana', icon: 'pi pi-fw pi-book', to: '/pedidos-giovana', requiredRole: ['Administrador', 'Gerente'] }
         ]
     },

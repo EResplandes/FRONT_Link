@@ -22,6 +22,7 @@ export default class CadastraPedidoService {
         formData.append('id_link', form?.link?.id ?? null);
         formData.append('id_empresa', form?.empresa?.id ?? null);
         formData.append('id_local', form?.local?.id ?? null);
+        formData.append('id_metodo', form?.metodos?.id ?? null);
         formData.append('id_criador', idCriador);
         formData.append('protheus', form?.protheus);
         formData.append('dt_emissao', this.formatarDataParaYMD(form?.dt_emissao));
@@ -55,6 +56,7 @@ export default class CadastraPedidoService {
         formData.append('id_link', form?.link?.id ?? null);
         formData.append('id_empresa', form?.empresa?.id ?? null);
         formData.append('id_local', form?.local?.id ?? null);
+        formData.append('id_metodo', form?.metodos?.id ?? null);
         formData.append('id_criador', localStorage.getItem('usuario_id'));
         formData.append('protheus', form?.protheus);
         formData.append('dt_emissao', this.formatarDataParaYMD(form?.dt_emissao));

@@ -25,7 +25,7 @@ export default {
             preloading: ref(true),
             display: ref(false),
             novaMensagem: ref(null),
-            urlBase: 'http://18.231.204.108/storage',
+            urlBase: 'http://34.196.238.92/storage',
             pdf: ref(null),
             pdfsrc: ref(null)
         };
@@ -63,7 +63,7 @@ export default {
 
         ressalvaPedidoEmivalTemp() {
             this.pedidoService.ressalvaPedidoEmivalTemp(this.idPedido, this.novaMensagem).then((data) => {
-                this.showSuccess('Pedido com ressalva com sucesso!');
+                this.showSuccess('Pedido aprovado com ressalva com sucesso!');
                 this.buscaPedidos();
                 this.displayChatRessalva = false;
                 this.display = false;
@@ -163,22 +163,19 @@ export default {
         <Toast />
 
         <!-- Visualizar -->
-        <Dialog v-model:visible="display" :maximized="true" modal header="Documento" :style="{ width: '100%' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <div class="col-12 md:col-12">
-                <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none"> Oops! ocorreu um erro. </iframe>
-            </div>
-            <div class="flex justify-content-center">
-                <div class="flex-1 m-1">
-                    <Button @click.prevent="chat(1)" icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%" />
+        <Dialog v-model:visible="display" :maximized="true" modal header="Documento" :style="{ width: '100%', height: '100vh', margin: '0', padding: '0' }" breakpoints="{ }">
+            <div style="width: 100%; height: 80vh; display: flex; flex-direction: column">
+                <!-- Área do iframe -->
+                <div style="flex: 1; overflow: hidden">
+                    <iframe :src="pdfsrc" style="width: 100%; height: 100%; border: none"> Oops! ocorreu um erro. </iframe>
                 </div>
-                <div class="flex-1 m-1">
-                    <Button @click.prevent="chatRessalva(2)" icon="pi pi-check" label="Ressalva" class="p-button-info" style="width: 100%" />
-                </div>
-                <div class="flex-1 m-1">
-                    <Button @click.prevent="aprovar(1)" icon="pi pi-check" label="Aprovar" class="p-button-success" style="width: 100%" />
+                <!-- Área dos botões -->
+                <div class="flex justify-content-center" style="display: flex; padding: 10px; background-color: #f9f9f9; gap: 10px">
+                    <Button @click.prevent="chat(1)" icon="pi pi-times" label="Reprovar" class="p-button-danger" style="flex: 1" />
+                    <Button @click.prevent="chatRessalva(2)" icon="pi pi-check" label="Aprovar c/ Ressalva" class="p-button-info" style="flex: 1" />
+                    <Button @click.prevent="aprovar(1)" icon="pi pi-check" label="Aprovar" class="p-button-success" style="flex: 1" />
                 </div>
             </div>
-            <br />
         </Dialog>
 
         <!-- Chat -->
@@ -246,7 +243,7 @@ export default {
                     </div>
                     <hr />
                     <InputText class="col-12" type="text" v-model="this.novaMensagem" placeholder="Digite a mensagem..." />
-                    <Button @click.prevent="ressalvaPedidoEmivalTemp()" label="Reprovar e enviar mensagem" class="mr-2 mt-3 p-button-success col-12" />
+                    <Button @click.prevent="ressalvaPedidoEmivalTemp()" label="Aprovar com Ressalva e Enviar Mensagem" class="mr-2 mt-3 p-button-success col-12" />
                 </div>
             </div>
         </Dialog>

@@ -32,7 +32,7 @@ export default {
             display: ref(false),
             displayChat: ref(false),
             displayAnexo: ref(false),
-            urlBase: 'http://18.231.204.108/storage',
+            urlBase: 'http://34.196.238.92/storage',
             pdf: ref(null),
             pdfsrc: ref(null)
         };

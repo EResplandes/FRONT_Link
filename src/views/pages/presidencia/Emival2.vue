@@ -33,7 +33,7 @@ export default {
             quantidadesPedidos: ref({}),
             form: ref({}),
             pdfsrc: ref(null),
-            urlBase: 'http://18.231.204.108/storage', // Ambiente de Produção
+            urlBase: 'http://34.196.238.92/storage', // Ambiente de Produção
             adobeApiReady: false,
             previewFilePromise: null,
             titleDocumento: '',

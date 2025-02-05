@@ -14,7 +14,7 @@ export default {
             route: useRoute(),
             gerenteService: new GerenteService(),
             pedidoExternoService: new PedidoExterno(),
-            urlBase: 'http://18.231.204.108/storage',
+            urlBase: 'http://34.196.238.92/storage',
             pdf: ref(null),
             pdfsrc: ref(null),
             informacoes: ref({}),

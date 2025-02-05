@@ -5,6 +5,7 @@ import LinkService from '../../../service/LinkService';
 import EmpresaService from '../../../service/EmpresaService';
 import CadastrarPedidoService from '../../../service/CadastraPedidoService';
 import LocalService from '../../../service/LocalService';
+import MetodoService from '../../../service/MetodoService';
 
 export default {
     data() {
@@ -14,12 +15,14 @@ export default {
             displayConfirmationActivation: ref(false),
             linkService: new LinkService(),
             empresaService: new EmpresaService(),
+            metodoService: new MetodoService(),
             cadastrarPedidoService: new CadastrarPedidoService(),
             localService: new LocalService(),
             visibleRight: ref(false),
             loading1: ref(null),
             links: ref(null),
             empresas: ref(null),
+            metodos: ref(null),
             displayParcelas: ref(false),
             parcelas: ref([]),
             locais: ref(null),
@@ -54,6 +57,13 @@ export default {
         this.empresaService.buscaEmpresas().then((data) => {
             if (data.resposta === 'Empresas listados com sucesso!') {
                 this.empresas = data.empresas;
+            }
+        });
+
+        // Metódo responsável por buscar todos metodos de pagamentos
+        this.metodoService.buscaMetodos().then((data) => {
+            if (data.resposta === 'Metodos listados com sucesso!') {
+                this.metodos = data.metodos;
             }
         });
 
@@ -113,7 +123,7 @@ export default {
                         this.preloading = false;
                         this.showSuccess('Pedido cadastrado com sucesso!');
                         this.form = {};
-                        window.location.reload();
+                        // window.location.reload();
                     } else {
                         this.preloading = false;
                         this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
@@ -245,24 +255,28 @@ export default {
                                 <label for="firstname2">PDF<span class="obrigatorio">*</span></label>
                                 <FileUpload chooseLabel="Selecionar Arquivo" @change="uploadPdf" mode="basic" type="file" ref="pdf" name="demo[]" accept=".pdf,.docx" :maxFileSize="999999999"></FileUpload>
                             </div>
-                            <div class="field col-12 md:col-4">
+                            <div class="field col-12 md:col-3 mt-2">
                                 <label for="Link">Link <span class="obrigatorio">*</span></label>
                                 <Dropdown id="Link" v-model="form.link" :options="links" optionLabel="link" placeholder="Selecione..."></Dropdown>
                             </div>
-                            <div class="field col-12 md:col-4">
+                            <div class="field col-12 md:col-3 mt-2">
                                 <label for="Empresa">Empresa <span class="obrigatorio">*</span></label>
                                 <Dropdown id="Empresa" v-model="form.empresa" :options="empresas" optionLabel="nome_empresa" placeholder="Selecione..."></Dropdown>
                             </div>
-                            <div class="field col-12 md:col-4">
+                            <div class="field col-12 md:col-3 mt-2">
                                 <label for="Local">Local <span class="obrigatorio">*</span></label>
                                 <Dropdown id="Local" v-model="form.local" :options="locais" optionLabel="local" placeholder="Selecione..."></Dropdown>
                             </div>
-                            <div class="field col-12">
+                            <div class="field col-12 md:col-3 mt-2">
+                                <label for="Metodos">Formas de Pagamentos: <span class="obrigatorio">*</span></label>
+                                <Dropdown id="Metodos" v-model="form.metodos" :options="metodos" optionLabel="metodo_pagamento" placeholder="Selecione..."></Dropdown>
+                            </div>
+                            <div class="field col-12 mt-2">
                                 <label for="descricao">Fornecedor: <span class="obrigatorio">*</span></label>
                                 <Textarea v-tooltip.top="'Digite fornecedor'" id="descricao" rows="4" v-model="form.descricao" placeholder="Digite o fornecedor..." />
                             </div>
                             <Divider />
-                            <div class="col-12 mb-2">
+                            <!-- <div class="col-12 mb-2">
                                 <h5>Cadastro de Nota Fiscal <span class="text-400 aviso-nota">(somente se a compra foi efetuada anteriormente!)</span></h5>
                             </div>
                             <div class="field col-12 md:col-2">
@@ -284,7 +298,7 @@ export default {
                             <div class="field col-1 md:col-2">
                                 <label class="mb-2" for="firstname2">Gerar Parcelas</label>
                                 <Button :disabled="!this.form.boleto" @click.prevent="this.displayParcelas = true" icon="pi pi-check" label="Gerar" class="mr-2 mb-2 p-button-info" />
-                            </div>
+                            </div> -->
                         </div>
                         <br />
                         <div class="p-fluid formgrid grid">
