@@ -34,7 +34,7 @@ export default {
             preloading: ref(true),
             displayChat: ref(false),
             display: ref(false),
-            urlBase: 'http://34.196.238.92/storage',
+            urlBase: 'https://api-link.gruporialma.com.br/storage',
             pdf: ref(null),
             pdfsrc: ref(null),
             conversa: ref(null),
@@ -303,7 +303,7 @@ export default {
                 accept: () => {
                     this.enviarPedidoComprador(id_pedido);
                 },
-                reject: () => { }
+                reject: () => {}
             });
         },
 
@@ -342,9 +342,7 @@ export default {
                     <div class="card timeline-container" ref="msgContainer">
                         <Timeline :value="conversa" align="alternate" class="customized-timeline">
                             <template #marker="slotProps">
-                                <span
-                                    class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2"
-                                    :style="{ backgroundColor: slotProps.item.color }">
+                                <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
                                     <i :class="slotProps.item.icon"></i>
                                 </span>
                             </template>
@@ -367,33 +365,36 @@ export default {
                     </div>
                     <hr />
                     <InputText class="col-12" type="text" v-model="novaMensagem" placeholder="Digite a mensagem..." />
-                    <Button @click.prevent="enviarMensagem()" label="Enviar"
-                        class="mr-2 mt-3 p-button-success col-12" />
+                    <Button @click.prevent="enviarMensagem()" label="Enviar" class="mr-2 mt-3 p-button-success col-12" />
                 </div>
             </div>
         </Dialog>
 
         <!-- Tabela com todos pedidos -->
         <div class="col-12">
-            <div style="margin-top: 10px" class="header-padrao">PEDIDOS REPROVADOS E APROVADOS COM RESSALVA - COM FLUXO
-            </div>
+            <div style="margin-top: 10px" class="header-padrao">PEDIDOS REPROVADOS E APROVADOS COM RESSALVA - COM FLUXO</div>
 
             <div class="card">
-                <DataTable v-model:filters="filters" :value="pedidos" paginator :rows="10" dataKey="id"
+                <DataTable
+                    v-model:filters="filters"
+                    :value="pedidos"
+                    paginator
+                    :rows="10"
+                    dataKey="id"
                     :rowsPerPageOptions="[5, 10, 25, 50, 100]"
                     currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
-                    filterDisplay="row" :loading="loading"
-                    :globalFilterFields="['descricao', 'empresa.nome_empresa', 'country.name', 'representative.name', 'status.status']">
+                    filterDisplay="row"
+                    :loading="loading"
+                    :globalFilterFields="['descricao', 'empresa.nome_empresa', 'country.name', 'representative.name', 'status.status']"
+                >
                     <template #empty> Nenhum Pedido Encontrado. </template>
                     <template #loading> Loading customers data. Please wait. </template>
-                    <Column field="dt_inclusao_formatada" header="Dt. Inclusão" :showFilterMenu="false"
-                        :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
+                    <Column field="dt_inclusao_formatada" header="Dt. Inclusão" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
                         <template #body="{ data }">
                             {{ data.dt_inclusao_formatada }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()"
-                                class="p-column-filter" placeholder="Filtrar pela Dt. de Inclusão" />
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Filtrar pela Dt. de Inclusão" />
                         </template>
                     </Column>
                     <Column field="protheus" header="Nº Protheus" :showFilterMenu="false">
@@ -401,8 +402,7 @@ export default {
                             {{ data.protheus }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()"
-                                class="p-column-filter" placeholder="Filtrar pelo Nº Pedido Protheus" />
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Filtrar pelo Nº Pedido Protheus" />
                         </template>
                     </Column>
                     <Column field="valor_formatado" header="Valor" style="min-width: 12rem">
@@ -410,8 +410,7 @@ export default {
                             {{ data.valor_formatado }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()"
-                                class="p-column-filter" placeholder="Procurar pelo Valor" />
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pelo Valor" />
                         </template>
                     </Column>
                     <Column field="criador" header="Comprador" style="min-width: 12rem">
@@ -419,8 +418,7 @@ export default {
                             {{ data.criador }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()"
-                                class="p-column-filter" placeholder="Procurar pelo comprador" />
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pelo comprador" />
                         </template>
                     </Column>
                     <Column field="descricao" header="Fornecedor" style="min-width: 12rem">
@@ -428,51 +426,41 @@ export default {
                             {{ data.descricao }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()"
-                                class="p-column-filter" placeholder="Filtrar pela descrição" />
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Filtrar pela descrição" />
                         </template>
                     </Column>
-                    <Column field="empresa.nome_empresa" header="Empresa" :showFilterMenu="false"
-                        :filterMenuStyle="{ width: '14rem' }" style="min-width: 8rem">
+                    <Column field="empresa.nome_empresa" header="Empresa" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 8rem">
                         <template #body="{ data }">
                             {{ data.empresa.nome_empresa }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="empresas"
-                                placeholder="Selecione" class="p-column-filter" style="min-width: 10rem"
-                                :showClear="true">
+                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="empresas" placeholder="Selecione" class="p-column-filter" style="min-width: 10rem" :showClear="true">
                                 <template #option="slotProps">
                                     {{ slotProps.option }}
                                 </template>
                             </Dropdown>
                         </template>
                     </Column>
-                    <Column field="local.local" header="Local" :showFilterMenu="false"
-                        :filterMenuStyle="{ width: '14rem' }" style="min-width: 8rem">
+                    <Column field="local.local" header="Local" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 8rem">
                         <template #body="{ data }">
                             {{ data.local.local }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="local"
-                                placeholder="Selecione" class="p-column-filter" style="min-width: 10rem"
-                                :showClear="true">
+                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="local" placeholder="Selecione" class="p-column-filter" style="min-width: 10rem" :showClear="true">
                                 <template #option="slotProps">
                                     {{ slotProps.option }}
                                 </template>
                             </Dropdown>
                         </template>
                     </Column>
-                    <Column header="Status" filterField="status" :showFilterMenu="false"
-                        :filterMenuStyle="{ width: '10rem' }" style="min-width: 10rem">
+                    <Column header="Status" filterField="status" :showFilterMenu="false" :filterMenuStyle="{ width: '10rem' }" style="min-width: 10rem">
                         <template #body="{ data }">
                             <div class="flex align-items-center gap-2">
                                 <Tag :value="getStatus(data)" :severity="getSeverity(data.status.status)" />
                             </div>
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="status"
-                                placeholder="Selecione" class="p-column-filter" style="min-width: 10rem"
-                                :showClear="true">
+                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="status" placeholder="Selecione" class="p-column-filter" style="min-width: 10rem" :showClear="true">
                                 <template #option="slotProps">
                                     {{ slotProps.option }}
                                 </template>
@@ -483,50 +471,58 @@ export default {
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
                             <div class="flex gap-2">
-                                <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye"
-                                    class="p-button-info" />
+                                <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
 
                                 <!-- Botão de Chat -->
                                 <Button
-                                    v-if="['Aprovado com Ressalva', 'Reprovado', 'Mensagem Emival'].includes(slotProps.data.status.status)"
-                                    @click.prevent="chat(slotProps.data.id, slotProps.data)" icon="pi pi-comments"
-                                    class="p-button-secondary" />
+                                    v-if="['Aprovado com Ressalva', 'Reprovado', 'Mensagem de Emival'].includes(slotProps.data.status.status)"
+                                    @click.prevent="chat(slotProps.data.id, slotProps.data)"
+                                    icon="pi pi-comments"
+                                    class="p-button-secondary"
+                                />
 
                                 <!-- Botão de Imprimir -->
-                                <Button v-if="
-                                    ['Aprovado', 'Aprovado com Ressalva', 'Resposta do Pedido de Compra Aprovado com Ressalva', 'Retorno do Pedido de Compra Aprovado com Ressalva', 'Enviado para Fiscal', 'Enviado para Financeiro'].includes(
-                                        slotProps.data.status.status
-                                    )
-                                " @click.prevent="buscaInformacoesPedido(slotProps.data.id)" icon="pi pi-print"
-                                    class="p-button-secondary" />
+                                <Button
+                                    v-if="
+                                        ['Aprovado', 'Aprovado com Ressalva', 'Resposta do Pedido de Compra Aprovado com Ressalva', 'Retorno do Pedido de Compra Aprovado com Ressalva', 'Enviado para Fiscal', 'Enviado para Financeiro'].includes(
+                                            slotProps.data.status.status
+                                        )
+                                    "
+                                    @click.prevent="buscaInformacoesPedido(slotProps.data.id)"
+                                    icon="pi pi-print"
+                                    class="p-button-secondary"
+                                />
 
                                 <!-- Botão de Envio -->
-                                <Button @click.prevent="confirmEnvio(slotProps.data.id, slotProps.data.criador)"
-                                    icon="pi pi-pencil" class="p-button-warning" />
+                                <Button @click.prevent="confirmEnvio(slotProps.data.id, slotProps.data.criador)" icon="pi pi-pencil" class="p-button-warning" />
                             </div>
                         </template>
                     </Column>
                 </DataTable>
             </div>
 
-            <div style="margin-top: 10px" class="header-padrao">PEDIDOS REPROVADOS E APROVADOS COM RESSALVA - SEM FLUXO
-            </div>
+            <div style="margin-top: 10px" class="header-padrao">PEDIDOS REPROVADOS E APROVADOS COM RESSALVA - SEM FLUXO</div>
             <div class="card">
-                <DataTable v-model:filters="filters" :value="pedidosSemFluxo" paginator :rows="10" dataKey="id"
+                <DataTable
+                    v-model:filters="filters"
+                    :value="pedidosSemFluxo"
+                    paginator
+                    :rows="10"
+                    dataKey="id"
                     :rowsPerPageOptions="[5, 10, 25, 50, 100]"
                     currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
-                    filterDisplay="row" :loading="loading"
-                    :globalFilterFields="['descricao', 'empresa.nome_empresa', 'country.name', 'representative.name', 'status.status']">
+                    filterDisplay="row"
+                    :loading="loading"
+                    :globalFilterFields="['descricao', 'empresa.nome_empresa', 'country.name', 'representative.name', 'status.status']"
+                >
                     <template #empty> Nenhum Pedido Encontrado. </template>
                     <template #loading> Loading customers data. Please wait. </template>
-                    <Column field="dt_inclusao_formatada" header="Dt. Inclusão" :showFilterMenu="false"
-                        :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
+                    <Column field="dt_inclusao_formatada" header="Dt. Inclusão" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
                         <template #body="{ data }">
                             {{ data.dt_inclusao_formatada }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()"
-                                class="p-column-filter" placeholder="Filtrar pela Dt. de Inclusão" />
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Filtrar pela Dt. de Inclusão" />
                         </template>
                     </Column>
                     <Column field="protheus" header="Nº Protheus" :showFilterMenu="false">
@@ -534,8 +530,7 @@ export default {
                             {{ data.protheus }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()"
-                                class="p-column-filter" placeholder="Filtrar pelo Nº Pedido Protheus" />
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Filtrar pelo Nº Pedido Protheus" />
                         </template>
                     </Column>
                     <Column field="valor_formatado" header="Valor" style="min-width: 12rem">
@@ -543,8 +538,7 @@ export default {
                             {{ data.valor_formatado }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()"
-                                class="p-column-filter" placeholder="Procurar pelo valor" />
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pelo valor" />
                         </template>
                     </Column>
                     <Column field="criador" header="Comprador" style="min-width: 12rem">
@@ -552,8 +546,7 @@ export default {
                             {{ data.criador }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()"
-                                class="p-column-filter" placeholder="Procurar pelo comprador" />
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pelo comprador" />
                         </template>
                     </Column>
                     <Column field="descricao" header="Fornecedor" style="min-width: 12rem">
@@ -561,51 +554,41 @@ export default {
                             {{ data.descricao }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()"
-                                class="p-column-filter" placeholder="Filtrar pela descrição" />
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Filtrar pela descrição" />
                         </template>
                     </Column>
-                    <Column field="empresa.nome_empresa" header="Empresa" :showFilterMenu="false"
-                        :filterMenuStyle="{ width: '14rem' }" style="min-width: 8rem">
+                    <Column field="empresa.nome_empresa" header="Empresa" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 8rem">
                         <template #body="{ data }">
                             {{ data.empresa.nome_empresa }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="empresas"
-                                placeholder="Selecione" class="p-column-filter" style="min-width: 10rem"
-                                :showClear="true">
+                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="empresas" placeholder="Selecione" class="p-column-filter" style="min-width: 10rem" :showClear="true">
                                 <template #option="slotProps">
                                     {{ slotProps.option }}
                                 </template>
                             </Dropdown>
                         </template>
                     </Column>
-                    <Column field="local.local" header="Local" :showFilterMenu="false"
-                        :filterMenuStyle="{ width: '14rem' }" style="min-width: 8rem">
+                    <Column field="local.local" header="Local" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 8rem">
                         <template #body="{ data }">
                             {{ data.local.local }}
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="local"
-                                placeholder="Selecione" class="p-column-filter" style="min-width: 10rem"
-                                :showClear="true">
+                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="local" placeholder="Selecione" class="p-column-filter" style="min-width: 10rem" :showClear="true">
                                 <template #option="slotProps">
                                     {{ slotProps.option }}
                                 </template>
                             </Dropdown>
                         </template>
                     </Column>
-                    <Column header="Status" filterField="status" :showFilterMenu="false"
-                        :filterMenuStyle="{ width: '10rem' }" style="min-width: 10rem">
+                    <Column header="Status" filterField="status" :showFilterMenu="false" :filterMenuStyle="{ width: '10rem' }" style="min-width: 10rem">
                         <template #body="{ data }">
                             <div class="flex align-items-center gap-2">
                                 <Tag :value="getStatus(data)" :severity="getSeverity(data.status.status)" />
                             </div>
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="status"
-                                placeholder="Selecione" class="p-column-filter" style="min-width: 10rem"
-                                :showClear="true">
+                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="status" placeholder="Selecione" class="p-column-filter" style="min-width: 10rem" :showClear="true">
                                 <template #option="slotProps">
                                     {{ slotProps.option }}
                                 </template>
@@ -616,26 +599,25 @@ export default {
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
                             <div class="flex gap-2">
-                                <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye"
-                                    class="p-button-info" />
+                                <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
 
                                 <!-- Botão de Chat -->
-                                <Button
-                                    v-if="['Aprovado com Ressalva', 'Reprovado'].includes(slotProps.data.status.status)"
-                                    @click.prevent="chat(slotProps.data.id, slotProps.data)" icon="pi pi-comments"
-                                    class="p-button-secondary" />
+                                <Button v-if="['Aprovado com Ressalva', 'Reprovado', 'Mensagem de Emival'].includes(slotProps.data.status.status)" @click.prevent="chat(slotProps.data.id, slotProps.data)" icon="pi pi-comments" class="p-button-secondary" />
 
                                 <!-- Botão de Imprimir -->
-                                <Button v-if="
-                                    ['Aprovado', 'Aprovado com Ressalva', 'Resposta do Pedido de Compra Aprovado com Ressalva', 'Retorno do Pedido de Compra Aprovado com Ressalva', 'Enviado para Fiscal', 'Enviado para Financeiro'].includes(
-                                        slotProps.data.status.status
-                                    )
-                                " @click.prevent="buscaInformacoesPedido(slotProps.data.id)" icon="pi pi-print"
-                                    class="p-button-secondary" />
+                                <Button
+                                    v-if="
+                                        ['Aprovado', 'Aprovado com Ressalva', 'Resposta do Pedido de Compra Aprovado com Ressalva', 'Retorno do Pedido de Compra Aprovado com Ressalva', 'Enviado para Fiscal', 'Enviado para Financeiro'].includes(
+                                            slotProps.data.status.status
+                                        )
+                                    "
+                                    @click.prevent="buscaInformacoesPedido(slotProps.data.id)"
+                                    icon="pi pi-print"
+                                    class="p-button-secondary"
+                                />
 
                                 <!-- Botão de Envio -->
-                                <Button @click.prevent="confirmEnvio(slotProps.data.id, slotProps.data.criador)"
-                                    icon="pi pi-pencil" class="p-button-warning" />
+                                <Button @click.prevent="confirmEnvio(slotProps.data.id, slotProps.data.criador)" icon="pi pi-pencil" class="p-button-warning" />
                             </div>
                         </template>
                     </Column>

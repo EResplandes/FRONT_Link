@@ -33,7 +33,8 @@ export default {
                 pdfBoleto: null
             }),
             preloading: ref(true),
-            validaInputUrgente: localStorage.getItem('grupo')
+            validaInputUrgente: localStorage.getItem('grupo'),
+            validaInputPorNome: localStorage.getItem('nome')
         };
     },
 
@@ -226,7 +227,7 @@ export default {
                 <TabView>
                     <TabPanel header="Formulário">
                         <div class="p-fluid formgrid grid">
-                            <div v-if="this.validaInputUrgente == 'Administrador' || this.validaInputUrgente == 'Gestor de Fluxo'" class="field col-1 md:col-1">
+                            <div v-if="this.validaInputUrgente == 'Administrador' || this.validaInputUrgente == 'Gestor de Fluxo' || this.validaInputPorNome == 'DP'" class="field col-1 md:col-1">
                                 <label for="firstname2">Urgente</label><br />
                                 <InputSwitch :trueValue="1" :falseValue="0" :modelValue="form.urgente" v-model="form.urgente" />
                             </div>

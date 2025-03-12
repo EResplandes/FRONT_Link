@@ -24,7 +24,7 @@ export default {
             preloading: ref(true),
             display: ref(false),
             novaMensagem: ref(null),
-            urlBase: 'http://34.196.238.92/storage',
+            urlBase: 'https://api-link.gruporialma.com.br/storage',
             pdf: ref(null),
             pdfsrc: ref(null)
         };
@@ -50,22 +50,13 @@ export default {
 
         async aprovarPedido(idDestino) {
             // const pdfUrl = `http://127.0.0.1:8000/api/pdf/${this.pedidoSelecionado.id}`;
-            const pdfUrl = `https://link.gruporialma.com.br/api/pdf/${this.pedidoSelecionado.id}`;
-
-            try {
-                const response = await fetch(pdfUrl, { method: 'GET' });
-
-                if (!response.ok) {
-                    throw new Error('Erro ao carregar o PDF');
+            this.pedidoService.aprovarGiovana(this.pedidoSelecionado.id, idDestino).then((data) => {
+                if (data.resposta == 'Pedido aprovado com sucesso!') {
+                    this.showSuccess(data.resposta);
+                    this.buscaPedidos();
+                    this.display = false;
                 }
-
-                const arrayBuffer = await response.arrayBuffer();
-                this.pdfData = new Uint8Array(arrayBuffer);  // Armazena os dados do PDF
-                this.editPdf(idDestino);
-            } catch (error) {
-                console.error('Erro ao carregar o PDF:', error);
-                alert('Erro ao carregar o PDF. Verifique a URL e tente novamente.');
-            }
+            });
         },
 
         async editPdf(idDestino) {
@@ -86,7 +77,7 @@ export default {
                     x: 300, // Posição horizontal
                     y: height - 670, // Posição vertical a 50 unidades do topo
                     size: 10,
-                    color: rgb(0, 0, 0),
+                    color: rgb(0, 0, 0)
                 });
 
                 // Salvar o PDF editado
@@ -101,13 +92,11 @@ export default {
                         this.display = false;
                     }
                 });
-
             } catch (error) {
                 console.error('Erro ao editar o PDF:', error);
                 alert('Erro ao editar o PDF. Confira o console para mais detalhes.');
             }
         },
-
 
         // Metódo responsável por reprovar fluxo
         reprovarPedido() {
@@ -192,20 +181,16 @@ export default {
         <Toast />
 
         <!-- Visualizar -->
-        <Dialog v-model:visible="display" maximizable modal header="Documento" :style="{ width: '80%' }"
-            :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="display" maximizable modal header="Documento" :style="{ width: '80%' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <div class="flex justify-content-center">
+                <!-- <div class="flex-1 m-1">
+                    <Button @click.prevent="aprovarPedido(1)" icon="pi pi-check" label="Aprovar e Enviar Dr. Emival" class="p-button-success" style="width: 100%" />
+                </div> -->
                 <div class="flex-1 m-1">
-                    <Button @click.prevent="aprovarPedido(1)" icon="pi pi-check" label="Aprovar e Enviar Dr. Emival"
-                        class="p-button-success" style="width: 100%" />
+                    <Button @click.prevent="aprovarPedido(2)" icon="pi pi-check" label="Aprovar e Enviar Financeiro" class="p-button-info" style="width: 100%" />
                 </div>
                 <div class="flex-1 m-1">
-                    <Button @click.prevent="aprovarPedido(2)" icon="pi pi-check" label="Aprovar e Enviar Financeiro"
-                        class="p-button-info" style="width: 100%" />
-                </div>
-                <div class="flex-1 m-1">
-                    <Button @click.prevent="chat()" icon="pi pi-times" label="Reprovar" class="p-button-danger"
-                        style="width: 100%" />
+                    <Button @click.prevent="chat()" icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%" />
                 </div>
             </div>
             <br />
@@ -221,9 +206,7 @@ export default {
                     <div class="card timeline-container">
                         <Timeline :value="conversa" align="alternate" class="customized-timeline">
                             <template #marker="slotProps">
-                                <span
-                                    class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2"
-                                    :style="{ backgroundColor: slotProps.item.color }">
+                                <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
                                     <i :class="slotProps.item.icon"></i>
                                 </span>
                             </template>
@@ -245,10 +228,8 @@ export default {
                         </Timeline>
                     </div>
                     <hr />
-                    <InputText class="col-12" type="text" v-model="this.novaMensagem"
-                        placeholder="Digite a mensagem..." />
-                    <Button @click.prevent="reprovarPedido()" label="Reprovar e enviar mensagem"
-                        class="mr-2 mt-3 p-button-success col-12" />
+                    <InputText class="col-12" type="text" v-model="this.novaMensagem" placeholder="Digite a mensagem..." />
+                    <Button @click.prevent="reprovarPedido()" label="Reprovar e enviar mensagem" class="mr-2 mt-3 p-button-success col-12" />
                 </div>
             </div>
         </Dialog>
@@ -259,11 +240,18 @@ export default {
                 <Toast />
             </div>
             <div class="card">
-                <DataTable dataKey="id" :value="pedidos" :paginator="true" :rows="10"
+                <DataTable
+                    dataKey="id"
+                    :value="pedidos"
+                    :paginator="true"
+                    :rows="10"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25, 50, 100]"
                     currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
-                    responsiveLayout="scroll" filterDisplay="menu" stripedRows>
+                    responsiveLayout="scroll"
+                    filterDisplay="menu"
+                    stripedRows
+                >
                     <template #header>
                         <div class="flex justify-content-between">
                             <h5 for="empresa">Pedidos com Dr. Giovana</h5>
@@ -275,8 +263,7 @@ export default {
                     <Column field="" header="" class="w-1">
                         <template #body="slotProps">
                             <span class="p-column-title">Dt. Inclusão</span>
-                            <Tag v-if="slotProps.data.urgente == 1" class="mr-2" severity="danger" value="Urgente">
-                            </Tag>
+                            <Tag v-if="slotProps.data.urgente == 1" class="mr-2" severity="danger" value="Urgente"> </Tag>
                             <Tag v-else class="mr-2" severity="info" value="Normal"></Tag>
                         </template>
                     </Column>
@@ -333,8 +320,7 @@ export default {
                             <span class="p-column-title"></span>
                             <div class="grid">
                                 <div class="col-4 md:col-4 mr-3">
-                                    <Button @click.prevent="visualizar(slotProps.data)" icon="pi pi-eye"
-                                        class="p-button-info" />
+                                    <Button @click.prevent="visualizar(slotProps.data)" icon="pi pi-eye" class="p-button-info" />
                                 </div>
                             </div>
                         </template>

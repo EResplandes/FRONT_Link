@@ -22,7 +22,7 @@ export default {
             displayAcima: ref(false),
             pedidoAcima: ref({}),
             pdfsrc: ref(null),
-            urlBase: 'http://34.196.238.92/storage', // Ambiente de Produção
+            urlBase: 'https://api-link.gruporialma.com.br/storage', // Ambiente de Produção
             adobeApiReady: false,
             previewFilePromise: null,
             titleDocumento: '',

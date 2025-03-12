@@ -33,7 +33,8 @@ export default {
             quantidadesPedidos: ref({}),
             form: ref({}),
             pdfsrc: ref(null),
-            urlBase: 'http://34.196.238.92/storage', // Ambiente de Produção
+            urlBase: 'https://api-link.gruporialma.com.br/storage',
+            // urlBase: 'http://localhost:8000/storage',
             adobeApiReady: false,
             previewFilePromise: null,
             titleDocumento: '',
@@ -181,7 +182,7 @@ export default {
             viewer.id = 'viewer';
             this.$refs.pdfContainer.appendChild(viewer);
             let adobeDCView = new AdobeDC.View({
-                clientId: 'e554d20b8f714b768bbbae4b194fa',
+                clientId: 'e8c98881c48049bbb03b3c5d5db05129',
                 divId: 'viewer'
             });
             this.previewFilePromise = adobeDCView.previewFile(
@@ -212,7 +213,7 @@ export default {
             vieweracima.id = 'vieweracima';
             this.$refs.pdfContainerAcima.appendChild(vieweracima);
             let adobeDCView = new AdobeDC.View({
-                clientId: 'e554d20b8f714b768bbbae4b194fa',
+                clientId: 'e8c98881c48049bbb03b3c5d5db05129',
                 divId: 'vieweracima'
             });
             this.previewFilePromise = adobeDCView.previewFile(
@@ -696,8 +697,10 @@ export default {
         },
 
         visualizarAcima(id, data) {
+            console.log(data);
             this.quantidade_mensagens = data.quantidade_mensagens;
             this.pedidoSelecionado = data;
+            console.log(this.pedidoSelecionado)
             this.titleDocumento = `Visualizando Pedido ${this.currentIndex + 1} de ${this.pedidos.length} Pedidos`;
             this.pedidoAcima = data;
             this.displayAcima = true;
@@ -845,24 +848,6 @@ export default {
             </div>
         </div>
     </Dialog>
-
-    <!-- Informações -->
-    <!-- <Dialog header="AUDITORIA" v-model:visible="displayAuditoria" :style="{ width: '90%' }" :modal="true">
-        <div class="grid">
-            <div class="field col-4 md:col-4 mt-3">
-                <label for="firstname2">Comprador</label><br />
-                <InputText id="username" v-model="this.form.comprador" />
-            </div>
-            <div class="field col-4 md:col-4 mt-3">
-                <label for="firstname2">Dt de Inclusão no Link</label><br />
-                <Calendar dateFormat="dd/mm/yy" v-model="this.form.dt_inclusao" showIcon iconDisplay="input" disabled />
-            </div>
-            <div class="field col-4 md:col-4 mt-3">
-                <label for="firstname2">Dt de Emissão Nota</label><br />
-                <Calendar dateFormat="dd/mm/yy" v-model="this.form.emissao" showIcon iconDisplay="input" disabled />
-            </div>
-        </div>
-    </Dialog> -->
 
     <!-- Chat 2 -->
     <Dialog :header="this.titleChat" v-model:visible="displayChat2" :style="{ width: '80%' }" :modal="true">

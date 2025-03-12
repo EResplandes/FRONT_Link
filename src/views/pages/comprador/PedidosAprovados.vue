@@ -36,7 +36,7 @@ export default {
             display: ref(false),
             displayNota: ref(false),
             displayParcelas: ref(false),
-            urlBase: 'http://34.196.238.92/storage',
+            urlBase: 'https://api-link.gruporialma.com.br/storage',
             pdf: ref(null),
             pdfsrc: ref(null),
             fluxoPedido: ref(null),

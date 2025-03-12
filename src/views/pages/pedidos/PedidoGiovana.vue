@@ -21,7 +21,7 @@ export default {
             editar: ref(false),
             preloading: ref(true),
             display: ref(false),
-            urlBase: 'http://34.196.238.92/storage',
+            urlBase: 'https://api-link.gruporialma.com.br/storage',
             pdf: ref(null),
             pdfsrc: ref(null),
             validaExclusaoButton: localStorage.getItem('grupo')

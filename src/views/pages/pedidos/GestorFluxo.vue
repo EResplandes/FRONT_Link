@@ -32,7 +32,7 @@ export default {
             displayFluxo: ref(false),
             displayChat: ref(false),
             display: ref(false),
-            urlBase: 'http://34.196.238.92/storage',
+            urlBase: 'https://api-link.gruporialma.com.br/storage',
             pdf: ref(null),
             pdfsrc: ref(null),
             fluxoPedido: ref(null),
