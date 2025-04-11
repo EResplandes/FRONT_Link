@@ -41,6 +41,7 @@ export default {
                 global: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 protheus: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 descricao: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                diretor: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 dt_inclusao_formatada: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 'empresa.nome_empresa': { value: null, matchMode: FilterMatchMode.CONTAINS },
                 status: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -53,10 +54,12 @@ export default {
     mounted: function () {
         // Metódo responsável por buscar todos pedidos relacionas a esse usuário que não foram aprovados por ele mesmo
         this.gerenteService.buscaPedidos(localStorage.getItem('usuario_id')).then((data) => {
+            console.log(data);
             this.pedidos = data.pedidos.map((pedido) => ({
                 ...pedido,
                 criador: pedido.pedido.criador,
                 descricao: pedido.pedido.descricao,
+                diretor: pedido.pedido.link.link,
                 protheus: pedido.pedido.protheus,
                 dt_inclusao_formatada: this.formatarData(pedido.pedido.dt_inclusao),
                 valor_formatado: pedido.pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -354,6 +357,14 @@ export default {
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
                             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pelo Valor" />
+                        </template>
+                    </Column>
+                    <Column field="diretor" header="Link" style="min-width: 12rem">
+                        <template #body="{ data }">
+                            {{ data.diretor }}
+                        </template>
+                        <template #filter="{ filterModel, filterCallback }">
+                            <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Filtrar por diretor" />
                         </template>
                     </Column>
                     <Column field="descricao" header="Fornecedor" style="min-width: 12rem">

@@ -124,6 +124,7 @@ export default {
                         this.preloading = false;
                         this.showSuccess('Pedido cadastrado com sucesso!');
                         this.form = {};
+                        this.$refs.pdf.clear();
                         // window.location.reload();
                     } else {
                         this.preloading = false;

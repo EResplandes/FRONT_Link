@@ -10,7 +10,7 @@ export default class BancoService {
     async listarBancos(form, id_pedido) {
         return await fetch(`${API_URL}/bancos/listar-bancos`, {
             method: 'GET',
-            headers: headers,
+            headers: headers
         })
             .then((res) => res.json())
             .then((d) => {

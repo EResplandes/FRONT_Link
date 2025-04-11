@@ -33,6 +33,7 @@ export default {
             form: ref({
                 urgente: 0
             }),
+            tabIndex: ref(0),
             preloading: ref(true),
             validaInputUrgente: localStorage.getItem('grupo')
         };
@@ -136,7 +137,9 @@ export default {
                         this.preloading = false;
                         this.showSuccess('Pedido cadastrado com sucesso!');
                         this.form = {};
-                        window.location.reload();
+                        this.$refs.pdf.clear();
+                        this.tabIndex = 0;
+                        // window.location.reload();
                     } else {
                         this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
                     }
@@ -235,7 +238,7 @@ export default {
             </div>
             <div class="card">
                 <h5>Cadastro de Pedido</h5>
-                <TabView :activeIndex="activeIndex">
+                <TabView v-model:activeIndex="tabIndex">
                     <TabPanel header="Formulário">
                         <div class="p-fluid formgrid grid">
                             <div v-if="this.validaInputUrgente == 'Administrador' || this.validaInputUrgente == 'Gestor de Fluxo'" class="field col-1 md:col-1">

@@ -590,6 +590,15 @@ export default {
 
                     <template #empty> Nenhum Pedido Encontrado. </template>
                     <template #loading> Loading customers data. Please wait. </template>
+
+                    <Column field="" header="" class="w-1">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Dt. Inclusão</span>
+                            <Tag v-if="slotProps.data.urgente == 1" class="mr-2" severity="danger" value="Urgente"></Tag>
+                            <Tag v-else class="mr-2" severity="info" value="Normal"></Tag>
+                        </template>
+                    </Column>
+
                     <Column field="dt_inclusao_formatada" header="Dt. Inclusão" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
                         <template #body="{ data }">
                             {{ data.dt_inclusao_formatada }}
@@ -649,6 +658,7 @@ export default {
                             </Dropdown>
                         </template>
                     </Column>
+
                     <Column field="..." header="..." :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
