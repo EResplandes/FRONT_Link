@@ -135,6 +135,7 @@ export default {
                 this.cadastrarPedidoService.comFluxo(this.form, this.parcelas).then((data) => {
                     if (data.resposta == 'Pedido cadastrado com sucesso!') {
                         this.preloading = false;
+                        0;
                         this.showSuccess('Pedido cadastrado com sucesso!');
                         this.form = {};
                         this.$refs.pdf.clear();
