@@ -90,4 +90,78 @@ const checkActiveRoute = (item) => {
     </li>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+:root {
+    --blue-50: #f0f9ff;
+    --blue-100: #e0f2fe;
+    --blue-200: #bae6fd;
+    --blue-300: #7dd3fc;
+    --blue-400: #38bdf8;
+    --blue-500: #1d9df2;
+    --blue-600: #1e40af;
+    --blue-700: #1e3a8a;
+    --blue-800: #1e2b58;
+    --blue-900: #0f172a;
+}
+
+a,
+.router-link {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    color: var(--blue-100);
+    border-radius: 0.5rem;
+    margin: 0.25rem 0.75rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    user-select: none;
+
+    .layout-menuitem-icon {
+        color: var(--blue-300);
+        margin-right: 0.75rem;
+        transition: all 0.3s ease;
+    }
+
+    .layout-menuitem-text {
+        flex-grow: 1;
+        transition: all 0.3s ease;
+    }
+
+    .layout-submenu-toggler {
+        color: var(--blue-300);
+        transition: all 0.3s ease;
+    }
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.1);
+
+        .layout-menuitem-icon,
+        .layout-menuitem-text,
+        .layout-submenu-toggler {
+            color: white;
+        }
+    }
+}
+.active-menuitem > a,
+.active-menuitem > .router-link,
+.active-route {
+    position: relative;
+
+    &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: var(--blue-400);
+        border-radius: 0 4px 4px 0;
+    }
+
+    .layout-menuitem-icon,
+    .layout-menuitem-text,
+    .layout-submenu-toggler {
+        font-weight: 600;
+    }
+}
+</style>

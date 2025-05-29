@@ -387,6 +387,7 @@ export default {
         <div class="col-12">
             <div style="margin-top: 10px" class="header-padrao">TODAS LM's <br /></div>
             <DataTable :value="lms" showGridlines tableStyle="min-width: 50rem">
+                <Column field="id" header="ID"></Column>
                 <Column field="lm" header="LM"></Column>
                 <Column field="aplicacao" header="Aplicação"></Column>
                 <Column field="local" header="Local"></Column>
@@ -471,7 +472,7 @@ export default {
 }
 
 .timeline-container {
-    max-height: 300px;
+    max-height: 800px;
     /* Defina a altura máxima desejada */
     overflow-y: auto;
     /* Adiciona uma barra de rolagem vertical quando o conteúdo excede a altura máxima */

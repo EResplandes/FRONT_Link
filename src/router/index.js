@@ -14,6 +14,11 @@ const router = createRouter({
                     component: () => import('@/views/Dashboard.vue')
                 },
                 {
+                    path: '/dashboard-lm',
+                    name: 'dashboard-lm',
+                    component: () => import('@/views/pages/lista-materiais/DashboardLm.vue')
+                },
+                {
                     path: '/pedidos-emival',
                     name: 'pedidos-emival',
                     component: () => import('@/views/pages/pedidos/PedidosEmival.vue')
@@ -162,6 +167,11 @@ const router = createRouter({
                     path: '/controle-lms-almoxarife',
                     name: 'controle-lms-almoxarife',
                     component: () => import('@/views/pages/lista-materiais/almoxarifado/MinhasLms.vue')
+                },
+                {
+                    path: '/alteracao-lms-engenharia',
+                    name: 'alterecao-lms-engenharia',
+                    component: () => import('@/views/pages/lista-materiais/engenharia/AlteracaoLm.vue')
                 },
                 {
                     path: '/buscar-precos',

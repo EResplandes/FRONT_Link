@@ -59,7 +59,6 @@ const model = ref([
         items: [
             { label: 'Para Aprovação', icon: 'pi pi-fw pi-reply', to: '/aprovacao-gerentes', requiredRole: ['Diretor', 'Gerente', 'Administrador', 'Gestor de Fluxo'] },
             { label: 'Justificar Pedidos', icon: 'pi pi-fw pi-book', to: '/justificar-pedidos-gerente', requiredRole: ['Administrador', 'Diretor', 'Gerente', 'Gestor de Fluxo'] },
-            { label: 'LMs', icon: 'pi pi-fw pi-book', to: '/todas-lms', requiredRole: ['Administrador', 'Diretor', 'Gerente'], requiredNome: ['Eduardo C. Resplandes', 'Paulo', 'Cairo'] },
             { label: 'Todos', icon: 'pi pi-fw pi-book', to: '/todos-pedidos-soleni', requiredRole: ['Gerente', 'Administrador', 'Diretor'] },
             { label: 'Todos Pedidos Associados', icon: 'pi pi-fw pi-book', to: '/pedidos-gerentes', requiredRole: ['Gerente', 'Administrador', 'Diretor'] },
             { label: 'Pedidos com Emival', icon: 'pi pi-fw pi-book', to: '/pedidos-emival', requiredRole: ['Administrador', 'Gerente', 'Diretor'] },
@@ -71,8 +70,7 @@ const model = ref([
         label: 'Cadastro de Pedido',
         items: [
             { label: 'Cadastro SEM FLUXO', icon: 'pi pi-fw pi-book', to: '/cadastro-sem-fluxo', requiredRole: ['Gestor de Fluxo', 'Administrador', 'Comprador Externo', 'Comprador', 'Gerente'] },
-            { label: 'Cadastro COM FLUXO', icon: 'pi pi-fw pi-book', to: '/cadastro-pedido', requiredRole: ['Gerente', 'Administrador', 'Comprador', 'Gestor de Fluxo', 'Comprador Externo'] },
-            { label: 'Cadastro LM', icon: 'pi pi-fw pi-book', to: '/cadastro-lm', requiredRole: ['Administrador', 'Engenheiro'] }
+            { label: 'Cadastro COM FLUXO', icon: 'pi pi-fw pi-book', to: '/cadastro-pedido', requiredRole: ['Gerente', 'Administrador', 'Comprador', 'Gestor de Fluxo', 'Comprador Externo'] }
             // { label: 'Cotação', icon: 'pi pi-fw pi-book', to: '/buscar-precos', requiredRole: ['Administrador'] }
             // { label: 'Consulta', icon: 'pi pi-fw pi-book', to: '/consulta-precos', requiredRole: ['Administrador', 'Comprador', 'Comprador Externo'] }
         ]
@@ -107,12 +105,22 @@ const model = ref([
             // { label: 'Justificar Pedidos Reprovados', icon: 'pi pi-fw pi-pencil', to: '/pedidos-reprovados', requiredRole: ['Gestor de Fluxo', 'Administrador', 'Gerente', 'Comprador Externo', 'Diretor', 'Comprador', 'Fiscal'] },
             // { label: 'Justificar Notas Reprovados pelo Fiscal', icon: 'pi pi-fw pi-pencil', to: '/pedidos-reprovados-fiscal', requiredRole: ['Comprador', 'Administrador', 'Gestor de Fluxo'] },
             // { label: 'Justificar Pedidos Reprovados por Soleni', icon: 'pi pi-fw pi-pencil', to: '/reprovados-soleni', requiredRole: ['Comprador', 'Administrador', 'Gerente', 'Comprador Externo'] }
-            { label: 'Minhas LMs', icon: 'pi pi-fw pi-book', to: '/minhas-lms', requiredRole: ['Comprador Externo', 'Comprador', 'Administrador'] }
         ]
     },
     {
         label: 'Almoxarifado',
         items: [{ label: 'Controle de LMs', icon: 'pi pi-fw pi-book', to: '/controle-lms-almoxarife', requiredRole: ['Administrador', 'Almoxarife'] }]
+    },
+    {
+        label: 'Listas de Materiais',
+        items: [
+            { label: 'Dashboard', icon: 'pi pi-fw pi-book', to: '/dashboard-lm', requiredRole: ['Gerente', 'Administrador'] },
+            { label: 'Cadastro LM', icon: 'pi pi-fw pi-book', to: '/cadastro-lm', requiredRole: ['Administrador', 'Engenheiro'] },
+            { label: 'Acompanhamento de LM', icon: 'pi pi-fw pi-book', to: '/alteracao-lms-engenharia', requiredRole: ['Administrador', 'Engenheiro'] },
+            { label: 'Controle de LMs', icon: 'pi pi-fw pi-book', to: '/controle-lms-almoxarife', requiredRole: ['Administrador', 'Almoxarife'] },
+            { label: 'Minhas LMs', icon: 'pi pi-fw pi-book', to: '/minhas-lms', requiredRole: ['Comprador Externo', 'Comprador', 'Administrador'] },
+            { label: 'LMs', icon: 'pi pi-fw pi-book', to: '/todas-lms', requiredRole: ['Administrador', 'Diretor', 'Gerente'], requiredNome: ['Eduardo C. Resplandes', 'Paulo', 'Cairo'] }
+        ]
     },
     {
         label: 'Administração',

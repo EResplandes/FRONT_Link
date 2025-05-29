@@ -303,6 +303,36 @@ export default class LmService {
             });
     }
 
+    // Metódo responsável por cadastrar novo material a uma lm existente por parte da engenharia
+    async cadastrarNovoMaterial(material) {
+        console.log(material);
+        return await fetch(`${API_URL}/lm/cadastrar-novo-material`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                descricao: material.descricao,
+                descritiva: material.descritiva,
+                indicador: material.indicador,
+                unidade: material.unidade,
+                quantidade: material.quantidade,
+                id_lm: material.id_lm,
+                usuario: localStorage.getItem('nome')
+            })
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
     // Metódo responsável por finalizar LM
     async finalizarLm(idLm) {
         return await fetch(`${API_URL}/lm/finalizar-lm/${idLm}`, {

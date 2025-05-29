@@ -455,6 +455,7 @@ export default {
         <div class="col-12">
             <div style="margin-top: 10px" class="header-padrao">TODAS LM's <br /></div>
             <DataTable :value="lms" showGridlines tableStyle="min-width: 50rem">
+                <Column field="id" header="ID"></Column>
                 <Column field="lm" header="LM"></Column>
                 <Column field="aplicacao" header="Aplicação"></Column>
                 <Column field="empresa" header="Empresa"></Column>

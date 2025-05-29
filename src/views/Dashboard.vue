@@ -28,8 +28,6 @@ export default {
         });
 
         const usuario = localStorage.getItem('nome');
-
-        this.showInfo(`Bem-vindo, ${usuario}!`);
     },
 
     methods: {
@@ -199,7 +197,7 @@ export default {
             <div class="card">
                 <Card style="overflow: hidden">
                     <template #header>
-                        <img alt="imagem" width="430" src="https://www.gruporialma.com.br/wp-content/uploads/2024/02/wallpaper-Rialma.png" />
+                        <img style="width: 100%" alt="imagem" src="../../public/assets/img/rialma.png" />
                     </template>
                     <template #title>COMUNICADO</template>
                     <template #subtitle>Eduardo C. Resplandes | Desenvolvedor</template>
