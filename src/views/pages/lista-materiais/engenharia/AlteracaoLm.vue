@@ -18,19 +18,26 @@ export default {
             chat: ref(null),
             novoMaterial: ref({}),
             novaMensagem: ref(null),
+            novoAnexo: ref({}),
             materialSelecionado: ref(null),
             menuLateralChat: ref(null),
             menuLateralChatLms: ref(null),
+            modalAnexos: ref(null),
             materiais: ref(null),
+            cadastroAtivoAnexos: ref(null),
+            anexos: ref(null),
             preloading: ref(true),
             lmSelecionada: ref(null),
             statusLm: ref(null),
             ocultarTabelaListasMateriais: ref(false),
             compradorSelecionado: ref(null),
             modalHistoricoLancamentos: ref(null),
+            modalAdicionarAnexo: ref(null),
             modalAdicionarMaterial: ref(null),
+            modalAssociarComprador: ref(null),
             modalVisualizarLm: ref(null),
-            validaGerenteResponsavel: localStorage.getItem('nome')
+            validaGerenteResponsavel: localStorage.getItem('nome'),
+            urlAnexo: 'http://localhost:8000/public/'
         };
     },
 
@@ -64,6 +71,10 @@ export default {
             this.statusLm = lm.status;
             this.materiais = lm.materiais;
             this.idLmSelecioanda = lm.id;
+        },
+
+        abrirModalDesignarComprador() {
+            this.modalAssociarComprador = true;
         },
 
         contarLMsPorStatus(status) {
@@ -137,17 +148,51 @@ export default {
         },
 
         associarComprador() {
-            this.lmService.associarComprador(this.lmSelecionada, this.compradorSelecionado.id).then((data) => {
+            this.lmService.associarComprador(this.lmSelecionada.id, this.compradorSelecionado.id).then((data) => {
                 if (data.status === 200) {
                     this.buscarLms();
+                    this.lmSelecionada.comprador = this.compradorSelecionado.name;
                     this.showSuccess(data.resposta);
                     this.modalAssociarComprador = false;
                 }
             });
         },
 
+        salvarAnexo() {
+            this.novoAnexo.id_lm = this.idLmSelecioanda;
+            this.novoAnexo.usuario = localStorage.getItem('nome');
+            this.novoAnexo.id_usuario = localStorage.getItem('usuario_id');
+            this.lmService.salvarAnexo(this.novoAnexo).then((data) => {
+                if (data.status === 200) {
+                    this.showSuccess(data.resposta);
+                    this.buscarLms();
+                    this.cadastroAtivoAnexos = false;
+                    this.novoAnexo = {};
+                    this.lmService.listarAnexos(this.idLmSelecioanda).then((data) => {
+                        this.anexos = data.anexos;
+                    });
+                }
+            });
+        },
+
         salvarNovoMaterial() {
+            const camposObrigatorios = [
+                { campo: 'indicador', nome: 'Indicador' },
+                { campo: 'descricao', nome: 'Descrição' },
+                { campo: 'descritiva', nome: 'Descritiva' },
+                { campo: 'quantidade', nome: 'Quantidade' },
+                { campo: 'unidade', nome: 'Unidade' }
+            ];
+
+            for (let item of camposObrigatorios) {
+                if (!this.novoMaterial[item.campo]) {
+                    this.showError(`Por favor, preencha o campo ${item.nome}.`);
+                    return; // Interrompe o processo de salvar até que todos os campos estejam preenchidos
+                }
+            }
+
             this.novoMaterial.id_lm = this.idLmSelecioanda;
+
             this.lmService.cadastrarNovoMaterial(this.novoMaterial).then((data) => {
                 this.abrirModalAdicionarMaterial = false;
                 if (data.status === 200) {
@@ -167,7 +212,7 @@ export default {
         },
 
         abrirChatLm() {
-            this.buscaChatLm(this.lmSelecionada);
+            this.buscaChatLm(this.lmSelecionada.id);
             this.menuLateralChatLms = true;
         },
 
@@ -179,6 +224,22 @@ export default {
 
         abrirModalAdicionarMaterial() {
             this.modalAdicionarMaterial = true;
+        },
+
+        abrirModalAnexos() {
+            this.lmService.listarAnexos(this.idLmSelecioanda).then((data) => {
+                this.anexos = data.anexos;
+                this.modalAnexos = true;
+            });
+        },
+
+        abrirModalAdicionarAnexo() {
+            this.modalAdicionarAnexo = true;
+            this.cadastroAtivoAnexos = true;
+        },
+
+        visualizarAnexo(anexo) {
+            window.open('http://localhost:8000/storage/' + anexo, '_blank');
         },
 
         showSuccess(mensagem) {
@@ -252,6 +313,27 @@ export default {
             }
         },
 
+        getIconAnexo(ext) {
+            switch (ext) {
+                case 'pdf':
+                    return 'pi pi-file-pdf text-red-600'; // Badge azul para "Solicitado"
+                case 'jpg':
+                    return 'pi pi-file-image text-yellow-600';
+                case 'jpeg':
+                    return 'pi pi-file-image text-yellow-600';
+                case 'png':
+                    return 'pi pi-file-image text-yellow-600';
+                case 'doc':
+                    return 'pi pi-file-word text-blue-600';
+                case 'docx':
+                    return 'pi pi-file-word text-blue-600';
+                case 'xlsx':
+                    return 'pi pi-file-excel text-green-600';
+                default:
+                    return 'pi pi-file text-gray-600'; // Badge cinza para outros casos
+            }
+        },
+
         getStatusName(id) {
             switch (id) {
                 case 1:
@@ -294,6 +376,10 @@ export default {
                 default:
                     return baseClass + 'text-gray-500'; // Cinza para status desconhecidos
             }
+        },
+
+        handleFileUpload() {
+            this.novoAnexo.anexo = this.$refs.anexo.files[0];
         }
     }
 };
@@ -307,9 +393,16 @@ export default {
         <Toast />
         <ConfirmDialog></ConfirmDialog>
 
+        <!-- Modal para associar comprador a LM -->
+        <Dialog v-model:visible="modalAssociarComprador" maximizable modal header="Associar Comprador" :style="{ width: '25rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <div class="flex flex-column justify-content-center align-items-center gap-3">
+                <Dropdown id="Comprador" v-model="compradorSelecionado" :options="compradores" optionLabel="name" placeholder="Selecione..."></Dropdown>
+                <Button @click.prevent="associarComprador()" type="submit" severity="secondary" label="ASSOCIAR" />
+            </div>
+        </Dialog>
+
         <!-- Modal Chat de Materias -->
         <Sidebar style="width: 600px" v-model:visible="menuLateralChat" :baseZIndex="1000" position="right">
-            <h2 class="text-center">CHAT</h2>
             <div>
                 <div class="grid">
                     <div class="col-12">
@@ -341,6 +434,92 @@ export default {
                         <InputText class="col-12" type="text" v-model="novaMensagem" placeholder="Digite a mensagem..." />
                         <Button @click.prevent="enviarMensagem()" label="Enviar" class="mr-2 mt-3 p-button-primary col-12" />
                     </div>
+                </div>
+            </div>
+        </Sidebar>
+
+        <!-- Modal listagem de Anexo-->
+        <Sidebar style="width: 650px" v-model:visible="modalAnexos" :baseZIndex="1000" position="right">
+            <div class="sidebar-header">
+                <h2 class="text-center m-0">Documentos Anexados</h2>
+                <Button icon="pi pi-times" @click="modalAnexos = false" class="p-button-rounded p-button-text p-button-danger close-button" />
+            </div>
+
+            <div v-if="cadastroAtivoAnexos" class="sidebar-content">
+                <div class="form-container">
+                    <!-- Seção de Informações do Anexo -->
+                    <div class="form-section">
+                        <h5 class="section-title"><i class="pi pi-file mr-2"></i>Informações do Documento</h5>
+
+                        <div class="grid form-grid">
+                            <!-- Campo de Observação -->
+                            <div class="col-12 mt-5">
+                                <div class="field">
+                                    <label for="observacao" class="required">Descrição do Anexo</label>
+                                    <InputText id="observacao" v-model="novoAnexo.observacao" placeholder="Ex: Cotação de preços, Documento de identificação" class="w-full" />
+                                </div>
+                            </div>
+
+                            <!-- Campo de Upload -->
+                            <div class="col-12">
+                                <div class="field">
+                                    <label for="anexo" class="required">Selecione o Arquivo</label>
+                                    <FileUpload class="w-full upload-file" chooseLabel="Selecionar Arquivo" @change="handleFileUpload" mode="basic" type="file" ref="anexo" name="demo[]" :maxFileSize="999999999"></FileUpload>
+                                    <small class="field-hint">Formatos aceitos: PDF, DOC, XLS, JPG, PNG (Max. 10MB)</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Seção de Ações -->
+                    <div class="form-actions mt-5">
+                        <Button label="Cancelar" icon="pi pi-times" @click="cadastroAtivoAnexos = false" class="p-button-outlined p-button-secondary action-button" />
+                        <Button label="Salvar Anexo" icon="pi pi-check" @click.prevent="salvarAnexo()" :disabled="!novoAnexo.anexo || !novoAnexo.observacao" class="p-button-success action-button" />
+                    </div>
+                </div>
+            </div>
+
+            <div v-else class="sidebar-content">
+                <!-- Botão de adicionar novo anexo -->
+                <div class="flex justify-content-end mb-4">
+                    <Button @click="abrirModalAdicionarAnexo()" label="Adicionar Anexo" icon="pi pi-plus" class="p-button-success" />
+                </div>
+
+                <!-- Lista de anexos - Dados Fakes -->
+                <div v-if="anexos.length > 0" class="anexos-list">
+                    <!-- Anexo 1 -->
+                    <div v-for="anexo in anexos" :key="anexo.id" class="anexo-item">
+                        <div class="anexo-icon">
+                            <i :class="getIconAnexo(anexo.extensao)" style="color: #e74c3c; font-size: 1.5rem"></i>
+                        </div>
+                        <div class="anexo-info">
+                            <div class="anexo-descricao">{{ anexo.observacao }}</div>
+                            <div class="anexo-metadata">
+                                <span class="anexo-usuario">{{ anexo.usuario }}</span>
+                                <span class="anexo-data"> {{ formatarData(anexo.dt_criacao) }}</span>
+                            </div>
+                        </div>
+                        <div class="anexo-actions">
+                            <Button @click.prevent="visualizarAnexo(anexo.anexo)" icon="pi pi-eye" class="p-button-rounded p-button-info p-button-sm" v-tooltip.top="'Visualizar Documento'" />
+                        </div>
+                    </div>
+                </div>
+
+                <div v-else>
+                    <div class="no-attachments-card">
+                        <div class="no-attachments-content">
+                            <i class="pi pi-paperclip" style="font-size: 2rem; color: #a0a0a0"></i>
+                            <h3>Nenhum anexo disponível</h3>
+                            <p>Esta solicitação não possui documentos anexados.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mensagem quando não houver anexos -->
+                <div v-if="false" class="empty-state">
+                    <i class="pi pi-folder-open" style="font-size: 3rem; color: #ced4da"></i>
+                    <h3>Nenhum documento anexado</h3>
+                    <p>Adicione o primeiro documento clicando no botão acima</p>
                 </div>
             </div>
         </Sidebar>
@@ -427,7 +606,7 @@ export default {
 
         <!-- Modal Chat de Lms -->
         <Sidebar style="width: 600px" v-model:visible="menuLateralChatLms" :baseZIndex="1000" position="right">
-            <h2 class="text-center">CHAT</h2>
+            <!-- <h2 class="text-center">CHAT</h2> -->
             <div>
                 <div class="grid">
                     <div class="col-12">
@@ -517,11 +696,6 @@ export default {
                         <Button icon="pi pi-eye" @click.prevent="abrirNotaFiscal(slotProps.data)" class="p-button-rounded p-button-info" />
                     </template>
                 </Column>
-                <!-- <Column field="created_at" header="Pedido">
-                    <template #body="slotProps">
-                        <Button icon="pi pi-eye" @click.prevent="abrirPedidoCompra(slotProps.data)" class="p-button-rounded p-button-info" />
-                    </template>
-                </Column> -->
             </DataTable>
         </Dialog>
 
@@ -652,7 +826,6 @@ export default {
                     <template #body="slotProps">
                         <div class="flex gap-2">
                             <Button icon="pi pi-eye" @click.prevent="abrirModalVisualizarLm(slotProps.data)" class="p-button-rounded p-button-info" />
-                            <Button icon="pi pi-comments" @click.prevent="abrirChatLm(slotProps.data)" class="p-button-rounded p-button-secondary" />
                             <!-- <Button icon="pi pi-trash" class="p-button-rounded p-button-danger" @click="deletar(slotProps.data)" /> -->
                         </div>
                     </template>
@@ -752,11 +925,13 @@ export default {
                             <!-- Terceira Linha - Ações -->
                             <div class="col-12">
                                 <div class="flex justify-content-end gap-2 mt-3">
-                                    <Button @click.prevent="abrirChatLm()" icon="pi pi-comment" label="Chat" class="p-button-outlined" />
+                                    <Button @click.prevent="abrirChatLm()" icon="pi pi-comments" label="Log" class="p-button-outlined" />
 
-                                    <Button icon="pi pi-download" label="Anexos" class="p-button-outlined p-button-help" />
+                                    <Button @click.prevent="abrirModalAnexos()" icon="pi pi-download" label="Anexos" class="p-button-outlined p-button-help" />
 
                                     <Button @click.prevent="abrirModalAdicionarMaterial()" icon="pi pi-plus" label="Adicionar Material" class="p-button-outlined p-button-success" />
+
+                                    <Button @click.prevent="abrirModalDesignarComprador()" icon="pi pi-users" label="Designar Comprador" class="p-button-outlined p-button-secondary" />
 
                                     <Button icon="pi pi-print" label="Imprimir" class="p-button-outlined p-button-secondary" />
                                 </div>
@@ -838,7 +1013,7 @@ export default {
 }
 
 .timeline-container {
-    max-height: 800px;
+    max-height: 700px;
     /* Defina a altura máxima desejada */
     overflow-y: auto;
     /* Adiciona uma barra de rolagem vertical quando o conteúdo excede a altura máxima */
@@ -979,5 +1154,147 @@ export default {
 
 ::v-deep(.p-inputtextarea) {
     font-family: inherit;
+}
+
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 1;
+}
+
+.sidebar-content {
+    padding: 1.5rem;
+    height: calc(100% - 60px);
+    overflow-y: auto;
+}
+
+.anexos-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.anexo-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.anexo-item:hover {
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.anexo-icon {
+    margin-right: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+}
+
+.anexo-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.anexo-descricao {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.anexo-metadata {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.anexo-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 0;
+    text-align: center;
+    color: #6b7280;
+}
+
+.empty-state h3 {
+    margin: 1rem 0 0.5rem;
+    color: #4b5563;
+}
+
+.close-button {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+}
+
+.no-attachments-card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px dashed #dee2e6;
+    margin: 1rem 0;
+    text-align: center;
+}
+
+.no-attachments-content {
+    max-width: 300px;
+}
+
+.no-attachments-content h3 {
+    margin: 1rem 0 0.5rem;
+    color: #495057;
+    font-size: 1.2rem;
+}
+
+.no-attachments-content p {
+    color: #6c757d;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.sidebar-content {
+    padding: 1.5rem;
+    background: #ffffff;
+    border-radius: 6px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.form-title {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    color: #2c3e50;
+    font-size: 1.25rem;
+}
+
+.upload-field {
+    margin-top: 0.5rem;
+}
+
+.upload-field .p-button {
+    width: 100%;
 }
 </style>

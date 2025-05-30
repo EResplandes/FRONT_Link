@@ -470,6 +470,25 @@ export default class LmService {
             });
     }
 
+    // Metódo responsável por buscar anexos de uma lm
+    async listarAnexos(idLm) {
+        return await fetch(`${API_URL}/lm/listar-anexos/${idLm}`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
     // Metódo responsável por bloquear material para o almoxarife
     async bloqueiaMaterialAlmoxarife(idMaterial) {
         let idComprador = localStorage.getItem('usuario_id');
@@ -484,6 +503,30 @@ export default class LmService {
             .then((d) => {
                 return d;
             })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    // Metódo responsável por salvar anexo
+    async salvarAnexo(data) {
+        const form = new FormData();
+        form.append('id_usuario', data.id_usuario ?? '');
+        form.append('id_lm', data.id_lm ?? '');
+        form.append('anexo', data.anexo ?? '');
+        form.append('observacao', data.observacao ?? '');
+
+        return await fetch(`${API_URL}/lm/salvar-anexo`, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+                // NÃO inclua 'Content-Type': 'multipart/form-data' — o browser define isso automaticamente com o boundary
+            },
+            body: form
+        })
+            .then((res) => res.json())
             .catch((error) => {
                 console.error('Error:', error);
                 throw error;
