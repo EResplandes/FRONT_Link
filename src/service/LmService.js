@@ -333,6 +333,30 @@ export default class LmService {
             });
     }
 
+    // Metódo responsável por cadastrar novo material a uma lm existente por parte da engenharia
+    async autorizarQuantitativo(quantidades) {
+        return await fetch(`${API_URL}/lm/autorizar-quantidade`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                materiais: quantidades,
+                usuario: localStorage.getItem('nome')
+            })
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
     // Metódo responsável por finalizar LM
     async finalizarLm(idLm) {
         return await fetch(`${API_URL}/lm/finalizar-lm/${idLm}`, {
@@ -493,6 +517,27 @@ export default class LmService {
     async bloqueiaMaterialAlmoxarife(idMaterial) {
         let idComprador = localStorage.getItem('usuario_id');
         return await fetch(`${API_URL}/lm/bloquear-material/${idMaterial}/${idComprador}`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    // Metódo responsável por validar função do usuário
+    async validaFuncao() {
+        let idComprador = localStorage.getItem('usuario_id');
+        let funcao = localStorage.getItem('funcao');
+        return await fetch(`${API_URL}/lm/valida-funcao-usuario/${idComprador}/${funcao}`, {
             method: 'GET',
             headers: {
                 Accept: 'application/json',

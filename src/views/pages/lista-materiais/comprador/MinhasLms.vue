@@ -44,7 +44,6 @@ export default {
     mounted: function () {
         // Metódo responsável por buscar todas LM
         this.lmService.buscaLmsAssociadas().then((data) => {
-            console.log(data);
             this.lms = data.lm;
             this.informacoes = data.informacoes;
         });

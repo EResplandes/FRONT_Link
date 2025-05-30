@@ -19,6 +19,7 @@ export default {
             novoMaterial: ref({}),
             novaMensagem: ref(null),
             novoAnexo: ref({}),
+            quantidadeAutorizada: ref([]),
             materialSelecionado: ref(null),
             menuLateralChat: ref(null),
             menuLateralChatLms: ref(null),
@@ -37,29 +38,75 @@ export default {
             modalAssociarComprador: ref(null),
             modalVisualizarLm: ref(null),
             validaGerenteResponsavel: localStorage.getItem('nome'),
+            funcaoValidada: null,
             urlAnexo: 'http://localhost:8000/public/'
         };
     },
 
     mounted: function () {
-        // Metódo responsável por buscar todas LM
-        this.lmService.buscaLms().then((data) => {
-            this.lms = data.lm;
-            this.informacoes = data.informacoes;
-        });
-
         // Metódo responsável por buscar todos os compradores
         this.lmService.listarCompradores().then((data) => {
             this.compradores = data.compradores;
         });
 
         this.preloading = false;
+
+        // Metódo responsável por validar funcao
+        this.lmService.validaFuncao().then((data) => {
+            if (data.status === 200) {
+                this.funcaoValidada = data.funcao;
+
+                switch (this.funcaoValidada) {
+                    case 'Comprador':
+                        // Metódo responsável por buscar todas LM
+                        this.lmService.buscaLmsAssociadas().then((data) => {
+                            this.lms = data.lm;
+                            this.informacoes = data.informacoes;
+                        });
+                        break;
+                    default:
+                        // Metódo responsável por buscar todas LM
+                        this.lmService.buscaLms().then((data) => {
+                            this.lms = data.lm;
+                            this.informacoes = data.informacoes;
+                        });
+                        break;
+                }
+            }
+        });
     },
 
     methods: {
+        confirmarQuantitativo() {
+            this.confirm.require({
+                message: 'Deseja confirmar a autorização para a quantidade especificada?',
+                header: 'Confirmação',
+                icon: 'pi pi-exclamation-triangle',
+                rejectLabel: 'Cancelar',
+                acceptLabel: 'Autorizar',
+                accept: () => {
+                    this.lmService.autorizarQuantitativo(this.quantidadeAutorizada).then((data) => {
+                        this.toast.add({ severity: 'info', summary: 'Confirmar', detail: 'Você validou o quantitivo da LM!', life: 3000 });
+                        this.lmSelecionada.status = 'Solicitado';
+                    });
+                },
+                reject: () => {
+                    this.toast.add({ severity: 'error', summary: 'Aviso!', detail: 'Operação cancelada!', life: 3000 });
+                }
+            });
+        },
+
         // Metódo responsável por buscar lms
         async buscarLms() {
             this.lmService.buscaLms().then((data) => {
+                this.lms = data.lm;
+                this.informacoes = data.informacoes;
+            });
+        },
+
+        // Metódo responsável por buscar lms de comprador
+        async buscarLmsAssociadas() {
+            this.lmService.buscaLmsAssociadas().then((data) => {
                 this.lms = data.lm;
                 this.informacoes = data.informacoes;
             });
@@ -205,6 +252,17 @@ export default {
             });
         },
 
+        iniciarProcessoCompraLm(data) {
+            this.lmService.iniciarLm(data.id).then((data) => {
+                if (data.status === 200) {
+                    this.buscarLmsAssociadas();
+                    this.showSuccess(data.resposta);
+                } else {
+                    this.showError('Ocorreu um erro, entre em contato com o Administrador!');
+                }
+            });
+        },
+
         abrirChatMaterial(dados) {
             this.materialSelecionado = dados.id;
             this.buscaChat(dados.id);
@@ -236,6 +294,16 @@ export default {
         abrirModalAdicionarAnexo() {
             this.modalAdicionarAnexo = true;
             this.cadastroAtivoAnexos = true;
+        },
+
+        atualizarQuantidade(id, quantidadeAutorizada) {
+            const index = this.quantidadeAutorizada.findIndex((item) => item.id === id);
+
+            if (index !== -1) {
+                this.quantidadeAutorizada[index].quantidade_autorizada = quantidadeAutorizada;
+            } else {
+                this.quantidadeAutorizada.push({ id, quantidade_autorizada: quantidadeAutorizada });
+            }
         },
 
         visualizarAnexo(anexo) {
@@ -821,12 +889,25 @@ export default {
                         </span>
                     </template>
                 </Column>
-                <Column field="comprador" header="Comprador"></Column>
+                <Column field="comprador" header="Comprador">
+                    <template #body="slotProps">
+                        <span>
+                            {{ slotProps.data.comprador ? slotProps.data.comprador : 'N/A' }}
+                        </span>
+                    </template>
+                </Column>
                 <Column header="...">
                     <template #body="slotProps">
                         <div class="flex gap-2">
-                            <Button icon="pi pi-eye" @click.prevent="abrirModalVisualizarLm(slotProps.data)" class="p-button-rounded p-button-info" />
-                            <!-- <Button icon="pi pi-trash" class="p-button-rounded p-button-danger" @click="deletar(slotProps.data)" /> -->
+                            <Button v-if="slotProps.data.status != 'Aguardando'" label="Visualizar" icon="pi pi-eye" @click.prevent="abrirModalVisualizarLm(slotProps.data)" class="p-button-rounded p-button-info" />
+                            <Button
+                                v-if="slotProps.data.status == 'Aguardando'"
+                                @click="iniciarProcessoCompraLm(slotProps.data)"
+                                :disabled="this.funcaoValidada != 'Comprador'"
+                                label="Iniciar"
+                                icon="pi pi-check"
+                                class="p-button-rounded p-button-success"
+                            />
                         </div>
                     </template>
                 </Column>
@@ -929,9 +1010,17 @@ export default {
 
                                     <Button @click.prevent="abrirModalAnexos()" icon="pi pi-download" label="Anexos" class="p-button-outlined p-button-help" />
 
-                                    <Button @click.prevent="abrirModalAdicionarMaterial()" icon="pi pi-plus" label="Adicionar Material" class="p-button-outlined p-button-success" />
+                                    <Button v-if="['Administrador', 'Engenheiro'].includes(this.funcaoValidada)" @click.prevent="abrirModalAdicionarMaterial()" icon="pi pi-plus" label="Adicionar Material" class="p-button-outlined p-button-success" />
 
-                                    <Button @click.prevent="abrirModalDesignarComprador()" icon="pi pi-users" label="Designar Comprador" class="p-button-outlined p-button-secondary" />
+                                    <Button v-if="['Administrador', 'Gerente'].includes(this.funcaoValidada)" @click.prevent="abrirModalDesignarComprador()" icon="pi pi-users" label="Designar Comprador" class="p-button-outlined p-button-secondary" />
+
+                                    <Button
+                                        v-if="['Administrador', 'Gerente'].includes(this.funcaoValidada) && this.lmSelecionada.status == 'Validação de Quantitativo'"
+                                        icon="pi pi-check"
+                                        label="Autorizar Quantitativo"
+                                        @click.prevent="confirmarQuantitativo()"
+                                        class="p-button-outlined p-button-success"
+                                    />
 
                                     <Button icon="pi pi-print" label="Imprimir" class="p-button-outlined p-button-secondary" />
                                 </div>
@@ -949,9 +1038,15 @@ export default {
                             <Column field="id" header="ID"></Column>
                             <Column field="indicador" header="Indicador"></Column>
                             <Column field="descricao" header="Descrição"></Column>
-                            <Column field="descritiva" header="Descrição"></Column>
+                            <Column field="descritiva" header="Descritiva"></Column>
                             <Column field="unidade" header="Unidade"></Column>
-                            <Column field="quantidade" header="Quantidade"></Column>
+                            <Column field="quantidade" header="Quantidade Solicitada"></Column>
+                            <Column field="quantidade_autorizada" header="Quantidade Autorizada"></Column>
+                            <Column v-if="this.lmSelecionada.status === 'Validação de Quantitativo'" field="quantidade" header="Quantidade Validada">
+                                <template #body="slotProps">
+                                    <InputNumber v-model.number="slotProps.data.quantidade" @update:modelValue="(val) => atualizarQuantidade(slotProps.data.id, val)" />
+                                </template>
+                            </Column>
                             <Column field="quantidade_entregue" header="Entregue"></Column>
                             <Column header="Pendente">
                                 <template #body="slotProps">
