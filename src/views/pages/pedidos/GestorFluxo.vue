@@ -36,6 +36,7 @@ export default {
             pdf: ref(null),
             pdfsrc: ref(null),
             fluxoPedido: ref(null),
+            userLogado: localStorage.getItem('nome'),
             validaExclusaoButton: localStorage.getItem('grupo')
         };
     },
@@ -43,7 +44,13 @@ export default {
     mounted: function () {
         // Metódo responsável por buscar todas os pedidos com status 6
         this.pedidoService.buscaAnalisando().then((data) => {
-            this.pedidos = data.pedidos;
+            if (this.userLogado == 'Soleni' || this.userLogado == 'Eduardo C. Resplandes') {
+                this.pedidos = data.pedidos;
+            } else {
+                this.pedidos = data.pedidos;
+                this.pedidos = this.pedidos.filter((pedido) => pedido.criador !== 'DP');
+            }
+
             this.preloading = false;
         });
 

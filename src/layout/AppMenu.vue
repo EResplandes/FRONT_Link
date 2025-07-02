@@ -24,7 +24,7 @@ const model = ref([
                 requiredRole: ['Gestor de Fluxo', 'Administrador']
             },
             { label: 'Pedidos com Giovana', icon: 'pi pi-fw pi-book', to: '/pedidos-giovana', requiredRole: ['Gestor de Fluxo', 'Administrador'] },
-            { label: 'Análise de Fluxo', icon: 'pi pi-fw pi-sitemap', to: '/gestor-fluxo', requiredRole: ['Gestor de Fluxo', 'Administrador'] },
+            { label: 'Análise de Fluxo', icon: 'pi pi-fw pi-sitemap', to: '/gestor-fluxo', requiredRole: ['Gestor de Fluxo', 'Administrador', 'Auxiliar de Fluxo'], requiredNome: ['Eduardo C. Resplandes', 'Soleni', 'Neide Teixeira'] },
             { label: 'Resposta Reprovados', icon: 'pi pi-fw pi-sitemap', to: '/resposta-reprovados', requiredRole: ['Gestor de Fluxo', 'Administrador'] },
             { label: 'Todos', icon: 'pi pi-fw pi-book', to: '/todos-pedidos-soleni', requiredRole: ['Gestor de Fluxo', 'Administrador'] }
         ]
@@ -38,7 +38,7 @@ const model = ref([
                 icon: 'pi pi-fw pi-book',
                 to: '/pedidos-monica',
                 requiredRole: ['Comprador', 'Administrador', 'Comprador Externo'],
-                requiredNome: ['DP BRASÍLIA', 'Eduardo C. Resplandes', 'DP', 'Soleni', 'Ana Paulino', 'Neide']
+                requiredNome: ['DP BRASÍLIA', 'Eduardo C. Resplandes', 'DP', 'Soleni']
             },
             { label: 'Justificar Pedidos', icon: 'pi pi-fw pi-book', to: '/justificar-pedidos-dp', requiredRole: ['Administrador', 'Comprador', 'Comprador Externo'], requiredNome: ['Eduardo C. Resplandes', 'DP BRASÍLIA', 'DP'] },
             { label: 'Todos Pedidos', icon: 'pi pi-fw pi-book', to: '/todos-pedidos-dp', requiredRole: ['Administrador', 'Comprador', 'Comprador Externo', 'Gestor de Fluxo'], requiredNome: ['Eduardo C. Resplandes', 'DP BRASÍLIA', 'DP', 'Soleni'] }
