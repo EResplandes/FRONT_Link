@@ -448,6 +448,10 @@ export default {
 
         handleFileUpload() {
             this.novoAnexo.anexo = this.$refs.anexo.files[0];
+        },
+
+        rowClass(data) {
+            return data.adicionado_posteriormente === 1 ? 'linha-destacada' : '';
         }
     }
 };
@@ -1021,7 +1025,6 @@ export default {
                                         @click.prevent="confirmarQuantitativo()"
                                         class="p-button-outlined p-button-success"
                                     />
-
                                     <Button icon="pi pi-print" label="Imprimir" class="p-button-outlined p-button-secondary" />
                                 </div>
                             </div>
@@ -1034,7 +1037,7 @@ export default {
                     <div class="card p-4">
                         <h3 class="mt-0 mb-3">Materiais Solicitados</h3>
                         <!-- Exemplo de tabela com dados temporários -->
-                        <DataTable :value="materiais" showGridlines tableStyle="min-width: 50rem">
+                        <DataTable :value="materiais" showGridlines :rowClass="rowClass" tableStyle="min-width: 50rem">
                             <Column field="id" header="ID"></Column>
                             <Column field="indicador" header="Indicador"></Column>
                             <Column field="descricao" header="Descrição"></Column>
@@ -1053,7 +1056,11 @@ export default {
                                     {{ slotProps.data.quantidade - slotProps.data.quantidade_entregue }}
                                 </template>
                             </Column>
-                            <Column field="id_status" header="Status"></Column>
+                            <Column header="Status">
+                                <template #body="slotProps">
+                                    {{ getStatusName(slotProps.data.id_status) }}
+                                </template>
+                            </Column>
                         </DataTable>
                     </div>
                 </div>
@@ -1112,6 +1119,11 @@ export default {
     /* Defina a altura máxima desejada */
     overflow-y: auto;
     /* Adiciona uma barra de rolagem vertical quando o conteúdo excede a altura máxima */
+}
+
+.linha-destacada {
+    background-color: #fff7cd; /* amarelo claro */
+    font-weight: bold;
 }
 
 .header-padrao {
