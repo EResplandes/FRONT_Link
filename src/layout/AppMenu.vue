@@ -44,12 +44,12 @@ const model = ref([
             { label: 'Todos Pedidos', icon: 'pi pi-fw pi-book', to: '/todos-pedidos-dp', requiredRole: ['Administrador', 'Comprador', 'Comprador Externo', 'Gestor de Fluxo'], requiredNome: ['Eduardo C. Resplandes', 'DP BRASÍLIA', 'DP', 'Soleni'] }
         ]
     },
-    {
-        label: 'Comparação de Preços',
-        items: [
+    // {
+        // label: 'Comparação de Preços',
+        // items: [
             // { label: 'Consulta', icon: 'pi pi-fw pi-book', to: '/consulta-precos', requiredRole: ['Apresentação'] }
-        ]
-    },
+        // ]
+    // },
     {
         label: 'Consulta',
         items: [{ label: 'Todos', icon: 'pi pi-fw pi-book', to: '/todos-pedidos-soleni', requiredRole: ['Administrador', 'Consultante', 'Fiscal'] }]
@@ -75,14 +75,14 @@ const model = ref([
             // { label: 'Consulta', icon: 'pi pi-fw pi-book', to: '/consulta-precos', requiredRole: ['Administrador', 'Comprador', 'Comprador Externo'] }
         ]
     },
-    {
-        label: 'Módulo Fiscal',
-        items: [
-            { label: 'Cadastro FISCAL', icon: 'pi pi-fw pi-book', to: '/cadastro-fiscal', requiredRole: ['Administrador', 'Fiscal'] }
+    // {
+        // label: 'Módulo Fiscal',
+        // items: [
+            // { label: 'Cadastro FISCAL', icon: 'pi pi-fw pi-book', to: '/cadastro-fiscal', requiredRole: ['Administrador', 'Fiscal'] }
             // { label: 'Pedidos para Escriturar', icon: 'pi pi-fw pi-book', to: '/pedidos-escriturar', requiredRole: ['Fiscal', 'Administrador'] },
             // { label: 'Pedidos Reprovados pelo Financeiro', icon: 'pi pi-fw pi-book', to: '/pedidos-reprovados-financeiro', requiredRole: ['Fiscal', 'Administrador'] }
-        ]
-    },
+        // ]
+    // },
     // {
     //     label: 'Módulo Financeiro',
     //     items: [
@@ -107,21 +107,21 @@ const model = ref([
             // { label: 'Justificar Pedidos Reprovados por Soleni', icon: 'pi pi-fw pi-pencil', to: '/reprovados-soleni', requiredRole: ['Comprador', 'Administrador', 'Gerente', 'Comprador Externo'] }
         ]
     },
-    {
-        label: 'Almoxarifado',
-        items: [{ label: 'Controle de LMs', icon: 'pi pi-fw pi-book', to: '/controle-lms-almoxarife', requiredRole: ['Administrador', 'Almoxarife'] }]
-    },
-    {
-        label: 'Listas de Materiais',
-        items: [
-            { label: 'Dashboard', icon: 'pi pi-fw pi-book', to: '/dashboard-lm', requiredRole: ['Gerente', 'Administrador'] },
-            { label: 'Cadastro LM', icon: 'pi pi-fw pi-book', to: '/cadastro-lm', requiredRole: ['Administrador', 'Engenheiro'] },
-            { label: 'Acompanhamento de LM', icon: 'pi pi-fw pi-book', to: '/alteracao-lms-engenharia', requiredRole: ['Administrador', 'Engenheiro', 'Gerente', 'Almoxarife', 'Comprador'] },
-            { label: 'Controle de LMs', icon: 'pi pi-fw pi-book', to: '/controle-lms-almoxarife', requiredRole: ['Administrador', 'Almoxarife'] },
-            { label: 'Minhas LMs', icon: 'pi pi-fw pi-book', to: '/minhas-lms', requiredRole: ['Comprador Externo', 'Comprador', 'Administrador'] },
-            { label: 'LMs', icon: 'pi pi-fw pi-book', to: '/todas-lms', requiredRole: ['Administrador', 'Diretor', 'Gerente'], requiredNome: ['Eduardo C. Resplandes', 'Paulo', 'Cairo'] }
-        ]
-    },
+    // {
+    // label: 'Almoxarifado',
+    // items: [{ label: 'Controle de LMs', icon: 'pi pi-fw pi-book', to: '/controle-lms-almoxarife', requiredRole: ['Administrador', 'Almoxarife'] }]
+    // },
+    // {
+    // label: 'Listas de Materiais',
+    // items: [
+    // { label: 'Dashboard', icon: 'pi pi-fw pi-book', to: '/dashboard-lm', requiredRole: ['Gerente', 'Administrador'] },
+    // { label: 'Cadastro LM', icon: 'pi pi-fw pi-book', to: '/cadastro-lm', requiredRole: ['Administrador', 'Engenheiro'] },
+    // { label: 'Acompanhamento de LM', icon: 'pi pi-fw pi-book', to: '/alteracao-lms-engenharia', requiredRole: ['Administrador', 'Engenheiro', 'Gerente', 'Almoxarife', 'Comprador'] },
+    // { label: 'Controle de LMs', icon: 'pi pi-fw pi-book', to: '/controle-lms-almoxarife', requiredRole: ['Administrador', 'Almoxarife'] },
+    // { label: 'Minhas LMs', icon: 'pi pi-fw pi-book', to: '/minhas-lms', requiredRole: ['Comprador Externo', 'Comprador', 'Administrador'] },
+    // { label: 'LMs', icon: 'pi pi-fw pi-book', to: '/todas-lms', requiredRole: ['Administrador', 'Diretor', 'Gerente'], requiredNome: ['Eduardo C. Resplandes', 'Paulo', 'Cairo'] }
+    // ]
+    // },
     {
         label: 'Administração',
         items: [
@@ -143,17 +143,17 @@ const model = ref([
         label: 'Presidência',
         items: [
             { label: 'Emival', icon: 'pi pi-fw pi-users', to: '/emival-novo', requiredRole: ['Presidente', 'Administrador'] },
-            { label: 'Emival Temp.', icon: 'pi pi-fw pi-users', to: '/emival-temporario', requiredRole: ['Presidente', 'Administrador'] },
+            // { label: 'Emival Temp.', icon: 'pi pi-fw pi-users', to: '/emival-temporario', requiredRole: ['Presidente', 'Administrador'] },
             // { label: 'Emival 2.0', icon: 'pi pi-fw pi-users', to: '/emival-novo', requiredRole: ['Presidente', 'Administrador'] },
             { label: 'Giovana', icon: 'pi pi-fw pi-users', to: '/giovana', requiredRole: ['Diretor', 'Administrador'], requiredNome: ['Giovana', 'Eduardo C. Resplandes'] },
             { label: 'Auditoria', icon: 'pi pi-fw pi-book', to: '/pedidos-antecipados', requiredRole: ['Presidente', 'Administrador'] },
             { label: 'Mônica', icon: 'pi pi-fw pi-users', to: '/monica', requiredRole: ['Presidente', 'Administrador'], requiredNome: ['Mônica Caiado', 'Eduardo C. Resplandes'] }
         ]
     },
-    {
-        label: 'Controle de Caixa',
-        items: [{ label: 'Controle', icon: 'pi pi-fw pi-users', to: '/controle-caixa', requiredRole: ['Gestor de Fluxo', 'Administrador'], requiredNome: ['Soleni', 'Eduardo C. Resplandes'] }]
-    },
+    // {
+        // label: 'Controle de Caixa',
+        // items: [{ label: 'Controle', icon: 'pi pi-fw pi-users', to: '/controle-caixa', requiredRole: ['Gestor de Fluxo', 'Administrador'], requiredNome: ['Soleni', 'Eduardo C. Resplandes'] }]
+    // },
     {
         // label: 'P
         icon: 'pi pi-fw pi-briefcase',
