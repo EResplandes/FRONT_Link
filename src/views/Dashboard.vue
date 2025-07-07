@@ -205,10 +205,7 @@ export default {
                         <span class="text-900 line-height-3"
                             >Para relatar erros ou enviar sugestões de melhoria, por favor, entre em contato conosco através dos seguintes meios:
                             <span class="text-700 mt-3"
-                                ><span class="text-blue-500">
-                                    <p class="m-0">Telefone: +55 61 3298-8817</p>
-                                    <p class="m-0">E-mail: suporte@gruporialma.com.br</p></span
-                                ></span
+                                ><span class="text-blue-500"> <p class="m-0">E-mail: ti@gruporialma.com.br</p></span></span
                             >
                         </span>
                     </template>
