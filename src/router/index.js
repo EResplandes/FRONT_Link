@@ -251,7 +251,7 @@ const router = createRouter({
                 {
                     path: '/emival-temporario',
                     name: 'emival-temporario',
-                    component: () => import('@/views/pages/presidencia/Emival_novo.vue')
+                    component: () => import('@/views/pages/presidencia/Emival3.vue')
                 },
                 {
                     path: '/monica',

@@ -223,6 +223,24 @@ export default class PedidoService {
             });
     }
 
+    // Requisição responsável por listar todos pedidos pendentes do Emival
+    async listarPedidosPendentesEmival() {
+        return await fetch(`${API_URL}/app/listarPedidosPendentesEmival`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json'
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
     // Requisição responsável por buscar pedidos reprovados para justicar
     async listarPedidosParaJustificar() {
         return await fetch(`${API_URL}/pedidos/listar-justificar?id_usuario=` + localStorage.getItem('usuario_id'), {
@@ -1318,6 +1336,51 @@ export default class PedidoService {
                 Authorization: 'Bearer ' + token
             },
             body: formData
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    cobrarResposta(pedidoSelecionado, mensagemEmival) {
+        return fetch(`${API_URL}/app/cobrar-resposta`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                id_pedido: pedidoSelecionado,
+                mensagem: mensagemEmival
+            })
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    finalizarPendencia(id_pedido) {
+        return fetch(`${API_URL}/app/finalizar-ressalva`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                id_pedido: id_pedido
+            })
         })
             .then((res) => res.json())
             .then((d) => {

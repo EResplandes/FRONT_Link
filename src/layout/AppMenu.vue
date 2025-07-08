@@ -45,10 +45,10 @@ const model = ref([
         ]
     },
     // {
-        // label: 'Comparação de Preços',
-        // items: [
-            // { label: 'Consulta', icon: 'pi pi-fw pi-book', to: '/consulta-precos', requiredRole: ['Apresentação'] }
-        // ]
+    // label: 'Comparação de Preços',
+    // items: [
+    // { label: 'Consulta', icon: 'pi pi-fw pi-book', to: '/consulta-precos', requiredRole: ['Apresentação'] }
+    // ]
     // },
     {
         label: 'Consulta',
@@ -76,12 +76,12 @@ const model = ref([
         ]
     },
     // {
-        // label: 'Módulo Fiscal',
-        // items: [
-            // { label: 'Cadastro FISCAL', icon: 'pi pi-fw pi-book', to: '/cadastro-fiscal', requiredRole: ['Administrador', 'Fiscal'] }
-            // { label: 'Pedidos para Escriturar', icon: 'pi pi-fw pi-book', to: '/pedidos-escriturar', requiredRole: ['Fiscal', 'Administrador'] },
-            // { label: 'Pedidos Reprovados pelo Financeiro', icon: 'pi pi-fw pi-book', to: '/pedidos-reprovados-financeiro', requiredRole: ['Fiscal', 'Administrador'] }
-        // ]
+    // label: 'Módulo Fiscal',
+    // items: [
+    // { label: 'Cadastro FISCAL', icon: 'pi pi-fw pi-book', to: '/cadastro-fiscal', requiredRole: ['Administrador', 'Fiscal'] }
+    // { label: 'Pedidos para Escriturar', icon: 'pi pi-fw pi-book', to: '/pedidos-escriturar', requiredRole: ['Fiscal', 'Administrador'] },
+    // { label: 'Pedidos Reprovados pelo Financeiro', icon: 'pi pi-fw pi-book', to: '/pedidos-reprovados-financeiro', requiredRole: ['Fiscal', 'Administrador'] }
+    // ]
     // },
     // {
     //     label: 'Módulo Financeiro',
@@ -108,7 +108,6 @@ const model = ref([
         ]
     },
     // {
-<<<<<<< HEAD
     // label: 'Almoxarifado',
     // items: [{ label: 'Controle de LMs', icon: 'pi pi-fw pi-book', to: '/controle-lms-almoxarife', requiredRole: ['Administrador', 'Almoxarife'] }]
     // },
@@ -122,21 +121,6 @@ const model = ref([
     // { label: 'Minhas LMs', icon: 'pi pi-fw pi-book', to: '/minhas-lms', requiredRole: ['Comprador Externo', 'Comprador', 'Administrador'] },
     // { label: 'LMs', icon: 'pi pi-fw pi-book', to: '/todas-lms', requiredRole: ['Administrador', 'Diretor', 'Gerente'], requiredNome: ['Eduardo C. Resplandes', 'Paulo', 'Cairo'] }
     // ]
-=======
-    //     label: 'Almoxarifado',
-    //     items: [{ label: 'Controle de LMs', icon: 'pi pi-fw pi-book', to: '/controle-lms-almoxarife', requiredRole: ['Administrador', 'Almoxarife'] }]
-    // },
-    // {
-    //     label: 'Listas de Materiais',
-    //     items: [
-    //         { label: 'Dashboard', icon: 'pi pi-fw pi-book', to: '/dashboard-lm', requiredRole: ['Gerente', 'Administrador'] },
-    //         { label: 'Cadastro LM', icon: 'pi pi-fw pi-book', to: '/cadastro-lm', requiredRole: ['Administrador', 'Engenheiro'] },
-    //         { label: 'Acompanhamento de LM', icon: 'pi pi-fw pi-book', to: '/alteracao-lms-engenharia', requiredRole: ['Administrador', 'Engenheiro', 'Gerente', 'Almoxarife', 'Comprador'] },
-    //         { label: 'Controle de LMs', icon: 'pi pi-fw pi-book', to: '/controle-lms-almoxarife', requiredRole: ['Administrador', 'Almoxarife'] },
-    //         { label: 'Minhas LMs', icon: 'pi pi-fw pi-book', to: '/minhas-lms', requiredRole: ['Comprador Externo', 'Comprador', 'Administrador'] },
-    //         { label: 'LMs', icon: 'pi pi-fw pi-book', to: '/todas-lms', requiredRole: ['Administrador', 'Diretor', 'Gerente'], requiredNome: ['Eduardo C. Resplandes', 'Paulo', 'Cairo'] }
-    //     ]
->>>>>>> 9d8645d986a63baab6de93f4fa5a184f65ca83e0
     // },
     {
         label: 'Administração',
@@ -159,7 +143,7 @@ const model = ref([
         label: 'Presidência',
         items: [
             { label: 'Emival', icon: 'pi pi-fw pi-users', to: '/emival-novo', requiredRole: ['Presidente', 'Administrador'] },
-            // { label: 'Emival Temp.', icon: 'pi pi-fw pi-users', to: '/emival-temporario', requiredRole: ['Presidente', 'Administrador'] },
+            { label: 'Emival Temp.', icon: 'pi pi-fw pi-users', to: '/emival-temporario', requiredRole: ['Presidente', 'Administrador'] },
             // { label: 'Emival 2.0', icon: 'pi pi-fw pi-users', to: '/emival-novo', requiredRole: ['Presidente', 'Administrador'] },
             { label: 'Giovana', icon: 'pi pi-fw pi-users', to: '/giovana', requiredRole: ['Diretor', 'Administrador'], requiredNome: ['Giovana', 'Eduardo C. Resplandes'] },
             { label: 'Auditoria', icon: 'pi pi-fw pi-book', to: '/pedidos-antecipados', requiredRole: ['Presidente', 'Administrador'] },
@@ -167,13 +151,8 @@ const model = ref([
         ]
     },
     // {
-<<<<<<< HEAD
-        // label: 'Controle de Caixa',
-        // items: [{ label: 'Controle', icon: 'pi pi-fw pi-users', to: '/controle-caixa', requiredRole: ['Gestor de Fluxo', 'Administrador'], requiredNome: ['Soleni', 'Eduardo C. Resplandes'] }]
-=======
-    //     label: 'Controle de Caixa',
-    //     items: [{ label: 'Controle', icon: 'pi pi-fw pi-users', to: '/controle-caixa', requiredRole: ['Gestor de Fluxo', 'Administrador'], requiredNome: ['Soleni', 'Eduardo C. Resplandes'] }]
->>>>>>> 9d8645d986a63baab6de93f4fa5a184f65ca83e0
+    // label: 'Controle de Caixa',
+    // items: [{ label: 'Controle', icon: 'pi pi-fw pi-users', to: '/controle-caixa', requiredRole: ['Gestor de Fluxo', 'Administrador'], requiredNome: ['Soleni', 'Eduardo C. Resplandes'] }]
     // },
     {
         // label: 'P
