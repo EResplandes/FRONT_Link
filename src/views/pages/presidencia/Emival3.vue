@@ -789,7 +789,7 @@ export default {
             this.displayPendentes = true;
             const dataAgora = new Date();
             this.$nextTick(() => {
-                this.renderPdfAcima(`${this.urlBase}/${data.anexo}?t=${dataAgora.getSeconds()}`, `${dataAgora.getSeconds()}.pdf`);
+                this.renderPdfPendente(`${this.urlBase}/${data.anexo}?t=${dataAgora.getSeconds()}`, `${dataAgora.getSeconds()}.pdf`);
             });
         },
 
