@@ -80,7 +80,16 @@ export default {
         buscaPedidos() {
             this.preloading = true;
             this.gerenteService.buscaPedidos(localStorage.getItem('usuario_id')).then((data) => {
-                this.pedidos = data.pedidos;
+                this.pedidos = data.pedidos.map((pedido) => ({
+                    ...pedido,
+                    criador: pedido.pedido.criador,
+                    descricao: pedido.pedido.descricao,
+                    diretor: pedido.pedido.link.link,
+                    protheus: pedido.pedido.protheus,
+                    dt_inclusao_formatada: this.formatarData(pedido.pedido.dt_inclusao),
+                    valor_formatado: pedido.pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                }));
+
                 this.preloading = false;
             });
         },
