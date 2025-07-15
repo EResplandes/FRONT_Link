@@ -87,10 +87,11 @@ export default {
 
         // Metódo responsável por aprovar fluxo
         aprovarPedido() {
-            this.gerenteService.aprovar(this.idFluxo).then((data) => {
+            this.gerenteService.aprovar(this.idFluxo, this.urgente).then((data) => {
                 if (data.resposta == 'Pedido aprovado com sucesso!') {
                     this.showSuccess('Pedido aprovado com suceso!');
                     this.buscaPedidos();
+                    this.urgente = 0;
                     this.display = false;
                 } else {
                     this.showError('Ocorreu algum problema, entre em contato com o Administrador!');

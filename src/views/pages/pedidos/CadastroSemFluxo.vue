@@ -15,6 +15,7 @@ export default {
             displayConfirmationActivation: ref(false),
             linkService: new LinkService(),
             empresaService: new EmpresaService(),
+            fileKey: ref(0),
             metodoService: new MetodoService(),
             cadastrarPedidoService: new CadastrarPedidoService(),
             localService: new LocalService(),
@@ -123,8 +124,12 @@ export default {
                     if (data.resposta == 'Pedido cadastrado com sucesso!') {
                         this.preloading = false;
                         this.showSuccess('Pedido cadastrado com sucesso!');
-                        this.form = {};
-                        this.$refs.pdf.clear();
+                        this.form = {
+                            urgente: 0,
+                            pdf: null
+                        };
+                        this.fileKey++;
+                        this.form.pdf = null;
                         // window.location.reload();
                     } else {
                         this.preloading = false;
@@ -255,7 +260,7 @@ export default {
 
                             <div class="field col-1 md:col-3">
                                 <label for="firstname2">PDF<span class="obrigatorio">*</span></label>
-                                <FileUpload chooseLabel="Selecionar Arquivo" @change="uploadPdf" mode="basic" type="file" ref="pdf" name="demo[]" accept=".pdf,.docx" :maxFileSize="999999999"></FileUpload>
+                                <FileUpload :key="fileKey" chooseLabel="Selecionar Arquivo" @change="uploadPdf" mode="basic" type="file" ref="pdf" name="demo[]" accept=".pdf,.docx" :maxFileSize="999999999"></FileUpload>
                             </div>
                             <div class="field col-12 md:col-3 mt-2">
                                 <label for="Link">Link <span class="obrigatorio">*</span></label>

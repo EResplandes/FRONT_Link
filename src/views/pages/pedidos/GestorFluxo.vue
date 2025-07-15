@@ -31,7 +31,7 @@ export default {
         Dialog,
         Timeline,
         Tag,
-        InputText,
+        InputText
     },
 
     data() {
@@ -84,9 +84,9 @@ export default {
                     {
                         label: 'Aprovados (R$)',
                         backgroundColor: '#3b82f6',
-                        data: [180000, 210000, 195000],
-                    },
-                ],
+                        data: [180000, 210000, 195000]
+                    }
+                ]
             },
 
             chartOptions: {
@@ -94,10 +94,10 @@ export default {
                 plugins: {
                     legend: {
                         display: true,
-                        position: 'top',
-                    },
-                },
-            },
+                        position: 'top'
+                    }
+                }
+            }
         };
     },
 
@@ -116,7 +116,7 @@ export default {
         temPedidoNovo(novaLista) {
             if (!this.pedidosUltimaBusca.length) return false;
 
-            const idsAntigos = this.pedidosUltimaBusca.map(p => p.id);
+            const idsAntigos = this.pedidosUltimaBusca.map((p) => p.id);
             for (const pedido of novaLista) {
                 if (!idsAntigos.includes(pedido.id)) {
                     return true;
@@ -166,7 +166,6 @@ export default {
                 this.indicadores = data.indicadores;
             });
         },
-
 
         iniciarTimer() {
             if (this.timerInterval) {
@@ -235,7 +234,7 @@ export default {
 
         enviarMensagem() {
             this.preloading = true;
-            this.fluxoService.reprovar(this.form, this.idPedido).then((data) => {
+            this.fluxoService.reprovar(this.novaMensagem, this.idPedido).then((data) => {
                 if (data.resposta === 'Pedido reprovado com sucesso!') {
                     this.showSuccess('Pedido reprovado com sucesso!');
                     this.display = false;
@@ -250,7 +249,6 @@ export default {
 
         reprovarFluxo() {
             this.chatService.buscaConversa(this.idPedido).then((data) => {
-                console.log(data);
                 this.conversa = data.conversa;
                 this.displayChat = true;
             });
@@ -266,7 +264,7 @@ export default {
                 minute: '2-digit',
                 second: '2-digit',
                 hour12: false,
-                timeZone: 'UTC',
+                timeZone: 'UTC'
             };
 
             return new Intl.DateTimeFormat('pt-BR', options).format(dataFormatada);
@@ -339,9 +337,9 @@ export default {
                 const ctx = new AudioContext();
 
                 const oscillator = ctx.createOscillator();
-                oscillator.type = 'triangle'; 
+                oscillator.type = 'triangle';
 
-                oscillator.frequency.setValueAtTime(880, ctx.currentTime); 
+                oscillator.frequency.setValueAtTime(880, ctx.currentTime);
 
                 const gainNode = ctx.createGain();
                 gainNode.gain.setValueAtTime(0, ctx.currentTime);
@@ -352,35 +350,34 @@ export default {
                 oscillator.start();
 
                 gainNode.gain.linearRampToValueAtTime(1, ctx.currentTime + 0.01);
-                gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.5); 
+                gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.5);
                 oscillator.stop(ctx.currentTime + 1.5);
             } catch (e) {
                 console.warn('Erro ao tocar bip:', e);
             }
         },
 
-
         async notificarNovoPedido() {
-            if (!("Notification" in window)) {
-                console.log("Este navegador não suporta notificações.");
+            if (!('Notification' in window)) {
+                console.log('Este navegador não suporta notificações.');
                 return;
             }
 
-            if (Notification.permission === "granted") {
-                new Notification("Novo Pedido", {
-                    body: "Há um novo pedido aguardando aprovação.",
-                    icon: "/favicon.ico",
+            if (Notification.permission === 'granted') {
+                new Notification('Novo Pedido', {
+                    body: 'Há um novo pedido aguardando aprovação.',
+                    icon: '/favicon.ico'
                 });
-            } else if (Notification.permission !== "denied") {
+            } else if (Notification.permission !== 'denied') {
                 const permission = await Notification.requestPermission();
-                if (permission === "granted") {
-                    new Notification("Novo Pedido", {
-                        body: "Há um novo pedido aguardando aprovação.",
-                        icon: "/favicon.ico",
+                if (permission === 'granted') {
+                    new Notification('Novo Pedido', {
+                        body: 'Há um novo pedido aguardando aprovação.',
+                        icon: '/favicon.ico'
                     });
                 }
             }
-        },
+        }
     }
 };
 </script>
@@ -403,25 +400,19 @@ export default {
             <div class="grid">
                 <!-- Coluna do PDF -->
                 <div class="col-12 md:col-8">
-                    <Button @click.prevent="fluxo(idPedido)" label="Tomada de Ação" icon="pi pi-check"
-                        class="p-button-info w-full mb-2" />
-                    <iframe :src="pdfsrc"
-                        style="width: 100%; height: 700px; border: none; border-radius: 6px; box-shadow: 0 2px 10px rgba(0,0,0,0.1)"
-                        title="Visualização do documento">
-                        Oops! ocorreu um erro ao carregar o documento.
-                    </iframe>
+                    <Button @click.prevent="fluxo(idPedido)" label="Tomada de Ação" icon="pi pi-check" class="p-button-info w-full mb-2" />
+                    <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none; border-radius: 6px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1)" title="Visualização do documento"> Oops! ocorreu um erro ao carregar o documento. </iframe>
                 </div>
 
                 <!-- Coluna das informações do pedido -->
                 <div class="col-12 md:col-4">
-                    <div class="card p-6" style="height: 100%;">
+                    <div class="card p-6" style="height: 100%">
                         <h3 class="mt-0 mb-4">Informações do Pedido</h3>
 
                         <div class="grid">
                             <!-- Linha 1 -->
                             <div class="col-12 field-label">Data Inclusão:</div>
-                            <div class="col-12 field-value mb-3">{{ formatarData(pedidoSelecionado?.dt_inclusao) }}
-                            </div>
+                            <div class="col-12 field-value mb-3">{{ formatarData(pedidoSelecionado?.dt_inclusao) }}</div>
 
                             <!-- Linha 2 -->
                             <div class="col-12 field-label">N° Protheus:</div>
@@ -438,10 +429,14 @@ export default {
                             <!-- Linha 5 -->
                             <div class="col-12 field-label">Valor:</div>
                             <div class="col-12 field-value mb-3">
-                                {{ pedidoSelecionado?.valor ? pedidoSelecionado.valor.toLocaleString('pt-BR', {
-                                    style:
-                                        'currency', currency: 'BRL'
-                                }) : 'N/A' }}
+                                {{
+                                    pedidoSelecionado?.valor
+                                        ? pedidoSelecionado.valor.toLocaleString('pt-BR', {
+                                              style: 'currency',
+                                              currency: 'BRL'
+                                          })
+                                        : 'N/A'
+                                }}
                             </div>
 
                             <!-- Linha 6 -->
@@ -455,8 +450,7 @@ export default {
                             <!-- Linha 8 -->
                             <div class="col-12 field-label">Link:</div>
                             <div class="col-12 field-value mb-3">
-                                <a v-if="pedidoSelecionado?.link" :href="pedidoSelecionado.link" target="_blank"
-                                    class="text-primary">
+                                <a v-if="pedidoSelecionado?.link" :href="pedidoSelecionado.link" target="_blank" class="text-primary">
                                     {{ pedidoSelecionado.link }}
                                 </a>
                                 <span v-else>N/A</span>
@@ -474,9 +468,7 @@ export default {
                     <div class="card timeline-container" ref="msgContainer">
                         <Timeline :value="conversa" align="alternate" class="customized-timeline">
                             <template #marker="slotProps">
-                                <span
-                                    class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2"
-                                    :style="{ backgroundColor: slotProps.item.color }">
+                                <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
                                     <i :class="slotProps.item.icon"></i>
                                 </span>
                             </template>
@@ -500,12 +492,9 @@ export default {
                     <hr />
                     <InputText class="col-12" type="text" v-model="novaMensagem" placeholder="Digite a mensagem..." />
 
-                    <Button @click.prevent="enviarMensagem()" label="Reprovar e enviar mensagem"
-                        class="mr-2 mt-3 p-button-danger col-12" />
-                    <Button @click.prevent="aprovarFluxoComRessalva()" label="Aprovar com ressalva"
-                        class="mr-2 p-button-info col-12 mt-2" />
+                    <Button @click.prevent="enviarMensagem()" label="Reprovar e enviar mensagem" class="mr-2 mt-3 p-button-danger col-12" />
+                    <Button @click.prevent="aprovarFluxoComRessalva()" label="Aprovar com ressalva" class="mr-2 p-button-info col-12 mt-2" />
                     <Button @click.prevent="aprovarFluxo()" label="Aprovar" class="mr-2 p-button-success col-12 mt-2" />
-
                 </div>
             </div>
         </Dialog>
@@ -520,7 +509,7 @@ export default {
                         {{
                             (indicadores?.valorSaidaHoje || 0).toLocaleString('pt-BR', {
                                 style: 'currency',
-                                currency: 'BRL',
+                                currency: 'BRL'
                             })
                         }}
                     </h2>
@@ -533,7 +522,7 @@ export default {
                         {{
                             (indicadores?.valorSaidaMensal || 0).toLocaleString('pt-BR', {
                                 style: 'currency',
-                                currency: 'BRL',
+                                currency: 'BRL'
                             })
                         }}
                     </h2>
@@ -556,11 +545,18 @@ export default {
         <!-- Tabela de Pedidos -->
         <div class="col-12">
             <div class="card">
-                <DataTable dataKey="id" :value="pedidos" :paginator="true" :rows="10"
+                <DataTable
+                    dataKey="id"
+                    :value="pedidos"
+                    :paginator="true"
+                    :rows="10"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25, 50, 100]"
                     currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
-                    responsiveLayout="scroll" filterDisplay="menu" stripedRows>
+                    responsiveLayout="scroll"
+                    filterDisplay="menu"
+                    stripedRows
+                >
                     <template #empty>Nenhum pedido encontrado!</template>
                     <template #loading>Carregando informações... Por favor, aguarde!</template>
 
@@ -640,9 +636,7 @@ export default {
                             <span class="p-column-title"></span>
                             <div class="grid">
                                 <div class="col-4">
-                                    <Button
-                                        @click.prevent="visualizar(slotProps.data.id, slotProps.data.anexo, slotProps.data)"
-                                        icon="pi pi-eye" class="p-button-secondary" />
+                                    <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data.anexo, slotProps.data)" icon="pi pi-eye" class="p-button-secondary" />
                                 </div>
                             </div>
                         </template>
@@ -653,12 +647,10 @@ export default {
                             <span class="p-column-title"></span>
                             <div class="grid">
                                 <div class="col-4 md:col-1 mr-6">
-                                    <Button @click.prevent="urgente(slotProps.data.id)" label="Urgente"
-                                        class="p-button-danger" />
+                                    <Button @click.prevent="urgente(slotProps.data.id)" label="Urgente" class="p-button-danger" />
                                 </div>
                                 <div class="col-4 md:col-1 ml-6">
-                                    <Button @click.prevent="normal(slotProps.data.id)" label="Normal"
-                                        class="p-button-info" />
+                                    <Button @click.prevent="normal(slotProps.data.id)" label="Normal" class="p-button-info" />
                                 </div>
                             </div>
                         </template>
@@ -802,7 +794,6 @@ export default {
 
 /* Responsividade */
 @media screen and (max-width: 960px) {
-
     .field-label,
     .field-value {
         font-size: 0.85rem;

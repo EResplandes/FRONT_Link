@@ -45,8 +45,8 @@ export default class GerenteService {
             });
     }
 
-    async aprovar(id) {
-        return await fetch(`${API_URL}/pedidos/aprovar-fluxo/` + id, {
+    async aprovar(id, urgente) {
+        return await fetch(`${API_URL}/pedidos/aprovar-fluxo/` + id + '/' + urgente, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

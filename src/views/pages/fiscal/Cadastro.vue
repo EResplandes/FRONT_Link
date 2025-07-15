@@ -102,9 +102,14 @@ export default {
                     if (data.resposta == 'Pedido cadastrado com sucesso!') {
                         this.preloading = false;
                         this.showSuccess('Pedido cadastrado com sucesso!');
-                        this.form = {};
-                        window.location.reload();
+                        this.form = {
+                            urgente: 0,
+                            pdf: null
+                        };
+                        this.fileKey++;
+                        this.form.pdf = null;
                     } else {
+                        this.preloading = false;
                         this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
                     }
                 });

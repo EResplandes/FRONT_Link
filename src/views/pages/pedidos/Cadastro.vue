@@ -20,6 +20,7 @@ export default {
             funcionarioService: new FuncionarioService(),
             cadastrarPedidoService: new CadastrarPedidoService(),
             localService: new LocalService(),
+            fileKey: ref(0),
             visibleRight: ref(false),
             loading1: ref(null),
             links: ref(null),
@@ -31,7 +32,10 @@ export default {
             diretores: ref(null),
             locais: ref(null),
             form: ref({
-                urgente: 0
+                urgente: 0,
+                pdf: null,
+                pdfNota: null,
+                pdfBoleto: null
             }),
             tabIndex: ref(0),
             preloading: ref(true),
@@ -135,13 +139,16 @@ export default {
                 this.cadastrarPedidoService.comFluxo(this.form, this.parcelas).then((data) => {
                     if (data.resposta == 'Pedido cadastrado com sucesso!') {
                         this.preloading = false;
-                        0;
                         this.showSuccess('Pedido cadastrado com sucesso!');
-                        this.form = {};
-                        this.$refs.pdf.clear();
+                        this.form = {
+                            urgente: 0,
+                            pdf: null
+                        };
+                        this.fileKey++;
                         this.tabIndex = 0;
                         // window.location.reload();
                     } else {
+                        this.preloading = false;
                         this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
                     }
                 });
@@ -269,7 +276,7 @@ export default {
 
                             <div class="field col-1 md:col-3">
                                 <label for="firstname2">PDF <span class="obrigatorio">*</span></label>
-                                <FileUpload chooseLabel="Selecionar Arquivo" @change="uploadPdf" mode="basic" type="file" ref="pdf" name="demo[]" accept=".pdf,.docx" :maxFileSize="999999999"></FileUpload>
+                                <FileUpload :key="fileKey" chooseLabel="Selecionar Arquivo" @change="uploadPdf" mode="basic" type="file" ref="pdf" name="demo[]" accept=".pdf,.docx" :maxFileSize="999999999"></FileUpload>
                             </div>
                             <div class="field col-12 md:col-3 mt-2">
                                 <label for="Link">Link <span class="obrigatorio">*</span></label>
