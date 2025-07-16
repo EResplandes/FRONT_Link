@@ -125,4 +125,22 @@ export default class FluxoService {
                 throw error;
             });
     }
+
+    async buscaGerentesPedido(id) {
+        return await fetch(`${API_URL}/fluxo/listar-gerentes-pedidos/` + id, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
 }

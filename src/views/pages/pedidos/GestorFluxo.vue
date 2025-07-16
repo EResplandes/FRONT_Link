@@ -57,6 +57,7 @@ export default {
             indicadores: null,
             pedidoSelecionado: null,
             pedidosUltimaBusca: [],
+            gerentesPedidosSelecionado: null,
 
             form: {},
             idPedido: null,
@@ -271,6 +272,10 @@ export default {
         },
 
         visualizar(id, anexo, data) {
+            this.fluxoService.buscaGerentesPedido(id).then((data) => {
+                this.gerentesPedidosSelecionado = data.gerentes;
+            });
+
             this.idPedido = id;
             this.pedidoSelecionado = data;
             this.display = true;
@@ -283,7 +288,6 @@ export default {
 
             this.chatService.buscaConversa(this.idPedido).then((data) => {
                 this.conversa = data.conversa;
-                console.log(this.conversa);
             });
 
             this.fluxoService.buscaFluxo(id).then((data) => {
@@ -450,11 +454,24 @@ export default {
                             <!-- Linha 8 -->
                             <div class="col-12 field-label">Link:</div>
                             <div class="col-12 field-value mb-3">
-                                <a v-if="pedidoSelecionado?.link" :href="pedidoSelecionado.link" target="_blank" class="text-primary">
+                                <a v-if="pedidoSelecionado?.link" target="_blank" class="text-primary">
                                     {{ pedidoSelecionado.link }}
                                 </a>
                                 <span v-else>N/A</span>
                             </div>
+
+                            <!-- Linha 7 -->
+                            <div class="col-12 field-label">Tipo do Pedido:</div>
+                            <div class="col-12 field-value mb-3">{{ pedidoSelecionado?.tipo_pedido || 'N/A' }}</div>
+
+                            <!-- Linha 9 -->
+                            <div class="col-12 field-label">Gerentes Associados:</div>
+                            <div class="col-12 field-value mb-3" v-if="gerentesPedidosSelecionado && gerentesPedidosSelecionado.length">
+                                <div v-for="(gerente, index) in gerentesPedidosSelecionado" :key="index">
+                                    {{ gerente.usuario.name }}
+                                </div>
+                            </div>
+                            <div v-else class="col-12 field-value mb-3">N/A</div>
                         </div>
                     </div>
                 </div>
