@@ -400,12 +400,12 @@ export default {
         </div>
 
         <!-- Visualizar PDF -->
-        <Dialog header="Documento" v-model:visible="display" :style="{ width: '80%' }" :modal="true">
+        <Dialog header="Documento" v-model:visible="display" maximizable :style="{ width: '80%' }" :modal="true">
             <div class="grid">
                 <!-- Coluna do PDF -->
                 <div class="col-12 md:col-8">
                     <Button @click.prevent="fluxo(idPedido)" label="Tomada de Ação" icon="pi pi-check" class="p-button-info w-full mb-2" />
-                    <iframe :src="pdfsrc" style="width: 100%; height: 700px; border: none; border-radius: 6px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1)" title="Visualização do documento"> Oops! ocorreu um erro ao carregar o documento. </iframe>
+                    <iframe :src="pdfsrc" style="width: 100%; height: 1000px; border: none; border-radius: 6px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1)" title="Visualização do documento"> Oops! ocorreu um erro ao carregar o documento. </iframe>
                 </div>
 
                 <!-- Coluna das informações do pedido -->

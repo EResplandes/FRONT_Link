@@ -15,6 +15,7 @@ export default {
             password: ref(null),
             message: ref([]),
             count: ref(0),
+            remember: ref(false),
             form: ref({}),
             loading: ref(false)
         };

@@ -186,7 +186,7 @@ export default {
         uploadPdfBoleto() {
             this.form.boleto = this.$refs.pdfBoleto.files[0];
         }
-    }
+    } 
 };
 </script>
 

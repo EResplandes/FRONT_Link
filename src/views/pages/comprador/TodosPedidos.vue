@@ -461,8 +461,19 @@ export default {
                         </Timeline>
                     </div>
                     <hr />
-                    <InputText v-if="this.dadosPedidos.status.status != 'Reprovado' && this.dadosPedidos.status.status != 'Correção Pendente'" class="col-12" type="text" v-model="novaMensagem" placeholder="Digite a mensagem..." />
-                    <Button v-if="this.dadosPedidos.status.status != 'Reprovado' && this.dadosPedidos.status.status != 'Correção Pendente'" @click.prevent="enviarMensagem()" label="Enviar" class="mr-2 mt-3 p-button-success col-12" />
+                    <InputText
+                        v-if="this.dadosPedidos.status.status != 'Reprovado' && this.dadosPedidos.status.status != 'Correção Pendente' && this.dadosPedidos.status.status != 'Mensagem de Emival'"
+                        class="col-12"
+                        type="text"
+                        v-model="novaMensagem"
+                        placeholder="Digite a mensagem..."
+                    />
+                    <Button
+                        v-if="this.dadosPedidos.status.status != 'Reprovado' && this.dadosPedidos.status.status != 'Correção Pendente' && this.dadosPedidos.status.status != 'Mensagem de Emival'"
+                        @click.prevent="enviarMensagem()"
+                        label="Enviar"
+                        class="mr-2 mt-3 p-button-success col-12"
+                    />
                 </div>
             </div>
         </Dialog>
@@ -694,7 +705,7 @@ export default {
 
                                 <!-- Botão de Chat -->
                                 <Button
-                                    v-if="['Reprovado por Soleni', 'Fluxo Reprovado', 'Reprovado', 'Correção Pendente'].includes(slotProps.data.status.status)"
+                                    v-if="['Reprovado por Soleni', 'Fluxo Reprovado', 'Reprovado', 'Correção Pendente', 'Mensagem de Emival'].includes(slotProps.data.status.status)"
                                     @click.prevent="chat(slotProps.data.id, slotProps.data)"
                                     icon="pi pi-comments"
                                     class="p-button-secondary"
