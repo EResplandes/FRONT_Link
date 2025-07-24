@@ -237,14 +237,16 @@ export default {
         <ProgressSpinner />
     </div>
 
-    <Dialog v-model:visible="modalConfirmacaoCadastroPedidoRepitido" modal header="Confirmação de Pedido Possivelmente Duplicado" :style="{ width: '30rem' }">
+    <Dialog v-model:visible="modalConfirmacaoCadastroPedidoRepitido" modal header="PEDIDO DUPLICADO" :style="{ width: '30rem' }">
         <div class="p-text-center" style="padding: 1rem">
             <p style="margin-bottom: 2rem">
                 {{ this.mensagemPedidoRepitido }}
             </p>
+            <hr />
+            <p><b style="color: red">Atenção:</b> Antes de prosseguir, entre em contato com o Gerente do Departamento de Compras para validação do pedido.</p>
             <div class="p-d-flex p-jc-end">
-                <Button label="Cancelar" icon="pi pi-times" class="p-button-text p-button-danger" @click="cancelarCadastroPedido()" />
-                <Button label="Continuar Assim Mesmo" icon="pi pi-check" class="p-button-text p-button-info" @click="confirmarCadastroPedido()" />
+                <!-- <Button label="Cancelar" icon="pi pi-times" class="p-button-text p-button-danger w-full" @click="cancelarCadastroPedido()" /> -->
+                <!-- <Button label="Continuar Assim Mesmo" icon="pi pi-check" class="p-button-text p-button-info" @click="confirmarCadastroPedido()" /> -->
             </div>
         </div>
     </Dialog>
