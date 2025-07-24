@@ -697,10 +697,8 @@ export default {
         },
 
         visualizarAcima(id, data) {
-            console.log(data);
             this.quantidade_mensagens = data.quantidade_mensagens;
             this.pedidoSelecionado = data;
-            console.log(this.pedidoSelecionado)
             this.titleDocumento = `Visualizando Pedido ${this.currentIndex + 1} de ${this.pedidos.length} Pedidos`;
             this.pedidoAcima = data;
             this.displayAcima = true;
@@ -756,13 +754,13 @@ export default {
             const funcao = message.funcao;
             const dataAssinatura = message.data_assinatura
                 ? new Date(message.data_assinatura).toLocaleString('pt-BR', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit'
-                })
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit'
+                  })
                 : 'Data não disponível';
 
             const res = `${nomeUsuario} ${funcao} - ${dataAssinatura}`;
@@ -777,30 +775,26 @@ export default {
         <ProgressSpinner />
     </div>
 
-    <Button v-if="this.pedidos != null" label="Voltar" class="p-button-secondary" style="width: 20%"
-        @click="(this.ocultaFiltros = false), (this.pedidos = null), buscaQuantidades()" />
+    <Button v-if="this.pedidos != null" label="Voltar" class="p-button-secondary" style="width: 20%" @click="(this.ocultaFiltros = false), (this.pedidos = null), buscaQuantidades()" />
 
     <div v-if="this.ocultaFiltros == false" class="grid text-center">
         <div class="col-12">
             <Splitter style="height: 300px">
-                <SplitterPanel @click.prevent="listarEmivalMenorQuinhentos()"
-                    class="flex align-items-center justify-content-center splitter-panel">
+                <SplitterPanel @click.prevent="listarEmivalMenorQuinhentos()" class="flex align-items-center justify-content-center splitter-panel">
                     <div>
                         Total de pedidos com valor até R$ 500,00
                         <br />
                         <h3>{{ this.quantidadesPedidos.qtd_abaixoQuinhentos }} pedidos</h3>
                     </div>
                 </SplitterPanel>
-                <SplitterPanel @click.prevent="listarEmivalMenorMil()"
-                    class="flex align-items-center justify-content-center splitter-panel">
+                <SplitterPanel @click.prevent="listarEmivalMenorMil()" class="flex align-items-center justify-content-center splitter-panel">
                     <div>
                         Total de pedidos com valor de R$ 500,01 à R$ 1000,00
                         <br />
                         <h3>{{ this.quantidadesPedidos.qtd_abaixoMil }} pedidos</h3>
                     </div>
                 </SplitterPanel>
-                <SplitterPanel @click.prevent="listarEmivalMaiorMil()"
-                    class="flex align-items-center justify-content-center splitter-panel">
+                <SplitterPanel @click.prevent="listarEmivalMaiorMil()" class="flex align-items-center justify-content-center splitter-panel">
                     <div>
                         Total de pedidos com o valor acima de R$ 1000,00
                         <br />
@@ -818,9 +812,7 @@ export default {
                 <div class="card timeline-container" ref="msgContainer">
                     <Timeline :value="conversa" align="alternate" class="customized-timeline">
                         <template #marker="slotProps">
-                            <span
-                                class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2"
-                                :style="{ backgroundColor: slotProps.item.color }">
+                            <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
                                 <i :class="slotProps.item.icon"></i>
                             </span>
                         </template>
@@ -843,8 +835,7 @@ export default {
                 </div>
                 <hr />
                 <InputText class="col-12" type="text" v-model="mensagemEmival" placeholder="Digite a mensagem..." />
-                <Button @click="salvaMensagemPedido(this.salvarMensagemPedidoStatus)" label="Enviar Mensagem"
-                    class="mr-2 mt-3 p-button-success col-12" />
+                <Button @click="salvaMensagemPedido(this.salvarMensagemPedidoStatus)" label="Enviar Mensagem" class="mr-2 mt-3 p-button-success col-12" />
             </div>
         </div>
     </Dialog>
@@ -856,9 +847,7 @@ export default {
                 <div class="card timeline-container" ref="msgContainer">
                     <Timeline :value="conversa" align="alternate" class="customized-timeline">
                         <template #marker="slotProps">
-                            <span
-                                class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2"
-                                :style="{ backgroundColor: slotProps.item.color }">
+                            <span class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-2" :style="{ backgroundColor: slotProps.item.color }">
                                 <i :class="slotProps.item.icon"></i>
                             </span>
                         </template>
@@ -881,15 +870,14 @@ export default {
                 </div>
                 <hr />
                 <InputText class="col-12" type="text" v-model="mensagemEmival" placeholder="Digite a mensagem..." />
-                <Button @click="salvaMensagemPedido(this.salvarMensagemPedidoStatus)" label="Enviar Mensagem"
-                    class="mr-2 mt-3 p-button-success col-12" />
+                <Button @click="salvaMensagemPedido(this.salvarMensagemPedidoStatus)" label="Enviar Mensagem" class="mr-2 mt-3 p-button-success col-12" />
             </div>
         </div>
     </Dialog>
 
     <!-- Visualizar - Abaixo de 1000 reais -->
     <Dialog :header="this.titleDocumento" v-model:visible="display" :style="{ width: '98%' }" :modal="true">
-        <div class="flex align-items-center justify-content-start" >
+        <div class="flex align-items-center justify-content-start">
             <label for="buttondisplay" class="font-bold block mb-2">Autorizações: </label>
             <div v-for="(message, index) in this.pedidoSelecionado.assinados" :key="index">
                 <InlineMessage class="m-2" severity="success">
@@ -897,8 +885,7 @@ export default {
                 </InlineMessage>
             </div>
             <div class="ml-auto mb-3">
-                <Button @click.prevent="mensagemItem()" class="align-auto" type="button" label="Chat"
-                    icon="pi pi-comments" :badge="this.quantidade_mensagens" />
+                <Button @click.prevent="mensagemItem()" class="align-auto" type="button" label="Chat" icon="pi pi-comments" :badge="this.quantidade_mensagens" />
             </div>
         </div>
         <div class="grid flex justify-content-center">
@@ -906,34 +893,34 @@ export default {
                 <div ref="pdfContainer" style="width: 100%; height: 700px; border: none"></div>
             </div>
             <div class="col-4 md:col-3">
-                <Button icon="pi pi-times" label="Pedido Anterior" class="p-button-secondary"
-                    style="width: 100%; height: 50px" @click.prevent="voltar()" :disabled="this.currentIndex == 0" />
+                <Button icon="pi pi-times" label="Pedido Anterior" class="p-button-secondary" style="width: 100%; height: 50px" @click.prevent="voltar()" :disabled="this.currentIndex == 0" />
             </div>
             <div class="col-4 md:col-3">
-                <Button icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%; height: 50px"
-                    @click.prevent="reprovarItem()" />
+                <Button icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%; height: 50px" @click.prevent="reprovarItem()" />
             </div>
             <div class="col-4 md:col-3">
-                <Button icon="pi pi-times" label="Aprovar c/ Ressalva" class="p-button-warning"
-                    style="width: 100%; height: 50px" @click.prevent="ressalvaItem()" />
+                <Button icon="pi pi-times" label="Aprovar c/ Ressalva" class="p-button-warning" style="width: 100%; height: 50px" @click.prevent="ressalvaItem()" />
             </div>
             <div class="col-4 md:col-3">
-                <Button icon="pi pi-check"
+                <Button
+                    icon="pi pi-check"
                     :label="this.currentIndex >= this.pedidos.length - 1 ? 'Aprovar Último Pedido' : 'Próximo Pedido'"
-                    class="p-button-info" style="width: 100%; height: 50px" @click.prevent="proximoItem()"
-                    :disabled="this.currentIndex == this.pedidos.length" />
+                    class="p-button-info"
+                    style="width: 100%; height: 50px"
+                    @click.prevent="proximoItem()"
+                    :disabled="this.currentIndex == this.pedidos.length"
+                />
             </div>
 
             <div v-if="this.pedidosAprovados.length > 0" class="col-12 md:col-12">
-                <Button icon="pi pi-check" label="Finalizar Aprovações" class="p-button-success"
-                    style="width: 100%; height: 50px" @click.prevent="aprovar()" />
+                <Button icon="pi pi-check" label="Finalizar Aprovações" class="p-button-success" style="width: 100%; height: 50px" @click.prevent="aprovar()" />
             </div>
         </div>
     </Dialog>
 
     <!-- Visualizar - Acima de 1000 reais -->
     <Dialog :header="this.titleDocumento" v-model:visible="displayAcima" :style="{ width: '95%' }" :modal="true">
-        <div class="flex align-items-center justify-content-start" >
+        <div class="flex align-items-center justify-content-start">
             <label for="buttondisplay" class="font-bold block mb-2">Autorizações: </label>
             <div v-for="(message, index) in this.pedidoSelecionado.assinados" :key="index">
                 <InlineMessage class="m-2" severity="success">
@@ -941,8 +928,7 @@ export default {
                 </InlineMessage>
             </div>
             <div class="ml-auto mb-3">
-                <Button @click.prevent="mensagemItemAcima()" class="align-auto" type="button" label="Chat"
-                    icon="pi pi-comments" :badge="this.quantidade_mensagens" />
+                <Button @click.prevent="mensagemItemAcima()" class="align-auto" type="button" label="Chat" icon="pi pi-comments" :badge="this.quantidade_mensagens" />
             </div>
         </div>
 
@@ -951,21 +937,16 @@ export default {
                 <div ref="pdfContainerAcima" style="width: 100%; height: 750px; border: none"></div>
             </div>
             <div class="col-4 md:col-3">
-                <Button icon="pi pi-times" label="Pedido Anterior" class="p-button-secondary"
-                    style="width: 100%; height: 50px" @click.prevent="voltarAcima()"
-                    :disabled="this.currentIndex == 0" />
+                <Button icon="pi pi-times" label="Pedido Anterior" class="p-button-secondary" style="width: 100%; height: 50px" @click.prevent="voltarAcima()" :disabled="this.currentIndex == 0" />
             </div>
             <div class="col-4 md:col-3">
-                <Button icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%; height: 50px"
-                    @click.prevent="reprovarItemAcima()" />
+                <Button icon="pi pi-times" label="Reprovar" class="p-button-danger" style="width: 100%; height: 50px" @click.prevent="reprovarItemAcima()" />
             </div>
             <div class="col-4 md:col-3">
-                <Button icon="pi pi-times" label="Aprovar c/ Ressalva" class="p-button-warning"
-                    style="width: 100%; height: 50px" @click.prevent="ressalvaItemAcima()" />
+                <Button icon="pi pi-times" label="Aprovar c/ Ressalva" class="p-button-warning" style="width: 100%; height: 50px" @click.prevent="ressalvaItemAcima()" />
             </div>
             <div class="col-4 md:col-3">
-                <Button icon="pi pi-check" label="Aprovar" class="p-button-info" style="width: 100%; height: 50px"
-                    @click.prevent="proximoItemAcima()" :disabled="this.currentIndex == this.pedidos.length" />
+                <Button icon="pi pi-check" label="Aprovar" class="p-button-info" style="width: 100%; height: 50px" @click.prevent="proximoItemAcima()" :disabled="this.currentIndex == this.pedidos.length" />
             </div>
         </div>
     </Dialog>
@@ -980,11 +961,18 @@ export default {
                 <Toast />
             </div>
             <div v-if="this.pedidos && this.acimaMil == false" class="card">
-                <DataTable dataKey="id" :value="pedidos" :paginator="true" :rows="10"
+                <DataTable
+                    dataKey="id"
+                    :value="pedidos"
+                    :paginator="true"
+                    :rows="10"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25, 50, 100]"
                     currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
-                    responsiveLayout="scroll" filterDisplay="menu" stripedRows>
+                    responsiveLayout="scroll"
+                    filterDisplay="menu"
+                    stripedRows
+                >
                     <template #header>
                         <div class="flex justify-content-between"></div>
                     </template>
@@ -994,8 +982,7 @@ export default {
                     <Column field="" header="" class="w-1">
                         <template #body="slotProps">
                             <span class="p-column-title">Dt. Inclusão</span>
-                            <Tag v-if="slotProps.data.urgente == 1" class="mr-2" severity="danger" value="Urgente">
-                            </Tag>
+                            <Tag v-if="slotProps.data.urgente == 1" class="mr-2" severity="danger" value="Urgente"> </Tag>
                             <Tag v-else class="mr-2" severity="info" value="Normal"></Tag>
                         </template>
                     </Column>
@@ -1003,12 +990,13 @@ export default {
                     <Column field="Status" header="Status" :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">Status</span>
-                            <span :class="{
-                                'text-red': slotProps.data.status.status == 'Resposta do Pedido de Compra Aprovado com Ressalva',
-                                'text-bold': slotProps.data.status.status != 'Resposta do Pedido de Compra Aprovado com Ressalva'
-                            }">
-                                {{ slotProps.data.status.status == 'Resposta do Pedido de Compra Aprovado com Ressalva'
-                                    ? 'Resposta do Pedido de Compra Aprovado com Ressalva' : 'Novo Pedido' }}
+                            <span
+                                :class="{
+                                    'text-red': slotProps.data.status.status == 'Resposta do Pedido de Compra Aprovado com Ressalva',
+                                    'text-bold': slotProps.data.status.status != 'Resposta do Pedido de Compra Aprovado com Ressalva'
+                                }"
+                            >
+                                {{ slotProps.data.status.status == 'Resposta do Pedido de Compra Aprovado com Ressalva' ? 'Resposta do Pedido de Compra Aprovado com Ressalva' : 'Novo Pedido' }}
                             </span>
                         </template>
                     </Column>
@@ -1037,8 +1025,7 @@ export default {
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
                             <div class="col-4 md:col-4">
-                                <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye"
-                                    class="p-button-secondary" />
+                                <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-secondary" />
                             </div>
                         </template>
                     </Column>
@@ -1047,11 +1034,18 @@ export default {
 
             <!-- Tabela com todos pedidos com Dr Emival aprovação separada acima de 1000 reais -->
             <div v-if="this.pedidos && this.acimaMil" class="card">
-                <DataTable dataKey="id" :value="pedidos" :paginator="true" :rows="10"
+                <DataTable
+                    dataKey="id"
+                    :value="pedidos"
+                    :paginator="true"
+                    :rows="10"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25, 50, 100]"
                     currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
-                    responsiveLayout="scroll" filterDisplay="menu" stripedRows>
+                    responsiveLayout="scroll"
+                    filterDisplay="menu"
+                    stripedRows
+                >
                     <template #header>
                         <div class="flex justify-content-between"></div>
                     </template>
@@ -1061,8 +1055,7 @@ export default {
                     <Column field="" header="" class="w-1">
                         <template #body="slotProps">
                             <span class="p-column-title">Dt. Inclusão</span>
-                            <Tag v-if="slotProps.data.urgente == 1" class="mr-2" severity="danger" value="Urgente">
-                            </Tag>
+                            <Tag v-if="slotProps.data.urgente == 1" class="mr-2" severity="danger" value="Urgente"> </Tag>
                             <Tag v-else class="mr-2" severity="info" value="Normal"></Tag>
                         </template>
                     </Column>
@@ -1070,12 +1063,13 @@ export default {
                     <Column field="Status" header="Status" :sortable="true" class="w-2">
                         <template #body="slotProps">
                             <span class="p-column-title">Status</span>
-                            <span :class="{
-                                'text-red': slotProps.data.status.status == 'Resposta do Pedido de Compra Aprovado com Ressalva',
-                                'text-bold': slotProps.data.status.status != 'Resposta do Pedido de Compra Aprovado com Ressalva'
-                            }">
-                                {{ slotProps.data.status.status == 'Resposta do Pedido de Compra Aprovado com Ressalva'
-                                    ? 'Resposta do Pedido de Compra Aprovado com Ressalva' : 'Novo Pedido' }}
+                            <span
+                                :class="{
+                                    'text-red': slotProps.data.status.status == 'Resposta do Pedido de Compra Aprovado com Ressalva',
+                                    'text-bold': slotProps.data.status.status != 'Resposta do Pedido de Compra Aprovado com Ressalva'
+                                }"
+                            >
+                                {{ slotProps.data.status.status == 'Resposta do Pedido de Compra Aprovado com Ressalva' ? 'Resposta do Pedido de Compra Aprovado com Ressalva' : 'Novo Pedido' }}
                             </span>
                         </template>
                     </Column>
@@ -1104,8 +1098,7 @@ export default {
                         <template #body="slotProps">
                             <span class="p-column-title"></span>
                             <div class="col-4 md:col-4">
-                                <Button @click.prevent="visualizarAcima(slotProps.data.id, slotProps.data)"
-                                    icon="pi pi-eye" class="p-button-secondary" />
+                                <Button @click.prevent="visualizarAcima(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-secondary" />
                             </div>
                         </template>
                     </Column>

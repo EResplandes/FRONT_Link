@@ -50,7 +50,6 @@ export default {
                 valor_formatado: pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
             }));
             this.preloading = false;
-            console.log(data);
         });
 
         this.preloading = false;

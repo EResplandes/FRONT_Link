@@ -43,7 +43,7 @@ export default {
                 'local.local': { value: null, matchMode: FilterMatchMode.CONTAINS },
                 dt_inclusao_formatada: { value: null, matchMode: FilterMatchMode.CONTAINS },
                 'empresa.nome_empresa': { value: null, matchMode: FilterMatchMode.CONTAINS },
-                status: { value: null, matchMode: FilterMatchMode.IN },
+                'status.status': { value: null, matchMode: FilterMatchMode.CONTAINS },
                 valor_formatado: { value: null, matchMode: FilterMatchMode.CONTAINS }
             },
             loading: true
@@ -72,7 +72,7 @@ export default {
         // Metódo responsável por buscar todos status
         this.statusService.buscaStatus().then((data) => {
             if (data.resposta == 'Status listados com sucesso!') {
-                this.status = data.itens;
+                this.status = data.itens.map((status) => status.status);
             }
         });
     },
@@ -345,7 +345,7 @@ export default {
                     currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros!"
                     filterDisplay="row"
                     :loading="loading"
-                    :globalFilterFields="['descricao', 'empresa.nome_empresa', 'country.name', 'representative.name', 'status']"
+                    :globalFilterFields="['descricao', 'empresa.nome_empresa', 'country.name', 'representative.name', 'status.status']"
                 >
                     <template #empty> Nenhum Pedido Encontrado. </template>
                     <template #loading> Loading customers data. Please wait. </template>
@@ -381,6 +381,7 @@ export default {
                             <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Procurar pela Descrição" />
                         </template>
                     </Column>
+
                     <Column field="empresa.nome_empresa" header="Empresa" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
                         <template #body="{ data }">
                             {{ data.empresa.nome_empresa }}
@@ -394,20 +395,18 @@ export default {
                         </template>
                     </Column>
 
-                    <Column header="Status" filterField="status" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 16rem">
+                    <Column field="status.status" header="Status" :showFilterMenu="false" :filterMenuStyle="{ width: '14rem' }" style="min-width: 16rem">
                         <template #body="{ data }">
                             <div class="flex align-items-center gap-2">
                                 <Tag :value="getStatus(data)" :severity="getSeverity(data.status.status)" />
                             </div>
                         </template>
                         <template #filter="{ filterModel, filterCallback }">
-                            <MultiSelect v-model="filterModel.value" @change="filterCallback()" :options="status" optionLabel="status" placeholder="Todos" class="p-column-filter" style="min-width: 16rem" :maxSelectedLabels="1">
+                            <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="status" placeholder="Selecione um Status" class="p-column-filter" style="min-width: 16rem" :showClear="true">
                                 <template #option="slotProps">
-                                    <div class="flex align-items-center gap-2">
-                                        <span>{{ slotProps.option.status }}</span>
-                                    </div>
+                                    {{ slotProps.option }}
                                 </template>
-                            </MultiSelect>
+                            </Dropdown>
                         </template>
                     </Column>
 

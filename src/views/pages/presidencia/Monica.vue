@@ -342,7 +342,6 @@ export default {
         visualizarAcima(id, data) {
             this.pedidoSelecionado = data;
             this.pdfsrc = this.urlBase + '/' + data.anexo;
-            console.log(this.pdfsrc);
             this.titleDocumento = `Pedido ${this.currentIndex + 1} de ${this.pedidos.length} Pedidos`;
             this.pedidoAcima = data;
             this.display = true;

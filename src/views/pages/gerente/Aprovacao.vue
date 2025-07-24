@@ -54,7 +54,6 @@ export default {
     mounted: function () {
         // Metódo responsável por buscar todos pedidos relacionas a esse usuário que não foram aprovados por ele mesmo
         this.gerenteService.buscaPedidos(localStorage.getItem('usuario_id')).then((data) => {
-            console.log(data);
             this.pedidos = data.pedidos.map((pedido) => ({
                 ...pedido,
                 criador: pedido.pedido.criador,

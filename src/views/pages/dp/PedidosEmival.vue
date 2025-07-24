@@ -31,7 +31,6 @@ export default {
     mounted: function () {
         // Metódo responsável por buscar todas os pedidos com Emival
         this.pedidoService.pedidosEmivalDp().then((data) => {
-            console.log(data);
             this.pedidos = data.pedidos;
             this.preloading = false;
         });

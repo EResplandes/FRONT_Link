@@ -123,7 +123,6 @@ export default {
                 this.importedData = this.campos;
                 this.campos.shift();
                 this.campos = this.campos.filter((item) => item.indicador !== '0');
-                console.log(this.campos);
             } else {
                 this.error = 'Planilha "MONT.LISTA" não encontrada no arquivo.';
             }

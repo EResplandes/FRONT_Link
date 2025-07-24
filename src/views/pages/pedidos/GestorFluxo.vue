@@ -363,7 +363,6 @@ export default {
 
         async notificarNovoPedido() {
             if (!('Notification' in window)) {
-                console.log('Este navegador não suporta notificações.');
                 return;
             }
 

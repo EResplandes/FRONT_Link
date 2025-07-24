@@ -65,7 +65,6 @@ export default {
 
         // Metódo responsável por buscar todos status de um material
         this.lmService.listarStatusMaterial().then((data) => {
-            console.log(data);
             this.statusMateriais = data.statusMateriais;
         });
 
