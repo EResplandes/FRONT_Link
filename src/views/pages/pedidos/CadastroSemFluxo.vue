@@ -21,6 +21,8 @@ export default {
             localService: new LocalService(),
             visibleRight: ref(false),
             loading1: ref(null),
+            modalConfirmacaoCadastroPedidoRepitido: ref(false),
+            mensagemPedidoRepitido: ref(null),
             links: ref(null),
             empresas: ref(null),
             metodos: ref(null),
@@ -117,7 +119,52 @@ export default {
                 }
             }
 
-            // Verificar se todos os campos obrigatórios foram preenchidos antes de cadastrar o pedido
+            // Verifica se já existe sistema pedido
+            this.cadastrarPedidoService.veficaExistenciaPedido(this.form).then((data) => {
+                if (data.seguimento) {
+                    this.mensagemPedidoRepitido = data.resposta;
+                    this.modalConfirmacaoCadastroPedidoRepitido = true;
+                } else {
+                    if (todosCamposPreenchidos) {
+                        this.preloading = true;
+                        this.cadastrarPedidoService.semFluxo(this.form, this.parcelas).then((data) => {
+                            if (data.resposta == 'Pedido cadastrado com sucesso!') {
+                                this.preloading = false;
+                                this.showSuccess('Pedido cadastrado com sucesso!');
+                                this.form = {
+                                    urgente: 0,
+                                    pdf: null
+                                };
+                                this.fileKey++;
+                                this.form.pdf = null;
+                                // window.location.reload();
+                            } else {
+                                this.preloading = false;
+                                this.showError('Ocorreu algum erro, entre em contato com o Administrador!');
+                            }
+                        });
+                    }
+                }
+            });
+        },
+
+        confirmarCadastroPedido() {
+            // Array com os nomes dos campos obrigatórios
+            const camposObrigatorios = ['valor', 'dt_vencimento', 'link', 'empresa', 'descricao', 'local', 'protheus', 'dt_criacao_pedido'];
+
+            // Variável para verificar se todos os campos obrigatórios estão preenchidos
+            let todosCamposPreenchidos = true;
+
+            // Iterar sobre os campos obrigatórios
+            for (const campo of camposObrigatorios) {
+                // Verificar se o campo está vazio
+                if (!this.form[campo]) {
+                    // Se estiver vazio, exibir mensagem de erro e definir a variável como falsa
+                    this.showError(`O campo ${campo.toUpperCase()} é obrigatório!`);
+                    todosCamposPreenchidos = false;
+                }
+            }
+
             if (todosCamposPreenchidos) {
                 this.preloading = true;
                 this.cadastrarPedidoService.semFluxo(this.form, this.parcelas).then((data) => {
@@ -130,6 +177,7 @@ export default {
                         };
                         this.fileKey++;
                         this.form.pdf = null;
+                        this.modalConfirmacaoCadastroPedidoRepitido = false;
                         // window.location.reload();
                     } else {
                         this.preloading = false;
@@ -137,6 +185,16 @@ export default {
                     }
                 });
             }
+        },
+
+        cancelarCadastroPedido() {
+            this.form = {
+                urgente: 0,
+                pdf: null
+            };
+            this.fileKey++;
+            this.tabIndex = 0;
+            this.modalConfirmacaoCadastroPedidoRepitido = false;
         },
 
         // Metódo responsável por gerar quantidade de parcelas
@@ -178,6 +236,18 @@ export default {
     <div style="z-index: 99" v-if="preloading" class="full-screen-spinner">
         <ProgressSpinner />
     </div>
+
+    <Dialog v-model:visible="modalConfirmacaoCadastroPedidoRepitido" modal header="Confirmação de Pedido Possivelmente Duplicado" :style="{ width: '30rem' }">
+        <div class="p-text-center" style="padding: 1rem">
+            <p style="margin-bottom: 2rem">
+                {{ this.mensagemPedidoRepitido }}
+            </p>
+            <div class="p-d-flex p-jc-end">
+                <Button label="Cancelar" icon="pi pi-times" class="p-button-text p-button-danger" @click="cancelarCadastroPedido()" />
+                <Button label="Continuar Assim Mesmo" icon="pi pi-check" class="p-button-text p-button-info" @click="confirmarCadastroPedido()" />
+            </div>
+        </div>
+    </Dialog>
 
     <!-- Geração de Parcelas -->
     <Dialog v-model:visible="displayParcelas" header="PARCELAS" :style="{ width: '60%' }" maximizable modal :contentStyle="{ height: '80%' }">

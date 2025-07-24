@@ -133,4 +133,27 @@ export default class CadastraPedidoService {
             return `0000-00-00`;
         }
     }
+
+    veficaExistenciaPedido(form) {
+        return fetch(`${API_URL}/pedidos/verifica-pedido-existe`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                protheus: form.protheus,
+                valor: form.valor
+            })
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
 }
