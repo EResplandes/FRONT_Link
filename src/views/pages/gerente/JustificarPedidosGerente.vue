@@ -68,6 +68,9 @@ export default {
                 dt_inclusao_formatada: this.formatarData(pedido.dt_inclusao),
                 valor_formatado: pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
             }));
+
+            console.log(this.pedidosSemFluxo);
+            console.log(this.pedidos);
             this.preloading = false;
             this.loading = false;
         });
@@ -602,7 +605,12 @@ export default {
                                 <Button @click.prevent="visualizar(slotProps.data.id, slotProps.data)" icon="pi pi-eye" class="p-button-info" />
 
                                 <!-- Botão de Chat -->
-                                <Button v-if="['Aprovado com Ressalva', 'Reprovado', 'Mensagem de Emival'].includes(slotProps.data.status.status)" @click.prevent="chat(slotProps.data.id, slotProps.data)" icon="pi pi-comments" class="p-button-secondary" />
+                                <Button
+                                    v-if="['Aprovado com Ressalva', 'Reprovado', 'Mensagem de Emival'].includes(slotProps.data.status.status)"
+                                    @click.prevent="chat(slotProps.data.id, slotProps.data)"
+                                    icon="pi pi-comments"
+                                    class="p-button-secondary"
+                                />
 
                                 <!-- Botão de Imprimir -->
                                 <Button

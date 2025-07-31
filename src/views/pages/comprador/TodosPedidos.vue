@@ -64,6 +64,7 @@ export default {
                 dt_inclusao_formatada: this.formatarData(pedido.dt_inclusao),
                 valor_formatado: pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
             }));
+            console.log(this.pedidos);
             this.preloading = false;
             this.loading = false;
         });
@@ -462,14 +463,24 @@ export default {
                     </div>
                     <hr />
                     <InputText
-                        v-if="this.dadosPedidos.status.status != 'Reprovado' && this.dadosPedidos.status.status != 'Correção Pendente' && this.dadosPedidos.status.status != 'Mensagem de Emival'"
+                        v-if="
+                            this.dadosPedidos.status.status != 'Reprovado' &&
+                            this.dadosPedidos.status.status != 'Correção Pendente' &&
+                            this.dadosPedidos.status.status != 'Mensagem de Emival' &&
+                            this.dadosPedidos.status.status != 'Aprovado com Ressalva'
+                        "
                         class="col-12"
                         type="text"
                         v-model="novaMensagem"
                         placeholder="Digite a mensagem..."
                     />
                     <Button
-                        v-if="this.dadosPedidos.status.status != 'Reprovado' && this.dadosPedidos.status.status != 'Correção Pendente' && this.dadosPedidos.status.status != 'Mensagem de Emival'"
+                        v-if="
+                            this.dadosPedidos.status.status != 'Reprovado' &&
+                            this.dadosPedidos.status.status != 'Correção Pendente' &&
+                            this.dadosPedidos.status.status != 'Mensagem de Emival' &&
+                            this.dadosPedidos.status.status != 'Aprovado com Ressalva'
+                        "
                         @click.prevent="enviarMensagem()"
                         label="Enviar"
                         class="mr-2 mt-3 p-button-success col-12"
@@ -681,6 +692,30 @@ export default {
                                     v-if="
                                         ![
                                             'Aprovado',
+                                            'Excluído',
+                                            'Enviado para Fiscal',
+                                            'Sem Nota',
+                                            'Enviado para Financeiro',
+                                            'Nota Reprovada',
+                                            'Pago',
+                                            'Reprovado por Financeiro - Fiscal',
+                                            'Resposta do Pedido de Compra Aprovado com Ressalva',
+                                            'Enviado para Pagamento',
+                                            'Enviado para Emival',
+                                            'Enviado para Giovana',
+                                            'Enviado para Monica'
+                                        ].includes(slotProps.data.status.status) && slotProps.data.compra_antecipada == 'Sim'
+                                    "
+                                    @click.prevent="alterar(slotProps.data.id, slotProps.data.status)"
+                                    icon="pi pi-pencil"
+                                    class="p-button-warning"
+                                />
+
+                                <!-- Botão de Editar -->
+                                <Button
+                                    v-if="
+                                        ![
+                                            'Aprovado',
                                             'Aprovado com Ressalva',
                                             'Excluído',
                                             'Enviado para Fiscal',
@@ -694,8 +729,9 @@ export default {
                                             'Enviado para Emival',
                                             'Enviado para Giovana',
                                             'Enviado para Monica',
-                                            'Mensagem Emival',
-                                            'Reprovado'
+                                            'Reprovado',
+                                            'Aprovado com Ressalva',
+                                            'Mensagem de Emival'
                                         ].includes(slotProps.data.status.status)
                                     "
                                     @click.prevent="alterar(slotProps.data.id, slotProps.data.status)"
