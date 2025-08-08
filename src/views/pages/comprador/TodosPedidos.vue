@@ -420,6 +420,19 @@ export default {
                         this.showError('Ocorreu algum problema, entre em contato com o Administrador');
                     }
                 });
+            } else {
+                this.preloading = true;
+                this.pedidoService.respondePedidoReprovado(this.pdf, this.novaMensagem, this.idPedido).then((data) => {
+                    if (data.resposta == 'Mensagem enviada com sucesso!') {
+                        this.showSuccess('Mensagem enviada com sucesso!');
+                        this.displayChat = false;
+                        this.buscaPedidos();
+                        this.buscaInformacoes();
+                        this.novaMensagem = '';
+                    } else {
+                        this.showError('Ocorreu algum problema, entre em contato com o Administrador');
+                    }
+                });
             }
         }
     }
