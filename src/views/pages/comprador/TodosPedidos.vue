@@ -26,6 +26,7 @@ export default {
             confirm: new useConfirm(),
             loading1: ref(null),
             idPedido: ref(null),
+            id_usuario: ref(null),
             empresas: ref([]),
             empresa: ref([]),
             pedidos: ref(null),
@@ -42,6 +43,7 @@ export default {
             pdf: ref(null),
             pdfsrc: ref(null),
             conversa: ref(null),
+            comprador_especial: ref(false),
             customers: null,
             filters: {
                 global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -57,6 +59,10 @@ export default {
     },
 
     mounted: function () {
+        this.id_usuario = localStorage.getItem('usuario_id');
+
+        if (this.id_usuario == 2 || this.id_usuario == 11) this.comprador_especial = true;
+
         // Metódo responsável por buscar todas os pedidos
         this.pedidoService.buscaPedidosPorComprador(localStorage.getItem('usuario_id')).then((data) => {
             this.pedidos = data.pedidos.map((pedido) => ({
@@ -464,10 +470,11 @@ export default {
                     <hr />
                     <InputText
                         v-if="
-                            this.dadosPedidos.status.status != 'Reprovado' &&
-                            this.dadosPedidos.status.status != 'Correção Pendente' &&
-                            this.dadosPedidos.status.status != 'Mensagem de Emival' &&
-                            this.dadosPedidos.status.status != 'Aprovado com Ressalva'
+                            (this.dadosPedidos.status.status != 'Reprovado' &&
+                                this.dadosPedidos.status.status != 'Correção Pendente' &&
+                                this.dadosPedidos.status.status != 'Mensagem de Emival' &&
+                                this.dadosPedidos.status.status != 'Aprovado com Ressalva') ||
+                            this.comprador_especial == true
                         "
                         class="col-12"
                         type="text"
@@ -476,10 +483,11 @@ export default {
                     />
                     <Button
                         v-if="
-                            this.dadosPedidos.status.status != 'Reprovado' &&
-                            this.dadosPedidos.status.status != 'Correção Pendente' &&
-                            this.dadosPedidos.status.status != 'Mensagem de Emival' &&
-                            this.dadosPedidos.status.status != 'Aprovado com Ressalva'
+                            (this.dadosPedidos.status.status != 'Reprovado' &&
+                                this.dadosPedidos.status.status != 'Correção Pendente' &&
+                                this.dadosPedidos.status.status != 'Mensagem de Emival' &&
+                                this.dadosPedidos.status.status != 'Aprovado com Ressalva') ||
+                            this.comprador_especial == true
                         "
                         @click.prevent="enviarMensagem()"
                         label="Enviar"

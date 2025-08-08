@@ -374,6 +374,24 @@ export default class PedidoService {
             });
     }
 
+    async carregaMaisPedidos(id) {
+        return await fetch(`${API_URL}/pedidos/carrega-mais-pedidos/${id}`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
     // Requisição responsável por buscar pedidos com status 6
     async buscaAnalisando() {
         return await fetch(`${API_URL}/pedidos/listar-analise`, {
@@ -997,7 +1015,10 @@ export default class PedidoService {
             body: JSON.stringify({
                 dt_inicio: this.formatarDataParaYMD(form.dt_inicio),
                 dt_fim: this.formatarDataParaYMD(form.dt_fim),
-                numero_pedido: form?.numero_pedido
+                numero_pedido: form?.numero_pedido,
+                valor_min: form?.valor_min,
+                valor_max: form?.valor_max,
+                fornecedor: form?.fornecedor
             })
         })
             .then((res) => res.json())

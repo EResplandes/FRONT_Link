@@ -83,7 +83,7 @@ onBeforeUnmount(() => {
 });
 
 const logoUrl = computed(() => {
-    return `../../public/assets/img/logo_sem_fundo.png`;
+    return '../../';
 });
 
 const onTopBarMenuButton = () => {
@@ -171,7 +171,7 @@ const showSuccess = () => {
         </Dialog>
 
         <router-link to="/" class="layout-topbar-logo">
-            <img width="130" :src="logoUrl" alt="logo" />
+            <img width="130" src="../../public/assets/img/logo_sem_fundo.png" alt="logo" />
         </router-link>
 
         <button class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">

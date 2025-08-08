@@ -24,6 +24,7 @@ export default {
             loading1: ref(null),
             empresas: ref([]),
             pedidos: ref(null),
+            ultimoPedido: ref(null),
             status: ref(null),
             form: ref({}),
             editar: ref(false),
@@ -53,6 +54,8 @@ export default {
     mounted: function () {
         // Metódo responsável por buscar todas os pedidos
         this.pedidoService.buscaTodosPedidos().then((data) => {
+            this.ultimoPedido = data.ultimo_pedido;
+
             this.pedidos = data.pedidos.map((pedido) => ({
                 ...pedido,
                 dt_inclusao_formatada: this.formatarData(pedido.dt_inclusao),
@@ -60,6 +63,8 @@ export default {
             }));
             this.preloading = false;
             this.loading = false;
+
+            this.carregaMaisPedidos();
         });
 
         // Metódo responsável por buscar todas empresas
@@ -78,6 +83,20 @@ export default {
     },
 
     methods: {
+        async carregaMaisPedidos() {
+            this.pedidoService.carregaMaisPedidos(this.ultimoPedido.id).then((data) => {
+                this.pedidos = this.pedidos.concat(
+                    data.pedidos.map((pedido) => ({
+                        ...pedido,
+                        dt_inclusao_formatada: this.formatarData(pedido.dt_inclusao),
+                        valor_formatado: pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                    }))
+                );
+
+                this.showSuccess('Foram carregados mais 750 pedidos!');
+            });
+        },
+
         imprimirAutorizacao(data) {
             try {
                 generatePDF(data);
@@ -309,29 +328,37 @@ export default {
             <br />
 
             <div class="p-fluid formgrid grid justify-content-center">
-                <div class="field col-2 md:col-2">
-                    <label for="firstname2">Dt de Início</label>
-                    <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data'" v-model="form.dt_inicio" showIcon iconDisplay="input" />
-                </div>
-                <div class="field col-2 md:col-2">
-                    <label for="firstname2">Dt Fim</label>
-                    <Calendar dateFormat="dd/mm/yy" v-tooltip.top="'Selecione a data'" v-model="form.dt_fim" showIcon iconDisplay="input" />
-                </div>
-                <div class="field col-2 md:col-2">
+                <div class="field col-3">
                     <label for="firstname2">Nº Pedido</label>
                     <InputNumber v-tooltip.top="'Digite o número do pedido'" v-model="form.numero_pedido" showIcon iconDisplay="input" />
                 </div>
-                <div class="field col-2 md:col-2">
+
+                <div class="field col-3">
+                    <label for="firstname2">Fornecedor</label>
+                    <InputText v-model="form.fornecedor" showIcon iconDisplay="input" />
+                </div>
+
+                <div class="field col-3">
+                    <label for="firstname2">Valor Mínimo</label>
+                    <InputNumber v-model="form.valor_min" inputId="minmaxfraction" :minFractionDigits="2" :maxFractionDigits="2" />
+                </div>
+
+                <div class="field col-3">
+                    <label for="firstname2">Valor Maximo</label>
+                    <InputNumber v-model="form.valor_max" inputId="minmaxfraction" :minFractionDigits="2" :maxFractionDigits="2" />
+                </div>
+
+                <div class="field col-3 md:col-4">
                     <label style="color: white" for="firstname2">.</label><br />
                     <Button label="Pesquisar" @click.prevent="filtrar()" icon="pi pi-search" class="p-button-info" />
                 </div>
-                <div class="field col-2 md:col-2">
+                <div class="field col-2 md:col-4">
                     <label style="color: white" for="firstname2">.</label><br />
                     <Button label="Limpar Filtros" @click.prevent="buscaPedidos()" icon="pi pi-search" class="p-button-danger" />
                 </div>
             </div>
             <Divider></Divider>
-            <div style="margin-top: 10px" class="header-padrao">LISTAGEM DE TODOS PEDIDOS <br /><span style="font-size: 10px">( Limitado a os últimos 500 pedidos )</span></div>
+            <div style="margin-top: 10px" class="header-padrao">LISTAGEM DE TODOS PEDIDOS <br /><span style="font-size: 10px"></span></div>
             <br />
 
             <div class="card">
