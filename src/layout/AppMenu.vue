@@ -32,7 +32,7 @@ const model = ref([
     {
         label: 'Departamento Pessoal',
         items: [
-            { label: 'Pedidos com Emival', icon: 'pi pi-fw pi-users', to: '/pedidos-emival-dp', requiredRole: ['Comprador', 'Administrador', 'Comprador Externo'], requiredNome: ['Eduardo C. Resplandes', 'DP BRASÍLIA', 'DP'] },
+            { label: 'Pedidos com Emival', icon: 'pi pi-fw pi-users', to: '/pedidos-emival-dp', requiredRole: ['Comprador', 'Administrador', 'Gerente'], requiredNome: ['Eduardo C. Resplandes', 'DP BRASÍLIA', 'DP'] },
             {
                 label: 'Pedidos com Monica',
                 icon: 'pi pi-fw pi-book',
@@ -40,8 +40,8 @@ const model = ref([
                 requiredRole: ['Comprador', 'Administrador', 'Comprador Externo'],
                 requiredNome: ['DP BRASÍLIA', 'Eduardo C. Resplandes', 'DP', 'Soleni']
             },
-            { label: 'Justificar Pedidos', icon: 'pi pi-fw pi-book', to: '/justificar-pedidos-dp', requiredRole: ['Administrador', 'Comprador', 'Comprador Externo'], requiredNome: ['Eduardo C. Resplandes', 'DP BRASÍLIA', 'DP'] },
-            { label: 'Todos Pedidos', icon: 'pi pi-fw pi-book', to: '/todos-pedidos-dp', requiredRole: ['Administrador', 'Comprador', 'Comprador Externo', 'Gestor de Fluxo'], requiredNome: ['Eduardo C. Resplandes', 'DP BRASÍLIA', 'DP', 'Soleni'] }
+            { label: 'Justificar Pedidos', icon: 'pi pi-fw pi-book', to: '/justificar-pedidos-dp', requiredRole: ['Administrador', 'Comprador', 'Gerente'], requiredNome: ['Eduardo C. Resplandes', 'DP BRASÍLIA', 'DP'] },
+            { label: 'Todos Pedidos', icon: 'pi pi-fw pi-book', to: '/todos-pedidos-dp', requiredRole: ['Administrador', 'Comprador', 'Gerente', 'Gestor de Fluxo'], requiredNome: ['Eduardo C. Resplandes', 'DP BRASÍLIA', 'DP', 'Soleni'] }
         ]
     },
     // {

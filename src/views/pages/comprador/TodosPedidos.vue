@@ -70,7 +70,6 @@ export default {
                 dt_inclusao_formatada: this.formatarData(pedido.dt_inclusao),
                 valor_formatado: pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
             }));
-            console.log(this.pedidos);
             this.preloading = false;
             this.loading = false;
         });

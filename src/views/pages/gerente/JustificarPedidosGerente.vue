@@ -57,20 +57,22 @@ export default {
     mounted: function () {
         // Metódo responsável por buscar todas os pedidos
         this.gerenteService.buscaPedidosReprovadosRessalva(localStorage.getItem('usuario_id')).then((data) => {
-            this.pedidos = data.pedidos_com_fluxo.map((pedido) => ({
-                ...pedido,
-                dt_inclusao_formatada: this.formatarData(pedido.dt_inclusao),
-                valor_formatado: pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-            }));
+            this.pedidos = data.pedidos_com_fluxo
+                .filter((pedido) => pedido.compra_antecipada !== 'Sim')
+                .map((pedido) => ({
+                    ...pedido,
+                    dt_inclusao_formatada: this.formatarData(pedido.dt_inclusao),
+                    valor_formatado: pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                }));
 
-            this.pedidosSemFluxo = data.pedidos_sem_fluxo.map((pedido) => ({
-                ...pedido,
-                dt_inclusao_formatada: this.formatarData(pedido.dt_inclusao),
-                valor_formatado: pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-            }));
+            this.pedidosSemFluxo = data.pedidos_sem_fluxo
+                .filter((pedido) => pedido.compra_antecipada !== 'Sim')
+                .map((pedido) => ({
+                    ...pedido,
+                    dt_inclusao_formatada: this.formatarData(pedido.dt_inclusao),
+                    valor_formatado: pedido.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                }));
 
-            console.log(this.pedidosSemFluxo);
-            console.log(this.pedidos);
             this.preloading = false;
             this.loading = false;
         });
@@ -315,7 +317,10 @@ export default {
             this.pedidoService.enviarPedidoComprador(id_pedido).then((data) => {
                 if (data.resposta == 'Pedido enviado para comprador com sucesso!') {
                     this.showSuccess(data.resposta);
-                    this.buscaPedidos();
+                    this.pedidosSemFluxo.splice(
+                        this.pedidosSemFluxo.findIndex((pedido) => pedido.id === id_pedido),
+                        1
+                    );
                 } else {
                     this.showError(data.resposta);
                 }
